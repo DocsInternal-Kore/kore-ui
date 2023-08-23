@@ -126,7 +126,7 @@ public class ImageTemplateView extends LinearLayout
         vTheme.setVisibility(View.GONE);
 
         KaMediaUtils.updateExternalStorageState();
-        popupWindow = new PopupWindow(popUpView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
+        popupWindow = new PopupWindow(popUpView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 
         KoreEventCenter.register(this);
         sharedPreferences = getSharedPreferences();
@@ -137,14 +137,14 @@ public class ImageTemplateView extends LinearLayout
         leftDrawable.setStroke((int) (1*dp1), Color.parseColor(leftbgColor));
         llAttachment.setBackground(leftDrawable);
 
-        ivVideoMore.setOnClickListener(new View.OnClickListener() {
+        ivVideoMore.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.showAsDropDown(ivVideoMore, -250, -250);
             }
         });
 
-        ivAudioMore.setOnClickListener(new View.OnClickListener() {
+        ivAudioMore.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.showAsDropDown(ivAudioMore, -250, -250);
@@ -315,7 +315,7 @@ public class ImageTemplateView extends LinearLayout
                         }
                     });
 
-                    tvTheme1.setOnClickListener(new View.OnClickListener()
+                    tvTheme1.setOnClickListener(new OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
@@ -448,7 +448,7 @@ public class ImageTemplateView extends LinearLayout
                         }
                     });
 
-                    tvTheme1.setOnClickListener(new View.OnClickListener()
+                    tvTheme1.setOnClickListener(new OnClickListener()
                     {
                         @Override
                         public void onClick(View v)

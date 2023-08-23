@@ -26,7 +26,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -41,7 +40,6 @@ import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -119,6 +117,7 @@ import kore.botssdk.utils.BitmapUtils;
 import kore.botssdk.utils.BundleConstants;
 import kore.botssdk.utils.KaMediaUtils;
 import kore.botssdk.utils.KaPermissionsHelper;
+import kore.botssdk.utils.LogUtils;
 import kore.botssdk.utils.SharedPreferenceUtils;
 import kore.botssdk.utils.ToastUtils;
 import kore.botssdk.utils.Utility;
@@ -198,7 +197,6 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
         toggleTTSButton();
         initialSetUp();
         keyboard_img.performClick();
-//        KoreEventCenter.register(this);
         return view;
     }
 
@@ -321,7 +319,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                 editTextMessage.setText("");
             }*/
         } else {
-            Log.e(LOG_TAG, "ComposeFooterInterface is not found. Please set the interface first.");
+            LogUtils.e(LOG_TAG, "ComposeFooterInterface is not found. Please set the interface first.");
         }
     }
 
@@ -330,7 +328,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
         if (composeFooterInterface != null) {
             composeFooterInterface.onSendClick(message.trim(),dataList, false);
         } else {
-            Log.e(LOG_TAG, "ComposeFooterInterface is not found. Please set the interface first.");
+            LogUtils.e(LOG_TAG, "ComposeFooterInterface is not found. Please set the interface first.");
         }
     }
 
@@ -439,12 +437,8 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
     View.OnClickListener keyboardIconClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
                 animateLayoutVisible(mainContentLayout);
-//                animateLayoutVisible(newMenuLogo);
                 animateLayoutGone(defaultFooterLayout);
-                editTextMessage.requestFocus();
-                Utility.showVirtualKeyboard(getActivity(),editTextMessage);
         }
     };
 
@@ -519,10 +513,8 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
     }*/
 
     private void requestMicrophonePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            AppPermissionsHelper.requestForPermission(getActivity(), new String[]{
-                    Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
-        }
+        AppPermissionsHelper.requestForPermission(requireActivity(), new String[]{
+                Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
     }
 
     @Override
@@ -530,9 +522,6 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_RECORD_AUDIO && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//            rec_audio_img.setImageResource(R.drawable.mic_btn_active);
-//            mRecordingThread.startRecording();
-//            editTextMessage.setHint("Start talking...");
             onRecordAudioPermissionGranted();
         }
     }
@@ -594,14 +583,10 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
         if (Speech.getInstance().isListening()) {
             Speech.getInstance().stopListening();
         } else {
-            if (Build.VERSION.SDK_INT >= 23) {
-                if (checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) == PermissionChecker.PERMISSION_GRANTED) {
-                    onRecordAudioPermissionGranted();
-                } else {
-                    requestMicrophonePermission();
-                }
-            } else {
+            if (checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) == PermissionChecker.PERMISSION_GRANTED) {
                 onRecordAudioPermissionGranted();
+            } else {
+                requestMicrophonePermission();
             }
         }
     }
@@ -658,7 +643,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                 composeFooterInterface.onSendClick(result,false);
                 editTextMessage.setText("");
             } else {
-                Log.e(LOG_TAG, "ComposeFooterInterface is not found. Please set the interface first.");
+                LogUtils.e(LOG_TAG, "ComposeFooterInterface is not found. Please set the interface first.");
             }
             /*else {
             Speech.getInstance().say(result);
@@ -734,19 +719,19 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
 
     private void launchSelectedMode(int position) {
         switch (position) {
-            case 0:
+            case 4:
                 fileBrowsingActivity(BundleConstants.CHOOSE_TYPE_CAMERA, REQ_CAMERA, BundleConstants.MEDIA_TYPE_IMAGE);
                 break;
-            case 1:
+            case 0:
                 fileBrowsingActivity(BundleConstants.CHOOSE_TYPE_GALLERY, REQ_IMAGE, BundleConstants.MEDIA_TYPE_IMAGE);
                 break;
-            case 2:
+            case 3:
                 launchVideoRecorder();
                 break;
-            case 3:
+            case 1:
                 fileBrowsingActivity(BundleConstants.CHOOSE_TYPE_VIDEO_GALLERY, REQ_VIDEO, BundleConstants.MEDIA_TYPE_VIDEO);
                 break;
-            case 4:
+            case 2:
                 fileBrowsingActivity(BundleConstants.CHOOSE_TYPE_FILE, REQ_FILE, BundleConstants.MEDIA_TYPE_DOCUMENT);
                 break;
 
@@ -796,13 +781,9 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
         try {
             File actualImageFile = KaMediaUtils.getOutputMediaFile(BundleConstants.MEDIA_TYPE_VIDEO, null);
             Uri uri;
-            if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                cameraVideoUri1 = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", actualImageFile);
-            } else {
-                cameraVideoUri1 = Uri.fromFile(actualImageFile);
-            }
+            cameraVideoUri1 = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", actualImageFile);
 
-            Log.d(LOG_TAG, "actual file image path" + actualImageFile);
+            LogUtils.d(LOG_TAG, "actual file image path" + actualImageFile);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -817,19 +798,13 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
 
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
-                Log.e("Camera", "Oops! Failed create "
+                LogUtils.e("Camera", "Oops! Failed create "
                         + "Camera" + " directory");
                 return null;
             }
         }
         File mediaFile = new File(mediaStorageDir.getPath() + File.separator
                 + videoFileName + "." + "mp4");
-
-        /*File image = File.createTempFile(
-                videoFileName,  *//* prefix *//*
-                ".mp4",         *//* suffix *//*
-                storageDir      *//* directory *//*
-        );*/
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = mediaFile.getAbsolutePath();
@@ -842,17 +817,10 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
         photoPickerIntent.putExtra("fileContext", BundleConstants.FOR_MESSAGE);
         photoPickerIntent.putExtra("mediaType", mediaType);
 
-        switch (reqCode)
-        {
-            case REQ_CAMERA:
-            case REQ_IMAGE:
-                activityImageResultLaunch.launch(photoPickerIntent);
-            break;
-            case REQ_VIDEO:
-                activityVideoResultLaunch.launch(photoPickerIntent);
-                break;
-            default:
-                startActivityForResult(photoPickerIntent, reqCode);
+        if (reqCode == REQ_VIDEO) {
+            activityVideoResultLaunch.launch(photoPickerIntent);
+        } else {
+            activityImageResultLaunch.launch(photoPickerIntent);
         }
     }
 
@@ -867,7 +835,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                         String filePath = result.getData().getStringExtra("filePath");
                         String fileName = result.getData().getStringExtra("fileName");
                         String filePathThumbnail = result.getData().getStringExtra(THUMBNAIL_FILE_PATH);
-                        ((BotChatActivity) getActivity()).sendImage(filePath, fileName, filePathThumbnail);
+                        ((BotChatActivity) requireActivity()).sendImage(filePath, fileName, filePathThumbnail);
                     }
                 }
             });
@@ -909,7 +877,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
             String filePath = data.getStringExtra("filePath");
             String fileName = data.getStringExtra("fileName");
             String filePathThumbnail = data.getStringExtra(THUMBNAIL_FILE_PATH);
-            ((BotChatActivity) getActivity()).sendImage(filePath, fileName, filePathThumbnail);
+            ((BotChatActivity) requireActivity()).sendImage(filePath, fileName, filePathThumbnail);
           /*  String filePath = data.getStringExtra("filePath");
             String fileName = data.getStringExtra("fileName");
             String filePathThumbnail = data.getStringExtra(THUMBNAIL_FILE_PATH);
@@ -930,15 +898,10 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                 // ensuring a 100 millisecond delay so that thumbnail image name is different than the camera captured image name
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                Log.e(LOG_TAG, "onActivityResult() - Excep: = " + e.getMessage(), e);
+                LogUtils.e(LOG_TAG, "onActivityResult() - Excep: = " + e.getMessage());
             }
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                String path = mCurrentPhotoPath;
-                cameraVideoUri1 = Uri.parse(path);
-            } else {
-//                path = cameraVideoUri1.getPath();
-            }
-//            cameraVideoUri1 = Uri.parse(data.getStringExtra("uriString"));
+            String path = mCurrentPhotoPath;
+            cameraVideoUri1 = Uri.parse(path);
             processVideoResponse(cameraVideoUri1, true, data);
         } else if (reqCode == REQ_FILE && resCode == RESULT_OK) {
             String fileExtn = data.getStringExtra("fileExtn");
@@ -1034,7 +997,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                     // compress the image
                     File _file = new File(filePath);
 
-                    Log.d(LOG_TAG, " file.exists() ---------------------------------------- " + _file.exists());
+                    LogUtils.d(LOG_TAG, " file.exists() ---------------------------------------- " + _file.exists());
                     fOut = new FileOutputStream(_file);
 
                     thePic.compress(Bitmap.CompressFormat.JPEG, compressQualityInt, fOut);
@@ -1042,7 +1005,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                     orientation = thePic.getWidth() > thePic.getHeight() ? BitmapUtils.ORIENTATION_LS : BitmapUtils.ORIENTATION_PT;
                     fOut.flush();
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, e.toString());
+                    LogUtils.e(LOG_TAG, e.toString());
                 }
                 finally {
                     try {
@@ -1189,7 +1152,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
 
         @Override
         protected String doInBackground(String... params) {
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_MORE_FAVORABLE);
+            Process.setThreadPriority(Process.THREAD_PRIORITY_MORE_FAVORABLE);
             if (filePath != null && mContext.get() != null) {
 //                    compressImage(filePath);
                 FileOutputStream fOut = null;
@@ -1206,7 +1169,7 @@ public class ComposeFooterFragment extends Fragment implements ComposeFooterUpda
                     }
                     out.flush();
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, e.toString());
+                    LogUtils.e(LOG_TAG, e.toString());
                     return null;
                 } finally {
                     if (fOut != null) {

@@ -229,7 +229,7 @@ public class ListWidgetAdapter extends RecyclerView.Adapter implements RecyclerV
 
         } else {
 
-            final ListWidgetAdapter.ViewHolder holder = (ListWidgetAdapter.ViewHolder) holderData;
+            final ViewHolder holder = (ViewHolder) holderData;
             final WidgetListElementModel model = items.get(position);
 
             if (StringUtils.isNullOrEmpty(model.getTitle())) {

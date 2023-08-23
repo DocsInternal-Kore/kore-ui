@@ -25,16 +25,11 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.util.Log;
 import android.view.OrientationEventListener;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import java.io.ByteArrayOutputStream;
@@ -61,6 +56,7 @@ import kore.botssdk.utils.BitmapUtils;
 import kore.botssdk.utils.BundleConstants;
 import kore.botssdk.utils.KaMediaUtils;
 import kore.botssdk.utils.KaPermissionsHelper;
+import kore.botssdk.utils.LogUtils;
 
 
 /**
@@ -103,9 +99,9 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             imagePickType = extras.getString(BundleConstants.PICK_TYPE);
-            Log.d(LOG_TAG, "onCreate() :: extras :: imagePickType ::::" + imagePickType);
+            LogUtils.d(LOG_TAG, "onCreate() :: extras :: imagePickType ::::" + imagePickType);
             fileContext = extras.getString(BundleConstants.FILE_CONTEXT);
-            Log.d(LOG_TAG, "onCreate() :: extras :: fileContext ::::" + fileContext);
+            LogUtils.d(LOG_TAG, "onCreate() :: extras :: fileContext ::::" + fileContext);
             MEDIA_TYPE = extras.containsKey("mediaType") ? extras.getString("mediaType") : MEDIA_TYPE_IMAGE;
         }
 
@@ -115,11 +111,19 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
     private void checkForPermissionAccessAndRequest() {
         if (CHOOSE_TYPE_CAMERA.equalsIgnoreCase(imagePickType)) {
 
-            if (KaPermissionsHelper.hasPermission(this,Manifest.permission.CAMERA,Manifest.permission.READ_MEDIA_IMAGES)) {
+            if (KaPermissionsHelper.hasPermission(this,Manifest.permission.READ_MEDIA_IMAGES)) {
                 openImageIntent(imagePickType);
             } else {
-                KaPermissionsHelper.requestForPermission(this, CAPTURE_IMAGE_BUNDLED_PREMISSION_REQUEST,
-                        Manifest.permission.CAMERA);
+                if(Build.VERSION.SDK_INT >= 33)
+                {
+                    KaPermissionsHelper.requestForPermission(this, CAPTURE_IMAGE_BUNDLED_PREMISSION_REQUEST,
+                            Manifest.permission.READ_MEDIA_IMAGES);
+                }
+                else
+                {
+                    KaPermissionsHelper.requestForPermission(this, CAPTURE_IMAGE_BUNDLED_PREMISSION_REQUEST,
+                            Manifest.permission.READ_EXTERNAL_STORAGE);
+                }
             }
         } else if (CHOOSE_TYPE_IMAGE_VIDEO.equalsIgnoreCase(imagePickType) ||
                 CHOOSE_TYPE_GALLERY.equalsIgnoreCase(imagePickType) ||
@@ -156,7 +160,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
                 }
             }
         } else {
-            Log.e(LOG_TAG, "no pickType found. Please assign one and invoke this activity, again.");
+            LogUtils.e(LOG_TAG, "no pickType found. Please assign one and invoke this activity, again.");
         }
 
     }
@@ -171,7 +175,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         } else if (CHOOSE_TYPE_FILE.equalsIgnoreCase(imagePickType)) {
             return Build.VERSION.SDK_INT >= 33 ? KaPermissionsHelper.hasPermission(this, Manifest.permission.READ_MEDIA_IMAGES) : KaPermissionsHelper.hasPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE);
         } else {
-            Log.e(LOG_TAG, "no pickType found. Please assign one and invoke this activity, again.");
+            LogUtils.e(LOG_TAG, "no pickType found. Please assign one and invoke this activity, again.");
             return false;
         }
     }
@@ -327,8 +331,10 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
                         File file = null;
                         try {
                             file = KaMediaUtils.getOutputMediaFile(KoreMedia.MEDIA_TYPE_VIDEO, null);
-                        } catch (NoExternalStorageException | NoWriteAccessException e) {
+                        } catch (NoExternalStorageException e) {
                             e.printStackTrace();
+                        } catch (NoWriteAccessException e) {
+                            throw new RuntimeException(e);
                         }
                         if (file != null) MEDIA_FILE_PATH = file.getAbsolutePath();
 
@@ -383,7 +389,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
                             !CHOOSE_TYPE_GALLERY.equalsIgnoreCase(imagePickType) &&
                             !CHOOSE_TYPE_VIDEO_GALLERY.equalsIgnoreCase((imagePickType)) &&
                             !CHOOSE_TYPE_FILE.equalsIgnoreCase(imagePickType)) {
-                                Log.e(LOG_TAG, "no pickType found. Please assign one and invoke this activity, again.");
+                                LogUtils.e(LOG_TAG, "no pickType found. Please assign one and invoke this activity, again.");
                             }
                 }
             } else {
@@ -401,11 +407,10 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
     {
         String filepath = "";
         File file;
-        if (uri.getScheme().compareTo("content") == 0)
+        if (Objects.requireNonNull(uri.getScheme()).compareTo("content") == 0)
         {
-            Cursor cursor = context.getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA, MediaStore.Images.Media.ORIENTATION }, null, null, null);
+            Cursor cursor = context.getContentResolver().query(uri, new String[] { MediaStore.Images.ImageColumns.DATA, MediaStore.Images.Media.ORIENTATION }, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-
             cursor.moveToFirst();
 
             String mImagePath = cursor.getString(column_index);
@@ -444,7 +449,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
             SharedPreferences preferences = getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
             preferences.edit().putString("filestorageuri", result.getData().getData().toString()).apply();
         } else {
-            Log.e("FileUtility", "Some Error Occurred : " + result);
+            LogUtils.e("FileUtility", "Some Error Occurred : " + result);
         }
     }
 
@@ -551,7 +556,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         try {
             Bitmap highResBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri); //Todo: OOM encountered over here
             Bitmap bitmapPic = BitmapUtils.getScaledBitmap(highResBitmap);
-            Log.d(LOG_TAG, "getImageForGalleryFooter() :: ***** picture height ::" + bitmapPic.getHeight() + " and width::" + bitmapPic.getWidth());
+            LogUtils.d(LOG_TAG, "getImageForGalleryFooter() :: ***** picture height ::" + bitmapPic.getHeight() + " and width::" + bitmapPic.getWidth());
             String fileName = null;
             try{
                 Cursor returnCursor =
@@ -569,7 +574,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
             fOut.flush();
 
             MEDIA_FILE_PATH = file.getAbsolutePath();
-            Log.d(LOG_TAG, " file absolute path::" + MEDIA_FILE_PATH);
+            LogUtils.d(LOG_TAG, " file absolute path::" + MEDIA_FILE_PATH);
 
             MEDIA_FILENAME = MEDIA_FILE_PATH.substring(MEDIA_FILE_PATH.lastIndexOf("/") + 1);
             MEDIA_FILENAME = MEDIA_FILENAME.substring(0, MEDIA_FILENAME.lastIndexOf("."));
@@ -608,10 +613,10 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         path = mCurrentPhotoPath;
         File file = new File(path);
 
-        Log.d(LOG_TAG, "real image path  " + path);
+        LogUtils.d(LOG_TAG, "real image path  " + path);
 
         MEDIA_FILE_PATH = file.getAbsolutePath();
-        Log.d(LOG_TAG, "getFullImage() :: full image file absolute path::" + MEDIA_FILE_PATH);
+        LogUtils.d(LOG_TAG, "getFullImage() :: full image file absolute path::" + MEDIA_FILE_PATH);
 
         Bitmap thePic = BitmapUtils.decodeBitmapFromFile(file, 800, 600);
         OutputStream fOut = null;
@@ -620,14 +625,14 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
             // compress the image
             File _file = new File(MEDIA_FILE_PATH);
 
-            Log.d(LOG_TAG, "getFullImage() :: file.exists() ---------------------------------------- " + _file.exists());
+            LogUtils.d(LOG_TAG, "getFullImage() :: file.exists() ---------------------------------------- " + _file.exists());
             fOut = new FileOutputStream(_file);
 
             thePic.compress(Bitmap.CompressFormat.JPEG, compressQualityInt, fOut);
             fOut.flush();
             thePic = rotateIfNecessary(file.getAbsolutePath(), thePic);
         } catch (Exception e) {
-            Log.e(LOG_TAG, e.toString());
+            LogUtils.e(LOG_TAG, e.toString());
         }
         finally {
             try {
@@ -660,7 +665,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         if (cameraImgUri != null) {
             outState.putParcelable("uri", cameraImgUri);
-            Log.d(LOG_TAG, "onSaveInstanceState() :: +++++++On Save Instance " + cameraImgUri.getPath());
+            LogUtils.d(LOG_TAG, "onSaveInstanceState() :: +++++++On Save Instance " + cameraImgUri.getPath());
         }
         super.onSaveInstanceState(outState);
     }
@@ -680,14 +685,14 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         int original_W = finalMap.getWidth();
         int target_W = 0;
         int target_H = 0;
-        Log.d(LOG_TAG, "createImageThumbnail() :: original height" + original_H);
-        Log.d(LOG_TAG, "createImageThumbnail() :: original width" + original_W);
+        LogUtils.d(LOG_TAG, "createImageThumbnail() :: original height" + original_H);
+        LogUtils.d(LOG_TAG, "createImageThumbnail() :: original width" + original_W);
 
         try {
             ExifInterface fullImageExif = new ExifInterface(filePath);
             originalOrien = fullImageExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
 
-            Log.d(LOG_TAG, "createImageThumbnail() :: Original image orientation" + originalOrien);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: Original image orientation" + originalOrien);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -695,28 +700,28 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         if (!NORMAL_PORTRAIT) {
             target_W = THUMBNAIL_WIDTH;
             target_H = (target_W * original_H) / original_W;
-            Log.d(LOG_TAG, "createImageThumbnail() :: calculated thumbnail height for landscape mode" + target_H + "and width is" + target_W);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: calculated thumbnail height for landscape mode" + target_H + "and width is" + target_W);
         } else {
             target_H = THUMNAIL_HEIGHT;
             target_W = (target_H * original_W) / original_H;
-            Log.d(LOG_TAG, "createImageThumbnail() :: calculated thumbnail width for portrait mode: width " + target_W + "and height " + target_H);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: calculated thumbnail width for portrait mode: width " + target_W + "and height " + target_H);
         }
 
         if (originalOrien == ExifInterface.ORIENTATION_ROTATE_180) {
             degrees = 180;
-            Log.d(LOG_TAG, "createImageThumbnail() :: rotating thumbnail by " + degrees);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: rotating thumbnail by " + degrees);
 
 
         } else if (originalOrien == ExifInterface.ORIENTATION_ROTATE_90) {
             degrees = 90;
-            Log.d(LOG_TAG, "createImageThumbnail() :: rotating thumbnail by " + degrees);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: rotating thumbnail by " + degrees);
 
         } else if (originalOrien == ExifInterface.ORIENTATION_ROTATE_270) {
             degrees = 270;
-            Log.d(LOG_TAG, "createImageThumbnail() :: rotating thumbnail by " + degrees);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: rotating thumbnail by " + degrees);
 
         }
-        Log.d(LOG_TAG, "createImageThumbnail() :: Thumbnail rotation is " + degrees);
+        LogUtils.d(LOG_TAG, "createImageThumbnail() :: Thumbnail rotation is " + degrees);
 
         Matrix matrix = new Matrix();
         matrix.postRotate(degrees);
@@ -726,16 +731,16 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
         FileOutputStream out = null;
         try {
 
-            Log.d(LOG_TAG, "createImageThumbnail() :: target width" + target_W);
-            Log.d(LOG_TAG, "createImageThumbnail() :: target height" + target_H);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: target width" + target_W);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: target height" + target_H);
 
             int ind = filePath.lastIndexOf(".");
             thumbnailFilePath = filePath.substring(0, ind) + "_th.png";
 
-            Log.d(LOG_TAG, "createImageThumbnail() :: thumbNailPath:::::::::::::" + thumbnailFilePath);
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: thumbNailPath:::::::::::::" + thumbnailFilePath);
 
             File thumbNailfile = new File(thumbnailFilePath);//MediaUtil.getOutputMediaFile(AppConstants.MEDIA_TYPE_IMAGE);
-            Log.d(LOG_TAG, "createImageThumbnail() :: thumbnailFileName & path::::::::::::::" + thumbNailfile.getAbsolutePath());
+            LogUtils.d(LOG_TAG, "createImageThumbnail() :: thumbnailFileName & path::::::::::::::" + thumbNailfile.getAbsolutePath());
 
             out = new FileOutputStream(thumbNailfile);
             extBitmap.compress(Bitmap.CompressFormat.PNG, compressQualityInt, out);
@@ -744,7 +749,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
 
         } catch (Exception ee) {
             ee.printStackTrace();
-            Log.e(LOG_TAG, "Error while create Image Thumbnail" + ee);
+            LogUtils.e(LOG_TAG, "Error while create Image Thumbnail" + ee);
         } finally {
             scaledBitmap.recycle();
             if (extBitmap != null) {
@@ -853,6 +858,7 @@ public class KaCaptureImageActivity extends KaAppCompatActivity implements KoreM
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finishAndCancelOperation();
     }
 

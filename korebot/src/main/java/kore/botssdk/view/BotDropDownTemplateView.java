@@ -83,8 +83,8 @@ public class BotDropDownTemplateView extends LinearLayout {
 
         dp1 = (int) DimensionUtil.dp1;
         selectionCurrent = snrSplitList.getSelectedItemPosition();
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int width = LayoutParams.WRAP_CONTENT;
+        int height = LayoutParams.WRAP_CONTENT;
         boolean focusable = true;
         popUpView = LayoutInflater.from(mContext).inflate(R.layout.theme_change_layout, null);
         popupWindow = new PopupWindow(popUpView, width, height, focusable);

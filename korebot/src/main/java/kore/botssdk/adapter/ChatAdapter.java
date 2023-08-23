@@ -127,18 +127,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
         if(headersMap.isEmpty()) {
             prepareHeaderMap();
         }
-        //TODO Need to re visit : Handled crash in a bad way(if you change time zone and come back app crashing)
         boolean fDate = false;
         try {
-            fDate = headersMap.get(getItem(position).getFormattedDate()) == position;
+            fDate = headersMap.get(getItem(holder.getBindingAdapterPosition()).getFormattedDate()) == holder.getBindingAdapterPosition();
         }catch (Exception e){
             e.printStackTrace();
         }
-        holder.headerView.setVisibility(getItem(position) != null && fDate ? View.VISIBLE : View.GONE);
-        if(selectedItem == position){
+        holder.headerView.setVisibility(getItem(holder.getBindingAdapterPosition()) != null && fDate ? View.VISIBLE : View.GONE);
+        if(selectedItem == holder.getBindingAdapterPosition()){
             holder.baseBubbleLayout.setTimeStampVisible();
         }
-        if(getItemViewType(position) == BUBBLE_RIGHT_LAYOUT) {
+        if(getItemViewType(holder.getBindingAdapterPosition()) == BUBBLE_RIGHT_LAYOUT) {
             holder.baseBubbleLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -154,7 +153,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
                 @Override
                 public void onClick(View v) {
                     BotRequest botRequest = (BotRequest) getItem(holder.getBindingAdapterPosition());
-//                    if(composeFooterInterface != null)  composeFooterInterface.copyMessageToComposer(botRequest.getMessage().getBody(), false);
+                    if(composeFooterInterface != null)  composeFooterInterface.copyMessageToComposer(botRequest.getMessage().getBody(), false);
                 }
             });
         }

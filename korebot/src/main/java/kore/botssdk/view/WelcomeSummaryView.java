@@ -26,6 +26,7 @@ import kore.botssdk.models.BotCaourselButtonModel;
 import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.ContactViewListModel;
 import kore.botssdk.models.KnowledgeCollectionModel;
+import kore.botssdk.models.QuickRepliesPayloadModel;
 import kore.botssdk.models.Weather;
 import kore.botssdk.models.WelcomeChatSummaryModel;
 import kore.botssdk.models.WelcomeSummaryModel;
@@ -65,7 +66,7 @@ public class WelcomeSummaryView extends ViewGroup implements VerticalListViewAct
     }
 
     public void populateData(final WelcomeSummaryModel welcomeSummaryModel, boolean isEnabled) {
-        if (welcomeSummaryModel != null) {
+        if(welcomeSummaryModel != null){
             welcomeChatSummaryViewBinding.getRoot().setVisibility(VISIBLE);
             welcomeChatSummaryViewBinding.getRoot().setEnabled(isEnabled);
             welcomeChatSummaryViewBinding.getRoot().setClickable(isEnabled);
@@ -73,8 +74,8 @@ public class WelcomeSummaryView extends ViewGroup implements VerticalListViewAct
 
             ArrayList<WelcomeChatSummaryModel> list = new ArrayList<WelcomeChatSummaryModel>();
 
-            if (welcomeSummaryModel != null && welcomeSummaryModel.getActionItems() != null && welcomeSummaryModel.getActionItems().size() > 0) {
-                for (ActionItem actItem : welcomeSummaryModel.getActionItems()) {
+            if(welcomeSummaryModel!=null && welcomeSummaryModel.getActionItems()!=null && welcomeSummaryModel.getActionItems().size()>0){
+                for(ActionItem actItem : welcomeSummaryModel.getActionItems()){
                     WelcomeChatSummaryModel mdl = new WelcomeChatSummaryModel();
                     mdl.setSummary(actItem.getTitle());
                     mdl.setType(actItem.getType());
@@ -83,14 +84,15 @@ public class WelcomeSummaryView extends ViewGroup implements VerticalListViewAct
                     list.add(mdl);
                 }
             }
-            if (welcomeSummaryModel.getWeather() != null)
+            if(welcomeSummaryModel.getWeather() != null)
                 bindWeatherInfo(welcomeSummaryModel.getWeather());
+
 
             myRecyclerViewAdapter.setData(list);
             myRecyclerViewAdapter.setEnabled(isEnabled);
 
 
-        } else {
+        }else{
             welcomeChatSummaryViewBinding.getRoot().setVisibility(GONE);
             welcomeChatSummaryViewBinding.setWelcomeSummaryInfo(null);
             welcomeChatSummaryViewBinding.getRoot().setEnabled(isEnabled);
@@ -117,9 +119,9 @@ public class WelcomeSummaryView extends ViewGroup implements VerticalListViewAct
             }
         });
 
-        if (isWeatherDesc) {
+        if(isWeatherDesc) {
             welcomeChatSummaryViewBinding.tvWetherType.setText(weather.getDesc());
-        } else {
+        }else{
             welcomeChatSummaryViewBinding.tvWetherType.setText(weather.getTemp());
         }
     }
@@ -130,7 +132,7 @@ public class WelcomeSummaryView extends ViewGroup implements VerticalListViewAct
         dp1 = (int) DimensionUtil.dp1;
         welcomeChatSummaryViewBinding.setViewBase(this);
 
-        welcomeChatSummaryList = ((RecyclerView) findViewById(R.id.weather_chat_LV));
+        welcomeChatSummaryList = ((RecyclerView)findViewById(R.id.weather_chat_LV));
         myRecyclerViewAdapter = new WelcomeSummaryRecyclerAdapter(getContext());
         myRecyclerViewAdapter.setExpanded(false);
         myRecyclerViewAdapter.setVerticalListViewActionHelper(this);
@@ -232,29 +234,45 @@ public class WelcomeSummaryView extends ViewGroup implements VerticalListViewAct
 
     @Override
     public void welcomeSummaryItemClick(final WelcomeChatSummaryModel model) {
-        if (!StringUtils.isNullOrEmpty(model.getType()) && model.getType().equals("postback") && !StringUtils.isNullOrEmpty(model.getPayload())) {
-            if (Utility.checkIsSkillKora()) {
-                if (composeFooterInterface != null)
-                    composeFooterInterface.onSendClick(model.getPayload(), true);
-            } else {
-                DialogCaller.showDialog(context, null, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (composeFooterInterface != null)
-                            composeFooterInterface.onSendClick(Constants.SKILL_UTTERANCE + model.getPayload(), true);
-                        dialog.dismiss();
-                    }
-                });
+            if(!StringUtils.isNullOrEmpty(model.getType())&& model.getType().equals("postback") && model.getPayload() != null){
+                if (Utility.checkIsSkillKora()) {
+                    if(composeFooterInterface != null) {
+                        String quickReplyPayload = null;
+                        try {
+                            quickReplyPayload = (String) model.getPayload();
+                        }catch (Exception e)
+                        {
+                            try {
+                                QuickRepliesPayloadModel quickRepliesPayloadModel = (QuickRepliesPayloadModel) model.getPayload();
+                                quickReplyPayload = quickRepliesPayloadModel.getName();
+                            }
+                            catch (Exception exception)
+                            {
+                                quickReplyPayload = "";
+                            }
+                        }
 
-            }
+                        composeFooterInterface.onSendClick(quickReplyPayload, true);
+                    }
+                } else {
+                        DialogCaller.showDialog(context, null, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if(composeFooterInterface != null)
+                                    composeFooterInterface.onSendClick(Constants.SKILL_UTTERANCE+model.getPayload(),true);
+                                dialog.dismiss();
+                            }
+                        });
+
+                }
 
                 /*if(composeFooterInterface != null)
                     composeFooterInterface.onSendClick(model.getPayload(),true);*/
 
-        } else if (!StringUtils.isNullOrEmpty(model.getType()) && model.getType().equals("open_form")) {
-            if (composeFooterInterface != null)
-                composeFooterInterface.launchActivityWithBundle(BotResponse.WELCOME_SUMMARY_VIEW_NOTIFICAION, null);
-        }
+            }else if(!StringUtils.isNullOrEmpty(model.getType())&& model.getType().equals("open_form")){
+                if(composeFooterInterface != null)
+                    composeFooterInterface.launchActivityWithBundle(BotResponse.WELCOME_SUMMARY_VIEW_NOTIFICAION,null);
+            }
     }
 
     @Override

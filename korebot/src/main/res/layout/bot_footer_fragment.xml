@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:ripple="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
@@ -221,15 +219,17 @@
                         android:layout_gravity="center_vertical"
                         android:alpha="0.70"
                         android:padding="5dp"
-                        android:src="@drawable/ic_mic" />
+                        android:src="@drawable/ic_mic"
+                        android:visibility="visible" />
 
                     <ImageView
                         android:id="@+id/attachemnt"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="center_vertical"
                         android:padding="8dp"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         app:srcCompat="@drawable/attachment_comp" />
 
                     <ImageView
@@ -240,7 +240,7 @@
                         android:alpha="0.70"
                         android:padding="5dp"
                         android:src="@drawable/ic_volume_up_black_24dp"
-                        tools:ignore="ContentDescription" />
+                        android:visibility="visible" />
 
                 </LinearLayout>
 

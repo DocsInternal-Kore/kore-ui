@@ -127,7 +127,7 @@ public class BotContentFragment extends Fragment implements BotContentFragmentUp
     private View popUpView;
     private TextView tvChaseTitle;
     private String jwt;
-    private String dateformat = "M-DD-YYYY";
+    private String pattern = "M-DD-YYYY";
 
     @Nullable
     @Override
@@ -164,10 +164,6 @@ public class BotContentFragment extends Fragment implements BotContentFragmentUp
         ivChaseLogo = view.findViewById(R.id.ivChaseLogo);
         tvChaseTitle = view.findViewById(R.id.tvChaseTitle);
         headerView.setVisibility(View.GONE);
-
-        botsBubblesListView.getRecycledViewPool().setMaxRecycledViews(0,0);
-        botsBubblesListView.setItemViewCacheSize(100);
-
         tvChaseTitle.setText(Html.fromHtml(Client.bot_name));
         sharedPreferences = getActivity().getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -714,7 +710,7 @@ public class BotContentFragment extends Fragment implements BotContentFragmentUp
 
     private Date stringToDate(String aDate,String aFormat) {
 
-        SimpleDateFormat format = new SimpleDateFormat(dateformat);
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
         try
         {
             Date date = format.parse(aDate);

@@ -3,6 +3,11 @@
     <!--<color name="colorAccent">#2f91e5</color>--><!-- HSBC - #db0012, BMC Helix - #2f91e5 -->
     <color name="bgBlueSignup">#3F51B5</color>
     <color name="bgLightBlue">#9fa8da</color>
+    <color name="color_hint_composer">#dfe2e7</color>
+    <color name="background_tab_pressed">#efeffc</color>
+    <color name="bgBlueSignupAlpha">#503942f6</color>
+    <color name="color_c8c8c8">#c8c8c8</color>
+    <color name="color_blue_1_1">#0076FF</color>
 
 <!--    General Theme-->
     <color name="colorPrimaryKa">#3F51B5</color>
@@ -162,6 +167,7 @@
 
     <color name="color_626281">#3e3e51</color>
     <color name="transparent_widget">#40000000</color>
+    <color name="transparent">#00000000</color>
     <color name="transparent_card">#E0FFFFFF</color>
     <color name="color_728296">#485260</color>
     <color name="color_626281_widget">#3e3e51</color>
