@@ -13,7 +13,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/korebot" />
-            <option value="$PROJECT_DIR$/korebotsdklib" />
           </set>
         </option>
       </GradleProjectSettings>
