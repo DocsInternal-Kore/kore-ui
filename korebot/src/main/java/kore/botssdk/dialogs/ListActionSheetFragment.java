@@ -20,6 +20,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.Objects;
+
 import kore.botssdk.R;
 import kore.botssdk.adapter.BotListViewTemplateAdapter;
 import kore.botssdk.application.AppControl;
@@ -70,7 +72,7 @@ public class ListActionSheetFragment extends BottomSheetDialogFragment {
         llCloseBottomSheet = view.findViewById(R.id.llCloseBottomSheet);
         llTabHeader = view.findViewById(R.id.llTabHeader);
         llBottomLayout = view.findViewById(R.id.llBottomLayout);
-        sharedPreferences = getActivity().getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = requireActivity().getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
 
         if(sharedPreferences != null)
             llBottomLayout.setBackgroundColor(Color.parseColor(sharedPreferences.getString(BotResponse.WIDGET_BG_COLOR, "#FFFFFF")));

@@ -13,7 +13,6 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import kore.botssdk.R;
 import kore.botssdk.application.AppControl;

@@ -41,6 +41,7 @@ import kore.botssdk.view.BotTableView;
 import kore.botssdk.view.ButtonDeepLinkTemplateView;
 import kore.botssdk.view.CardTemplateView;
 import kore.botssdk.view.ContactInfoView;
+import kore.botssdk.view.EmptyTemplateView;
 import kore.botssdk.view.FeedbackTemplateView;
 import kore.botssdk.view.FormActionView;
 import kore.botssdk.view.HorizontalBarChartView;
@@ -62,7 +63,6 @@ import kore.botssdk.view.TextMediaLayout;
 import kore.botssdk.view.TimeLineTextView;
 import kore.botssdk.view.UniversalSearchView;
 import kore.botssdk.view.VerticalListView;
-import kore.botssdk.view.WelcomeSummaryView;
 
 /**
  * Created by Shiva Krishna on 11/20/2017.
@@ -294,14 +294,6 @@ public class ViewProvider {
         return contactInfoView;
     }
 
-    public static WelcomeSummaryView getWelcomeSummaryView(Context context){
-        WelcomeSummaryView welcomeSummaryView = new WelcomeSummaryView(context,"");
-        welcomeSummaryView.setId(WELCOME_SUMMARY_VIEW_ID);
-        return welcomeSummaryView;
-    }
-
-
-
     public static UniversalSearchView getUniversalSearchView(Context context){
         UniversalSearchView universalSearchView = new UniversalSearchView(context);
         universalSearchView.setId(UNIVERSAL_SEARCH_VIEW_ID);
@@ -459,6 +451,12 @@ public class ViewProvider {
         CardTemplateView multiSelectView = new CardTemplateView(context);
         multiSelectView.setId(MULTI_SELECT_VIEW_ID);
         return multiSelectView;
+    }
+
+    public static EmptyTemplateView getEmptyTemplateView(Context context) {
+        EmptyTemplateView emptyTemplateView = new EmptyTemplateView(context);
+        emptyTemplateView.setId(LIST_ID);
+        return emptyTemplateView;
     }
 
 }

@@ -5,7 +5,7 @@ import android.widget.LinearLayout;
 
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
-import kore.botssdk.models.PayloadInner;
+import kore.botssdk.models.BotResponsPayload;
 
 public abstract class CustomTemplateView extends LinearLayout
 {
@@ -13,7 +13,7 @@ public abstract class CustomTemplateView extends LinearLayout
         super(context);
     }
 
-    public abstract void populateTemplate(PayloadInner payloadInner, boolean isLast);
+    public abstract void populateTemplate(BotResponsPayload payloadInner, boolean isLast);
 
     public abstract CustomTemplateView getNewInstance();
 

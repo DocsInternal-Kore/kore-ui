@@ -1,9 +1,6 @@
 package kore.botssdk.view.tableview;
 
-import android.animation.Animator;
 import android.animation.LayoutTransition;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;

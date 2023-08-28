@@ -2,22 +2,17 @@ package kore.botssdk.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import kore.botssdk.R;
 import kore.botssdk.adapter.AdvancedListAdapter;
 import kore.botssdk.dialogs.AdvancedListActionSheetFragment;
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
-import kore.botssdk.models.AdvancedListModel;
 import kore.botssdk.models.PayloadInner;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.view.viewUtils.DimensionUtil;

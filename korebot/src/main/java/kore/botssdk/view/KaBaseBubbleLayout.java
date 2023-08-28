@@ -117,7 +117,6 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
     protected BarChartView barChartView;
     protected StackedBarChatView stackedBarChatView;
     protected ContactInfoView contactInfoView;
-    protected WelcomeSummaryView welcomeSummaryView;
     protected UniversalSearchView universalSearchView;
     protected KoraSummaryHelpView koraSummaryHelpView;
     protected KoraCarouselView koraCarouselView;
@@ -150,6 +149,7 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
     protected ResultsTemplateView resultsTemplateView;
     protected BotButtonLinkTemplateView botButtonLinkTemplateView;
     protected CardTemplateView cardTemplateView;
+    protected EmptyTemplateView emptyTemplateView;
 
 
     //    protected int[] dimens;
@@ -318,11 +318,6 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         contactInfoView.setInvokeGenericWebViewInterface(invokeGenericWebViewInterface);
         addView(contactInfoView);
 
-        welcomeSummaryView = ViewProvider.getWelcomeSummaryView(context);
-        welcomeSummaryView.setComposeFooterInterface(composeFooterInterface);
-        addView(welcomeSummaryView);
-
-
         universalSearchView = ViewProvider.getUniversalSearchView(context);
         universalSearchView.setComposeFooterInterface(composeFooterInterface);
         universalSearchView.setInvokeGenericWebViewInterface(invokeGenericWebViewInterface);
@@ -465,6 +460,9 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         cardTemplateView = ViewProvider.getCardTemplateView(context);
         cardTemplateView.setComposeFooterInterface(composeFooterInterface);
         addView(cardTemplateView);
+
+        emptyTemplateView = ViewProvider.getEmptyTemplateView(context);
+        addView(emptyTemplateView);
     }
 
 
@@ -524,9 +522,6 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         }
         if(contactInfoView != null){
             contactInfoView.setComposeFooterInterface(composeFooterInterface);
-        }
-        if(welcomeSummaryView !=null){
-            welcomeSummaryView.setComposeFooterInterface(composeFooterInterface);
         }
 
         if(universalSearchView !=null){

@@ -2,7 +2,6 @@ package kore.botssdk.view;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 

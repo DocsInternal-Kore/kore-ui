@@ -317,24 +317,7 @@ public class CalendarEventsAdapter extends RecyclerView.Adapter implements Recyc
                         }
                     } else if (BotResponse.TEMPLATE_TYPE_CAL_EVENTS.equalsIgnoreCase(type)) {
                         try {
-
-
-//                            String data = new Gson().toJson(model);
                             verticalListViewActionHelper.calendarItemClicked(BotResponse.TEMPLATE_TYPE_CAL_EVENTS, model);
-                            //Intent intentObj=new Intent(mContext,ViewMeetingDetailsActivity)
-
-                        /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                if (AppPermissionsHelper.hasPermission(mContext, Manifest.permission.READ_CALENDAR)) {
-                                    launchNativeView(model.getTitle(), (long) model.getDuration().getStart());
-                                } else {
-                                    gModel = model;
-                                    AppPermissionsHelper.requestForPermission((Activity) mContext, Manifest.permission.READ_CALENDAR, CAL_PERMISSION_REQUEST);
-                                }
-                            } else {
-
-                                launchNativeView(model.getTitle(), (long) model.getDuration().getStart());
-                            }*/
-
                         } catch (Exception e) {
 
                             launchWebView(model.getHtmlLink());

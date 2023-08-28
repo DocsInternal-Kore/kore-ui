@@ -142,29 +142,6 @@ public class BotListViewTemplateAdapter extends BaseAdapter {
             if(sharedPreferences != null)
                 holder.botListItemSubtitle.setTextColor(Color.parseColor(sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_TXT_COLOR, "#505968")));
         }
-//        if (botListModel.getButtons() == null || botListModel.getButtons().isEmpty()) {
-//            holder.botListItemButton.setVisibility(View.GONE);
-//        } else {
-//            holder.botListItemButton.setVisibility(View.VISIBLE);
-//            holder.botListItemButton.setText(botListModel.getButtons().get(0).getTitle());
-//            holder.botListItemButton.setTag(botListModel.getButtons().get(0));
-//
-//            holder.botListItemButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (composeFooterInterface != null && invokeGenericWebViewInterface != null) {
-//                        BotListElementButton botListElementButton = (BotListElementButton) v.getTag();
-//                        if (BundleConstants.BUTTON_TYPE_WEB_URL.equalsIgnoreCase(botListElementButton.getType())) {
-//                            invokeGenericWebViewInterface.invokeGenericWebView(botListElementButton.getUrl());
-//                        } else if (BundleConstants.BUTTON_TYPE_POSTBACK.equalsIgnoreCase(botListElementButton.getType())) {
-//                            String listElementButtonPayload = botListElementButton.getPayload();
-//                            String listElementButtonTitle = botListElementButton.getTitle();
-//                            composeFooterInterface.onSendClick(listElementButtonTitle, listElementButtonPayload,false);
-//                        }
-//                    }
-//                }
-//            });
-//        }
 
         holder.botListItemRoot.setOnClickListener(new View.OnClickListener() {
             @Override

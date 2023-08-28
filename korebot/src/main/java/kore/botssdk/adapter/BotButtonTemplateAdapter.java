@@ -144,8 +144,6 @@ public class BotButtonTemplateAdapter extends BaseAdapter {
     private void initializeViewHolder(View view) {
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.botItemButton = (TextView) view.findViewById(R.id.text_view);
-
-//        ((GradientDrawable) viewHolder.botItemButton.getBackground()).setColor(isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
         ((GradientDrawable) viewHolder.botItemButton.getBackground()).setStroke((int)(2*dp1), isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
         viewHolder.botItemButton.setTextColor(isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
         view.setTag(viewHolder);

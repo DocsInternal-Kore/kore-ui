@@ -627,16 +627,6 @@ public class PayloadHeaderModel {
         //    private final String INVALID_JSON = "Invalid JSON";
         private String speech_hint;
 
-        public ChildTemplate getChildTemplate() {
-            return childTemplate;
-        }
-
-        public void setChildTemplate(ChildTemplate childTemplate) {
-            this.childTemplate = childTemplate;
-        }
-
-        private ChildTemplate childTemplate;
-
         public String getTemplate_type() {
             return template_type;
         }
