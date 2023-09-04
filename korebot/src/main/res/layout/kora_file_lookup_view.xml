@@ -57,7 +57,7 @@
             android:fontFamily="@font/latomedium"
             android:maxLines="1"
             android:text="@{fileModel.getSharedByDetails()}"
-            android:visibility='@{fileModel.getSharedByDetails() == null || fileModel.getSharedByDetails ? View.GONE : View.VISIBLE}'
+            android:visibility='gone'
 
 
             android:textColor="#a3b0be"
