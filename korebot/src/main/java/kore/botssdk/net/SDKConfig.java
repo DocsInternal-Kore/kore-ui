@@ -15,10 +15,10 @@ public class SDKConfig {
     public static void initialize(String botId, String botName, String clientId, String clientName, String identity)
     {
         SDKConfiguration.Client.setBot_id(botId);
-        SDKConfiguration.Client.setBot_id(botName);
-        SDKConfiguration.Client.setBot_id(clientId);
-        SDKConfiguration.Client.setBot_id(clientName);
-        SDKConfiguration.Client.setBot_id(identity);
+        SDKConfiguration.Client.setBot_name(botName);
+        SDKConfiguration.Client.setClient_id(clientId);
+        SDKConfiguration.Client.setClient_secret(clientName);
+        SDKConfiguration.Client.setIdentity(identity);
     }
 
     public static void setServerUrl(String url)
