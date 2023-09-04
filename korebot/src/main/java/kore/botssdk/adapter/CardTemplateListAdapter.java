@@ -20,7 +20,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import kore.botssdk.R;
-import kore.botssdk.listener.AdvanceButtonClickListner;
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
 import kore.botssdk.models.AdvanceListTableModel;
@@ -32,7 +31,7 @@ public class CardTemplateListAdapter extends RecyclerView.Adapter<CardTemplateLi
     private final ArrayList<AdvanceListTableModel.AdvanceTableRowDataModel> buttons;
     private final Context mContext;
     private AdvanceOptionsAdapter advanceOptionsAdapter;
-    private ComposeFooterInterface composeFooterInterface;
+    private final ComposeFooterInterface composeFooterInterface;
     private InvokeGenericWebViewInterface invokeGenericWebViewInterface;
 
     public CardTemplateListAdapter(Context context, ArrayList<AdvanceListTableModel.AdvanceTableRowDataModel> buttons, ComposeFooterInterface composeFooterInterface, InvokeGenericWebViewInterface invokeGenericWebViewInterface) {
@@ -45,12 +44,12 @@ public class CardTemplateListAdapter extends RecyclerView.Adapter<CardTemplateLi
 
     @NonNull
     @Override
-    public CardTemplateListAdapter.ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new CardTemplateListAdapter.ButtonViewHolder(inflater.inflate(R.layout.card_desc_list_cell, viewGroup, false));
+    public ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        return new ButtonViewHolder(inflater.inflate(R.layout.card_desc_list_cell, viewGroup, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CardTemplateListAdapter.ButtonViewHolder holder, int i) {
+    public void onBindViewHolder(@NonNull ButtonViewHolder holder, int i) {
         AdvanceListTableModel.AdvanceTableRowDataModel btn = buttons.get(i);
         holder.tvBtnText.setText(btn.getTitle());
 
@@ -104,8 +103,9 @@ public class CardTemplateListAdapter extends RecyclerView.Adapter<CardTemplateLi
     }
 
     public static class ButtonViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvBtnText, tvDescriptionTitle;
-        private ImageView ivListBtnIcon;
+        private final TextView tvBtnText;
+        private final TextView tvDescriptionTitle;
+        private final ImageView ivListBtnIcon;
 
         public ButtonViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -50,6 +50,7 @@ import kore.botssdk.listener.RecyclerViewDataAccessor;
 import kore.botssdk.listener.VerticalListViewActionHelper;
 import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.CalEventsTemplateModel;
+import kore.botssdk.models.CalEventsTemplateModel.Duration;
 import kore.botssdk.models.MultiAction;
 import kore.botssdk.models.WCalEventsTemplateModel;
 import kore.botssdk.utils.AppPermissionsHelper;
@@ -80,7 +81,7 @@ public class WCalEventsAdapter extends RecyclerView.Adapter implements RecyclerV
         return eventList;
     }
 
-    private CalEventsTemplateModel.Duration _cursor;
+    private Duration _cursor;
 
 
     public void setEventList(ArrayList<WCalEventsTemplateModel> eventList) {
@@ -621,7 +622,7 @@ public class WCalEventsAdapter extends RecyclerView.Adapter implements RecyclerV
                         // ed = st + (30 * 60000);
                     }
 
-                    CalEventsTemplateModel.Duration _duration = _data.getData().getDuration();
+                    Duration _duration = _data.getData().getDuration();
 
                     _duration.setStart(st);
                     _duration.setEnd(ed);
@@ -727,11 +728,11 @@ public class WCalEventsAdapter extends RecyclerView.Adapter implements RecyclerV
         this.errorIcon = errorIcon;
     }
 
-    public CalEventsTemplateModel.Duration get_cursor() {
+    public Duration get_cursor() {
         return _cursor;
     }
 
-    public void set_cursor(CalEventsTemplateModel.Duration _cursor) {
+    public void set_cursor(Duration _cursor) {
         this._cursor = _cursor;
     }
 

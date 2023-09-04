@@ -17,7 +17,8 @@ public class Widget implements Serializable,Cloneable {
 
     @Override
     public Widget clone() throws CloneNotSupportedException {
-        return (Widget) super.clone();
+        Widget widget = (Widget) super.clone();
+        return widget;
     }
     public LoginModel getLogin() {
         return login;
@@ -31,7 +32,7 @@ public class Widget implements Serializable,Cloneable {
     @Expose
     private LoginModel login;
 
-    public static class Action implements Serializable {
+    public class Action implements Serializable {
 
         @SerializedName("title")
         @Expose
@@ -270,7 +271,7 @@ public class Widget implements Serializable,Cloneable {
     }
 
 
-    public static class Hook implements Serializable {
+    public class Hook implements Serializable {
 
         @SerializedName("method")
         @Expose
@@ -391,7 +392,7 @@ public class Widget implements Serializable,Cloneable {
 
     }*/
 
-    public static class Tz implements Serializable {
+    public class Tz implements Serializable {
 
         @SerializedName("default")
         @Expose
@@ -476,7 +477,7 @@ public class Widget implements Serializable,Cloneable {
         }
     }*/
 
-    public static class Element implements Serializable{
+    public class Element implements Serializable{
 
         private String paceHolder;
 
@@ -655,8 +656,7 @@ public class Widget implements Serializable,Cloneable {
 
     }
 
-    public static class Button implements Serializable{
-
+    public class Button implements Serializable{
         private String title;
         private String theme;
         private String type;
@@ -667,6 +667,10 @@ public class Widget implements Serializable,Cloneable {
 
         public String getBtnType() {
             return btnType;
+        }
+
+        public void setBtnType(String btnType) {
+            this.btnType = btnType;
         }
 
         public String getIcon() {
@@ -743,7 +747,7 @@ public class Widget implements Serializable,Cloneable {
     }
 
 
-    public static class DefaultAction implements Serializable{
+    public class DefaultAction implements Serializable{
 
         private String title;
         private String type;

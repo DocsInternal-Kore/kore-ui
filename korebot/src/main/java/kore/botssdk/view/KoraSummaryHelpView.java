@@ -23,7 +23,6 @@ import kore.botssdk.models.ButtonTemplate;
 import kore.botssdk.models.ContactViewListModel;
 import kore.botssdk.models.KnowledgeCollectionModel;
 import kore.botssdk.models.KoraSummaryHelpModel;
-import kore.botssdk.models.QuickRepliesPayloadModel;
 import kore.botssdk.models.WelcomeChatSummaryModel;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.view.viewUtils.DimensionUtil;
@@ -60,7 +59,7 @@ public class KoraSummaryHelpView extends ViewGroup implements VerticalListViewAc
 
             ArrayList<WelcomeChatSummaryModel> list = new ArrayList<WelcomeChatSummaryModel>();
 
-            if(summaryModel.getButtons() != null && summaryModel.getButtons().size() > 0){
+            if(summaryModel!=null && summaryModel.getButtons() != null && summaryModel.getButtons().size()>0){
                 for(ButtonTemplate item : summaryModel.getButtons()){
                     WelcomeChatSummaryModel mdl = new WelcomeChatSummaryModel();
                     mdl.setSummary(item.getTitle());
@@ -188,24 +187,9 @@ public class KoraSummaryHelpView extends ViewGroup implements VerticalListViewAc
 
     @Override
     public void welcomeSummaryItemClick(WelcomeChatSummaryModel model) {
-        if(!StringUtils.isNullOrEmpty(model.getType())&& model.getType().equals("postback") && model.getPayload() != null
+        if(!StringUtils.isNullOrEmpty(model.getType())&& model.getType().equals("postback") && !StringUtils.isNullOrEmpty(model.getPayload())
                 && composeFooterInterface != null){
-            String quickReplyPayload = null;
-            try {
-                quickReplyPayload = (String) model.getPayload();
-            }catch (Exception e)
-            {
-                try {
-                    QuickRepliesPayloadModel quickRepliesPayloadModel = (QuickRepliesPayloadModel) model.getPayload();
-                    quickReplyPayload = quickRepliesPayloadModel.getName();
-                }
-                catch (Exception exception)
-                {
-                    quickReplyPayload = "";
-                }
-            }
-
-            composeFooterInterface.onSendClick(quickReplyPayload ,true);
+            composeFooterInterface.onSendClick(model.getPayload(),true);
         }
     }
 

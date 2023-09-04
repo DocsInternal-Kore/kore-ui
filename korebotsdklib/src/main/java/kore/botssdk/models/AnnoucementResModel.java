@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.List;
 
+import kore.botssdk.models.CalEventsTemplateModel;
+
 public class AnnoucementResModel implements Serializable {
 
     @SerializedName("creator")
@@ -242,7 +244,7 @@ public class AnnoucementResModel implements Serializable {
     public void setSharedOn(Long sharedOn) {
         this.sharedOn = sharedOn;
     }
-    public static class MyActions implements Serializable {
+    public class MyActions implements Serializable {
 
         @SerializedName("follow")
         @Expose
@@ -268,7 +270,7 @@ public class AnnoucementResModel implements Serializable {
         }
 
     }
-    public static class SharedList implements Serializable{
+    public class SharedList implements Serializable{
 
         @SerializedName("lN")
         @Expose
@@ -351,7 +353,7 @@ public class AnnoucementResModel implements Serializable {
 
     }
 
-    public static class Owner implements Serializable {
+    public class Owner implements Serializable {
 
         @SerializedName("lN")
         @Expose
@@ -412,5 +414,8 @@ public class AnnoucementResModel implements Serializable {
         public String getFullName() {
             return fN + " " + lN;
         }
+
     }
+
+
 }

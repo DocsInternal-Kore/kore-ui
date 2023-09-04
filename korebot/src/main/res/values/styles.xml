@@ -203,5 +203,12 @@
         <attr format="reference" name="popupTheme"/>
     </declare-styleable>
 
+    <declare-styleable name="WaitingDots">
+        <attr format="color" name="dotsColor"/>
+        <attr format="integer" name="period"/>
+        <attr format="integer" name="jumpHeight"/>
+        <attr format="boolean" name="autoplay"/>
+    </declare-styleable>
+
 
 </resources>

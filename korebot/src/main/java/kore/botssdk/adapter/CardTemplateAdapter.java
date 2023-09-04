@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Base64;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,27 +45,27 @@ public class CardTemplateAdapter extends RecyclerView.Adapter<CardTemplateAdapte
     private final ArrayList<CardTemplateModel> arrCardTemplateModels;
     private final Context context;
     private final LayoutInflater layoutInflater;
-    private PopupWindow popupWindow;
-    private View popUpView;
+    private final PopupWindow popupWindow;
+    private final View popUpView;
 
     public CardTemplateAdapter(Context context, ArrayList<CardTemplateModel> arrCardTemplateModels)
     {
         this.arrCardTemplateModels = arrCardTemplateModels;
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
-        popUpView = LayoutInflater.from(context).inflate(R.layout.advancelist_drop_down_popup, null);
+        popUpView = View.inflate(context, R.layout.advancelist_drop_down_popup, null);
         popupWindow = new PopupWindow(popUpView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
     }
 
     @NonNull
     @io.reactivex.annotations.NonNull
     @Override
-    public CardTemplateAdapter.CardViewHolder onCreateViewHolder(@NonNull @io.reactivex.annotations.NonNull ViewGroup parent, int viewType) {
-        return new CardTemplateAdapter.CardViewHolder(layoutInflater.inflate(R.layout.card_template_cell, parent, false));
+    public CardViewHolder onCreateViewHolder(@NonNull @io.reactivex.annotations.NonNull ViewGroup parent, int viewType) {
+        return new CardViewHolder(layoutInflater.inflate(R.layout.card_template_cell, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @io.reactivex.annotations.NonNull CardTemplateAdapter.CardViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @io.reactivex.annotations.NonNull CardViewHolder holder, int position) {
         CardTemplateModel cardTemplateModel = arrCardTemplateModels.get(position);
         holder.bot_list_item_subtitle.setVisibility(View.GONE);
         holder.bot_list_item_image.setVisibility(View.GONE);
@@ -197,8 +196,7 @@ public class CardTemplateAdapter extends RecyclerView.Adapter<CardTemplateAdapte
                         ivDropDownCLose.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                if(popupWindow != null)
-                                    popupWindow.dismiss();
+                                popupWindow.dismiss();
                             }
                         });
 
@@ -242,8 +240,6 @@ public class CardTemplateAdapter extends RecyclerView.Adapter<CardTemplateAdapte
                     {
                         GradientDrawable rightDrawable = (GradientDrawable) ContextCompat.getDrawable(context, R.drawable.card_btn_bg);
                         if (rightDrawable != null) {
-//                            if(!StringUtils.isNullOrEmpty(cardTemplateButtonModel.getButtonStyles().getColor()))
-//                                holder.tvCardButton.setTextColor(Color.parseColor(cardTemplateButtonModel.getButtonStyles().getColor()));
 
                             if(!StringUtils.isNullOrEmpty(cardTemplateButtonModel.getButtonStyles().getBackground_color()))
                                 rightDrawable.setColor(Color.parseColor(cardTemplateButtonModel.getButtonStyles().getBackground_color()));

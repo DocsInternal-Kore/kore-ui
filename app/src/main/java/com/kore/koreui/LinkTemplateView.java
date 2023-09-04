@@ -10,14 +10,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.kore.koreui.model.ResponsePayload;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import kore.botssdk.fileupload.utils.StringUtils;
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
-import kore.botssdk.models.BotResponsPayload;
 import kore.botssdk.utils.KaFontUtils;
 import kore.botssdk.view.CustomTemplateView;
 
@@ -26,32 +32,35 @@ public class LinkTemplateView extends CustomTemplateView {
     private TextView tvPdfName;
     private Context context;
     private ProgressBar pbDownload;
+    private Gson gson = new Gson();
 
-    public LinkTemplateView(Context context) {
+    public LinkTemplateView(@NonNull Context context) {
         super(context);
         init(context);
     }
 
     @Override
-    public void populateTemplate(BotResponsPayload payloadInner, boolean isLast) {
-        if (payloadInner != null)
+    public void populateTemplate(@NonNull String botResponse, boolean isLast) {
+
+        Type botResp = new TypeToken<ResponsePayload>() {}.getType();
+        ResponsePayload responsePayload = gson.fromJson(botResponse, botResp);
+
+        if(responsePayload != null)
         {
-            tvPdfName.setText(payloadInner.getFileName());
+            tvPdfName.setText(responsePayload.getFileName());
             ivPdfDownload.setOnClickListener(v -> {
-                File fileLocation = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + payloadInner.getFileName());
-                if (!StringUtils.isNullOrEmpty(payloadInner.getUrl())) {
+                File fileLocation = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + responsePayload.getFileName());
+                if (!StringUtils.isNullOrEmpty(responsePayload.getUrl())) {
                     ivPdfDownload.setVisibility(GONE);
                     pbDownload.setVisibility(VISIBLE);
 
-                    if(writeBase64ToDisk(payloadInner.getUrl(), fileLocation))
-                    {
+                    if (writeBase64ToDisk(responsePayload.getUrl(), fileLocation)) {
                         ivPdfDownload.setVisibility(VISIBLE);
                         pbDownload.setVisibility(GONE);
 
                         Toast.makeText(context, "Statement downloaded successfully under downloads", Toast.LENGTH_SHORT).show();
                     }
-                } else
-                {
+                } else {
                     ivPdfDownload.setVisibility(VISIBLE);
                     pbDownload.setVisibility(GONE);
                     Toast.makeText(context, "Statement can not be downloaded", Toast.LENGTH_SHORT).show();
@@ -60,18 +69,19 @@ public class LinkTemplateView extends CustomTemplateView {
         }
     }
 
+    @NonNull
     @Override
     public CustomTemplateView getNewInstance() {
         return new LinkTemplateView(context);
     }
 
     @Override
-    public void setComposeFooterInterface(ComposeFooterInterface composeFooterInterface) {
+    public void setComposeFooterInterface(@NonNull ComposeFooterInterface composeFooterInterface) {
 
     }
 
     @Override
-    public void setInvokeGenericWebViewInterface(InvokeGenericWebViewInterface composeFooterInterface) {
+    public void setInvokeGenericWebViewInterface(@NonNull InvokeGenericWebViewInterface composeFooterInterface) {
 
     }
 

@@ -47,10 +47,10 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
     private final Context mContext;
     private String skillName;
     private final String type;
-    private final AdvanceButtonClickListner advanceButtonClickListner;
-    private AdvanceOptionsAdapter advanceOptionsAdapter;
-    private ComposeFooterInterface composeFooterInterface;
-    private InvokeGenericWebViewInterface invokeGenericWebViewInterface;
+    final AdvanceButtonClickListner advanceButtonClickListner;
+    AdvanceOptionsAdapter advanceOptionsAdapter;
+    final ComposeFooterInterface composeFooterInterface;
+    InvokeGenericWebViewInterface invokeGenericWebViewInterface;
     private PopupWindow popupWindow;
     private int count;
 
@@ -66,7 +66,7 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
 
     @NonNull
     @Override
-    public AdvanceListButtonAdapter.ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         if (!StringUtils.isNullOrEmpty(type) && type.equalsIgnoreCase(BundleConstants.FULL_WIDTH)) {
             return new ButtonViewHolder(inflater.inflate(R.layout.advance_button_fullwidth, viewGroup, false));
         }
@@ -74,7 +74,7 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdvanceListButtonAdapter.ButtonViewHolder holder, int i) {
+    public void onBindViewHolder(@NonNull ButtonViewHolder holder, int i) {
 
         Widget.Button btn = buttons.get(i);
         holder.tv.setText(btn.getTitle());
@@ -194,7 +194,7 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
     public static class ButtonViewHolder extends RecyclerView.ViewHolder {
         private final TextView tv;
         private final ImageView ivBtnImage;
-        private final LinearLayout layout_deails;
+        final LinearLayout layout_deails;
 
         public ButtonViewHolder(@NonNull View itemView) {
             super(itemView);

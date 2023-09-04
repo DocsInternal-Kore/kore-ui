@@ -34,6 +34,7 @@ public class BotButtonModel implements MultiSelectBase {
     }
 
     HashMap<String,Object> customData;
+
     private boolean isSamePageNavigation;
 
     public boolean isSamePageNavigation() {

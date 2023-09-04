@@ -2,6 +2,7 @@ package kore.botssdk.view;
 
 import android.content.Context;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,7 +28,6 @@ import kore.botssdk.charts.utils.MPPointF;
 import kore.botssdk.formatters.BarChartDataFormatter;
 import kore.botssdk.models.BotBarChartDataModel;
 import kore.botssdk.models.PayloadInner;
-import kore.botssdk.utils.LogUtils;
 import kore.botssdk.view.viewUtils.DimensionUtil;
 import kore.botssdk.view.viewUtils.LayoutUtils;
 import kore.botssdk.view.viewUtils.MeasureUtils;
@@ -135,7 +135,7 @@ public class HorizontalBarChartView extends ViewGroup implements OnChartValueSel
             BarData data = new BarData(barDataSets);
             data.setValueFormatter(new BarChartDataFormatter());
 //        data.setValueTypeface(mTfLight);
-            LogUtils.e("Values", _payInner.getxAxis()+"");
+            Log.e("Values", _payInner.getxAxis()+"");
             XAxis xAxis = mChart.getXAxis();
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 //            xAxis.setTypeface(mTfLight);
@@ -246,10 +246,10 @@ public class HorizontalBarChartView extends ViewGroup implements OnChartValueSel
         mChart.getBarBounds((BarEntry) e, bounds);
         MPPointF position = mChart.getPosition(e, YAxis.AxisDependency.LEFT);
 
-        LogUtils.i("bounds", bounds.toString());
-        LogUtils.i("position", position.toString());
+        Log.i("bounds", bounds.toString());
+        Log.i("position", position.toString());
 
-        LogUtils.i("x-index",
+        Log.i("x-index",
                 "low: " + mChart.getLowestVisibleX() + ", high: "
                         + mChart.getHighestVisibleX());
 

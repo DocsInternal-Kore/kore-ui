@@ -16,6 +16,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,6 @@ import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.EntityEditModel;
 import kore.botssdk.utils.BubbleConstants;
 import kore.botssdk.utils.KaFontUtils;
-import kore.botssdk.utils.LogUtils;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.utils.markdown.MarkdownImageTagHandler;
 import kore.botssdk.utils.markdown.MarkdownTagHandler;
@@ -188,7 +188,7 @@ public class TextMediaLayout extends ViewGroup {
 
             String replaceText = str.substring(_start,_end);
             String _payload = replaceText.substring(2,replaceText.length()-2);
-            LogUtils.d("!@#$% getReqText(", _payload);
+            Log.d("!@#$% getReqText(", _payload);
             _payload = _payload.substring(_payload.indexOf("{"));
             EntityEditModel model = gson.fromJson(_payload, EntityEditModel.class);
             String addableText = !StringUtils.isNullOrEmpty(model.getTitle())?model.getTitle().trim():"";
@@ -221,9 +221,9 @@ public class TextMediaLayout extends ViewGroup {
             boolean isPencilSpanClick = false;
 
             if(textualContent.indexOf("%%{")>0){
-                LogUtils.d("!@#$% BEFORE ", textualContent);// munduki%%{} %%
+                Log.d("!@#$% BEFORE ", textualContent);// munduki%%{} %%
                 textualContent = getReqText(textualContent);
-                LogUtils.d("!@#$% AFTER ", textualContent);
+                Log.d("!@#$% AFTER ", textualContent);
                 strBuilder = new SpannableStringBuilder(textualContent);
             }
             Matcher matcher = pattern.matcher(textualContent);
@@ -237,7 +237,7 @@ public class TextMediaLayout extends ViewGroup {
                 String reqText = textualContent.substring(_start+2, _end-2);
                 reqText = reqText.substring(reqText.indexOf("{"));
 
-                LogUtils.d("!@#$% REQ_TEXT while", reqText);
+                Log.d("!@#$% REQ_TEXT while", reqText);
 
                 EntityEditModel model = gson.fromJson(reqText, EntityEditModel.class);
                 String addableText = !StringUtils.isNullOrEmpty(model.getTitle())?model.getTitle().trim():"";
@@ -492,7 +492,7 @@ public class TextMediaLayout extends ViewGroup {
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
 
         int childWidthSpec, childHeightSpec;
-        int wrapSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        int wrapSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         int containerWidth = 0;
 
         final int count = getChildCount();

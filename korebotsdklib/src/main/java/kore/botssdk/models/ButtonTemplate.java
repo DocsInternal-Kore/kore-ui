@@ -7,7 +7,7 @@ public class ButtonTemplate {
 
     private String type;
     private String title;
-    private Object payload;
+    private String payload;
 
     public String getType() {
         return type;
@@ -17,11 +17,11 @@ public class ButtonTemplate {
         this.type = type;
     }
 
-    public Object getPayload() {
+    public String getPayload() {
         return payload;
     }
 
-    public void setPayload(Object payload) {
+    public void setPayload(String payload) {
         this.payload = payload;
     }
 

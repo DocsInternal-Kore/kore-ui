@@ -3,9 +3,11 @@ package kore.botssdk.net;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 import kore.botssdk.models.Authorization;
 import kore.botssdk.models.BotInfoModel;
+import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.BotUserInfo;
 import kore.botssdk.models.User;
 
@@ -138,6 +140,8 @@ public class RestResponse {
     public static class BotCustomData extends HashMap<String,Object>{
 
     }
+
+    public static class BotResponses extends ArrayList<BotResponse>{}
 
     public static class Meta{
         public String timezone;

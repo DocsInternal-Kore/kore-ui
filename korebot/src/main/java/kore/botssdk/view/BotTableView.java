@@ -40,6 +40,7 @@ import kore.botssdk.view.viewUtils.LayoutUtils;
  * @author ISchwarz
  */
 public class BotTableView extends TableView<MiniTableModel> {
+
     private Context context;
     private ComposeFooterInterface composeFooterInterface;
     private InvokeGenericWebViewInterface invokeGenericWebViewInterface;
@@ -210,7 +211,7 @@ public class BotTableView extends TableView<MiniTableModel> {
         for (int i = 0; i < listAdapter.getCount(); i++) {
             View listItem = listAdapter.getView(i, null, listView);
             listItem.measure(desiredWidth, MeasureSpec.UNSPECIFIED);
-            totalHeight += (int) (25 * dp1);
+            totalHeight += listItem.getMeasuredHeight();
         }
         return totalHeight;
     }

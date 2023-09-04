@@ -33,7 +33,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -230,7 +229,7 @@ public class ListWidgetAdapter extends RecyclerView.Adapter implements RecyclerV
 
         } else {
 
-            final ViewHolder holder = (ViewHolder) holderData;
+            final ListWidgetAdapter.ViewHolder holder = (ListWidgetAdapter.ViewHolder) holderData;
             final WidgetListElementModel model = items.get(position);
 
             if (StringUtils.isNullOrEmpty(model.getTitle())) {
@@ -262,12 +261,19 @@ public class ListWidgetAdapter extends RecyclerView.Adapter implements RecyclerV
                 public void onClick(View v) {
                     boolean expanded = holder.buttonLayout.isExpanded();
                     if(!expanded)
-                        holder.img_up_down.setImageDrawable(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.ic_arrow_drop_up_24px, mContext.getTheme()));
+                        holder.img_up_down.setImageDrawable(mContext.getResources().getDrawable( R.drawable.ic_arrow_drop_up_24px));
                     else
-                        holder.img_up_down.setImageDrawable(ResourcesCompat.getDrawable(mContext.getResources(), R.drawable.ic_arrow_drop_down_24px, mContext.getTheme()));
+                        holder.img_up_down.setImageDrawable(mContext.getResources().getDrawable( R.drawable.ic_arrow_drop_down_24px));
                     holder.buttonLayout.setExpanded(!expanded);
                 }
             });
+
+
+           /* if (StringUtils.isNullOrEmpty(model.getText())) {
+                holder.txtText.setVisibility(GONE);
+            } else {
+                holder.txtText.setText(model.getText().trim());
+            }*/
 
             if (model.getImage()!=null && !StringUtils.isNullOrEmpty(model.getImage().getImage_src()) && Patterns.WEB_URL.matcher(model.getImage().getImage_src()).matches()) {
                 String url = model.getImage().getImage_src().trim();
@@ -276,6 +282,24 @@ public class ListWidgetAdapter extends RecyclerView.Adapter implements RecyclerV
             } else {
                 holder.imageIcon.setVisibility(GONE);
             }
+
+            /*if (model.getActions() != null && model.getActions().size() > 0) {
+                holder.icon_down.setVisibility(VISIBLE);
+                holder.icon_down.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                            WidgetActionSheetFragment bottomSheetDialog = new WidgetActionSheetFragment();
+                            bottomSheetDialog.setisFromFullView(false);
+                            bottomSheetDialog.setSkillName(skillName,trigger);
+                            bottomSheetDialog.setData(model);
+                            bottomSheetDialog.setVerticalListViewActionHelper(verticalListViewActionHelper);
+                            bottomSheetDialog.show(((FragmentActivity) mContext).getSupportFragmentManager(), "add_tags");
+                    }
+                });
+            } else {
+                holder.icon_down.setVisibility(GONE);
+            }*/
+
 
             if(model.getValue() != null && model.getValue().getType() != null) {
                 switch (model.getValue().getType()){

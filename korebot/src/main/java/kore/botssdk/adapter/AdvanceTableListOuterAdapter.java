@@ -5,9 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,8 +17,8 @@ import kore.botssdk.utils.KaFontUtils;
 
 public class AdvanceTableListOuterAdapter extends BaseAdapter
 {
-    private Context context;
-    private ArrayList<AdvanceListTableModel> arrAdvanceListTableModels;
+    private final Context context;
+    private final ArrayList<AdvanceListTableModel> arrAdvanceListTableModels;
     private final LayoutInflater layoutInflater;
 
     public AdvanceTableListOuterAdapter(Context context, ArrayList<AdvanceListTableModel> arrAdvanceListTableModels)
@@ -51,7 +48,7 @@ public class AdvanceTableListOuterAdapter extends BaseAdapter
     public View getView(int position, View convertView, ViewGroup viewGroup) {
         DetailsViewHolder holder;
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.advance_list_table_outer_cell, null);
+            convertView = View.inflate(context, R.layout.advance_list_table_outer_cell, null);
             KaFontUtils.applyCustomFont(context, convertView);
             holder = new DetailsViewHolder();
             holder.rvTableList = convertView.findViewById(R.id.rvTableList);

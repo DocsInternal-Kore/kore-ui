@@ -1,6 +1,9 @@
 package kore.botssdk.models;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * Created by Ramachandra Pradeep on 15-May-19.

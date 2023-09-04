@@ -49,6 +49,7 @@ import kore.botssdk.listener.RecyclerViewDataAccessor;
 import kore.botssdk.listener.VerticalListViewActionHelper;
 import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.CalEventsTemplateModel;
+import kore.botssdk.models.CalEventsTemplateModel.Duration;
 import kore.botssdk.models.WidgetDialogModel;
 import kore.botssdk.utils.DateUtils;
 import kore.botssdk.utils.StringUtils;
@@ -62,7 +63,7 @@ public class CalendarEventsAdapter extends RecyclerView.Adapter implements Recyc
     private boolean isExpanded = false;
     VerticalListViewActionHelper verticalListViewActionHelper;
     ArrayList<String> selectedIds = null;
-    private CalEventsTemplateModel.Duration _cursor;
+    private Duration _cursor;
 
     public ArrayList<CalEventsTemplateModel> getEventList() {
         return eventList;
@@ -317,7 +318,24 @@ public class CalendarEventsAdapter extends RecyclerView.Adapter implements Recyc
                         }
                     } else if (BotResponse.TEMPLATE_TYPE_CAL_EVENTS.equalsIgnoreCase(type)) {
                         try {
+
+
+//                            String data = new Gson().toJson(model);
                             verticalListViewActionHelper.calendarItemClicked(BotResponse.TEMPLATE_TYPE_CAL_EVENTS, model);
+                            //Intent intentObj=new Intent(mContext,ViewMeetingDetailsActivity)
+
+                        /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (AppPermissionsHelper.hasPermission(mContext, Manifest.permission.READ_CALENDAR)) {
+                                    launchNativeView(model.getTitle(), (long) model.getDuration().getStart());
+                                } else {
+                                    gModel = model;
+                                    AppPermissionsHelper.requestForPermission((Activity) mContext, Manifest.permission.READ_CALENDAR, CAL_PERMISSION_REQUEST);
+                                }
+                            } else {
+
+                                launchNativeView(model.getTitle(), (long) model.getDuration().getStart());
+                            }*/
+
                         } catch (Exception e) {
 
                             launchWebView(model.getHtmlLink());
@@ -494,7 +512,7 @@ public class CalendarEventsAdapter extends RecyclerView.Adapter implements Recyc
                             ed = st + (30 * 60000);
                         }
 
-                        CalEventsTemplateModel.Duration _duration = _data.getDuration();
+                        Duration _duration = _data.getDuration();
 
                         _duration.setStart(st);
                         _duration.setEnd(ed);
@@ -565,11 +583,11 @@ public class CalendarEventsAdapter extends RecyclerView.Adapter implements Recyc
 
     }
 
-    public void setCursorDuration(CalEventsTemplateModel.Duration cursor) {
+    public void setCursorDuration(Duration cursor) {
         _cursor = cursor;
     }
 
-    public CalEventsTemplateModel.Duration getCursorDuration(){
+    public Duration getCursorDuration(){
         return _cursor;
     }
 

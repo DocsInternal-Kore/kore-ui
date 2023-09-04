@@ -5,10 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 
-import kore.botssdk.adapter.BotButtonTemplateAdapter;
+import androidx.annotation.NonNull;
+
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
-import kore.botssdk.models.BotResponsPayload;
 import kore.botssdk.view.CustomTemplateView;
 
 /**
@@ -23,14 +23,14 @@ public class BotButtonView extends CustomTemplateView {
 
     private Context context;
 
-    public BotButtonView(Context context) {
+    public BotButtonView(@NonNull Context context) {
         super(context);
         init(context);
     }
 
     @Override
-    public void populateTemplate(BotResponsPayload payloadInner, boolean isLast) {
-//        if(payloadInner != null && payloadInner.getButtons() != null)
+    public void populateTemplate(@NonNull String payloadInner, boolean isLast) {
+//        if(payloadInner.getButtons() != null)
 //        {
 //            final BotButtonTemplateAdapter buttonTypeAdapter;
 //            autoExpandListView.setVisibility(VISIBLE);
@@ -44,6 +44,7 @@ public class BotButtonView extends CustomTemplateView {
 //        }
     }
 
+    @NonNull
     @Override
     public CustomTemplateView getNewInstance() {
         return new BotButtonView(context);
@@ -56,12 +57,12 @@ public class BotButtonView extends CustomTemplateView {
     }
 
     @Override
-    public void setComposeFooterInterface(ComposeFooterInterface composeFooterInterface) {
+    public void setComposeFooterInterface(@NonNull ComposeFooterInterface composeFooterInterface) {
         this.composeFooterInterface = composeFooterInterface;
     }
 
     @Override
-    public void setInvokeGenericWebViewInterface(InvokeGenericWebViewInterface invokeGenericWebViewInterface) {
+    public void setInvokeGenericWebViewInterface(@NonNull InvokeGenericWebViewInterface invokeGenericWebViewInterface) {
         this.invokeGenericWebViewInterface = invokeGenericWebViewInterface;
     }
 }

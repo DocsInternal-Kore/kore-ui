@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,6 @@ import kore.botssdk.models.BrandingDependenciesModel;
 import kore.botssdk.models.BrandingEntitiesModel;
 import kore.botssdk.models.BrandingSubEntitiesModel;
 import kore.botssdk.models.BrandingWidgetThemeModel;
-import kore.botssdk.utils.LogUtils;
 
 public class BrandingChangeActivity extends BotAppCompactActivity
 {
@@ -104,7 +104,7 @@ public class BrandingChangeActivity extends BotAppCompactActivity
                         {
                             if(selected_option_id.equalsIgnoreCase(brandingDependenciesModel.getEntities().get(k).getPropertyValue()))
                             {
-                                LogUtils.e("Color Value", brandingDependenciesModel.getAllowedValues()[0]);
+                                Log.e("Color Value", brandingDependenciesModel.getAllowedValues()[0]);
 
                                 if(BotResponse.BUBBLE_LEFT_BG_COLOR.trim().equalsIgnoreCase(brandingWidgetThemeModel.getBrandingwidgetdesktop().getEntities().get(i).getLabel().trim()))
                                 {
@@ -153,6 +153,7 @@ public class BrandingChangeActivity extends BotAppCompactActivity
                                 }
                                 else if(BotResponse.WIDGET_TXT_COLOR.trim().equalsIgnoreCase(brandingWidgetThemeModel.getBrandingwidgetdesktop().getEntities().get(i).getLabel().trim()))
                                 {
+//                                    SDKConfiguration.BubbleColors.setRightBubbleTextColor(brandingDependenciesModel.getAllowedValues()[0]);
                                     editor.putString(BotResponse.WIDGET_TXT_COLOR, brandingDependenciesModel.getAllowedValues()[0]);
                                 }
 
@@ -302,7 +303,7 @@ public class BrandingChangeActivity extends BotAppCompactActivity
             InputStream is = getResources().openRawResource(R.raw.branding_response);
             Reader reader = new InputStreamReader(is);
             botOptionsModel = gson.fromJson(reader, BrandingWidgetThemeModel.class);
-            LogUtils.e("Options Size", botOptionsModel.getBrandingwidgetdesktop().getEntities().size() + "" );
+            Log.e("Options Size", botOptionsModel.getBrandingwidgetdesktop().getEntities().size() + "" );
         }
         catch (Exception e)
         {

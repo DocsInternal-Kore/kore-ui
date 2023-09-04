@@ -45,14 +45,22 @@ public class CustomTableView extends ViewGroup {
     public void populateTableView(PayloadInner data){
         mTable.removeAllViews();
         if(data != null){
+/*            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(10,10,10,10);*/
             int size = data.getColumns().size();
-            int rowSize = ((ArrayList<?>) data.getElements()).size();
+            int rowSize = ((ArrayList) data.getElements()).size();
 
             TableRow tr = new TableRow(mContext);
             tr.setBackgroundResource(R.drawable.tableview_cell_shape);
+//                if(i%2==0)tr.setBackgroundColor(Color.GRAY);
+//                tr.setId(100+i);
+//                tr.setBackgroundColor(Color.GRAY);
             tr.setLayoutParams(new LayoutParams(
                     LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
+            //  tr.setPadding(10,10,10,10);
 
             //Create two columns to add as table data
             // Create a TextView to add date
@@ -60,7 +68,7 @@ public class CustomTableView extends ViewGroup {
                 TextView txtHeader = new TextView(mContext);
                 txtHeader.setId(200 + i);
                 //   txtHeader.setLayoutParams(layoutParams);
-                txtHeader.setText((String)((List<?>)data.getColumns().get(i)).get(0));
+                txtHeader.setText((String)((List)data.getColumns().get(i)).get(0));
                 txtHeader.setGravity(Gravity.CENTER);
                 txtHeader.setPadding(10, 20, 10, 20);
                 txtHeader.setTextColor(Color.BLACK);
@@ -73,6 +81,10 @@ public class CustomTableView extends ViewGroup {
 
             for(int j=0; j< rowSize; j++){//2
                 TableRow trdata = new TableRow(mContext);
+                //  trdata.setPadding(10,10,10,10);
+//                if(i%2==0)tr.setBackgroundColor(Color.GRAY);
+//                tr.setId(100+i);
+//                trdata.setBackgroundColor(Color.GRAY);
                 trdata.setLayoutParams(new LayoutParams(
                         LayoutParams.MATCH_PARENT,
                         LayoutParams.WRAP_CONTENT));
@@ -82,11 +94,17 @@ public class CustomTableView extends ViewGroup {
 
                     LinkedTreeMap lt = (LinkedTreeMap) ar.get(j);
                     int arr_size = ((ArrayList) ((LinkedTreeMap)((ArrayList) data.getElements()).get(j)).get("Values")).size();
+//                    String disText = (String)((ArrayList)(((LinkedTreeMap)((ArrayList) data.getElements()).get(j))).get("Values")).get(k);
+
+//                    if(data.getElements().get(j).size() != size) {
                     if(arr_size != size) {
                         continue;
                     }
                     TextView txtData = new TextView(mContext);
                     txtData.setId(200 + k);
+                    // txtData.setLayoutParams(layoutParams);
+                    //txtData.setText(data.getRows().get(j).get(k) != null?data.getRows().get(j).get(k):"");
+                  //  txtData.setText(Utils.isNullOrEmpty(disText) ?"":disText  );
                     txtData.setText(((ArrayList)(((LinkedTreeMap)((ArrayList) data.getElements()).get(j))).get("Values")).get(k) + "" );
 
                     txtData.setPadding(10, 20, 10, 20);
@@ -99,6 +117,11 @@ public class CustomTableView extends ViewGroup {
                         LayoutParams.MATCH_PARENT,
                         LayoutParams.WRAP_CONTENT));
             }
+                /*TextView labelWEIGHT = new TextView(mContext);
+                labelWEIGHT.setId(200+i);
+                labelWEIGHT.setText(data.getRows().get(i).get(0)!=null?data.getRows().get(i).get(0):"");
+                labelWEIGHT.setTextColor(Color.BLACK);
+                tr.addView(labelWEIGHT);*/
         }
 
     }

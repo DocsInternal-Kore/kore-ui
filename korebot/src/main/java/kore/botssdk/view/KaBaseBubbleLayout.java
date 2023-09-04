@@ -40,6 +40,7 @@ import kore.botssdk.view.viewUtils.DimensionUtil;
  * Created by Pradeep Mahato on 31-May-16.
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
+@SuppressLint("UnknownNullness")
 public abstract class KaBaseBubbleLayout extends ViewGroup {
     Context context;
     Activity activityContext;
@@ -76,8 +77,8 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
     protected int BUBBLE_LEFT_BORDER = 0;
     protected int BUBBLE_RIGHT_BORDER = 0;
     protected int BUBBLE_FORWARD_LAYOUT_HEIGHT_CONSIDERATION_FOR_PAINT = 0;
-    protected int BUBBLE_CONTENT_LEFT_BORDER = 0; //TODO remove this...
-    protected int BUBBLE_CONTENT_RIGHT_BORDER = 0; //TODO remove this...
+    protected int BUBBLE_CONTENT_LEFT_BORDER = 0;
+    protected int BUBBLE_CONTENT_RIGHT_BORDER = 0;
     protected int BUBBLE_LEFT_PROFILE_PIC = 0;
     protected int BUBBLE_SEPARATION_DISTANCE = 0;
     protected int BUBBLE_GROUPING_TIMELINE = 0;
@@ -117,6 +118,7 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
     protected BarChartView barChartView;
     protected StackedBarChatView stackedBarChatView;
     protected ContactInfoView contactInfoView;
+    protected WelcomeSummaryView welcomeSummaryView;
     protected UniversalSearchView universalSearchView;
     protected KoraSummaryHelpView koraSummaryHelpView;
     protected KoraCarouselView koraCarouselView;
@@ -141,6 +143,7 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
     protected BankingFeedbackTemplateView bankingFeedbackTemplateView;
     protected BotContactTemplateView botContactTemplateView;
     protected BotCustomTableView botCustomTableView;
+
     protected LinkTemplateView linkTemplateView;
     protected AdvancedListTemplateView advancedListTemplateView;
     protected BotBeneficiaryTemplateView botBeneficiaryTemplateView;
@@ -151,15 +154,14 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
     protected CardTemplateView cardTemplateView;
     protected EmptyTemplateView emptyTemplateView;
 
-
     //    protected int[] dimens;
     protected int textColor;
     protected int textMediaLayoutGravity = BubbleConstants.GRAVITY_LEFT;
     protected GradientDrawable leftGradientDrawable,rightGradientDrawable;
-
     LayoutInflater ownLayoutInflater;
     protected TextView timeStampsTextView;
     protected TimeLineTextView timeLineView;
+
 
     public KaBaseBubbleLayout(Context context) {
         super(context);
@@ -197,7 +199,6 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         }
         viewAddition();
     }
-
 
     public void setTimeStampVisible(){
         timeStampsTextView.setVisibility(VISIBLE);
@@ -254,7 +255,7 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
             } else {
                 paint.setColor(LEFT_COLOR_UNSELECTED);
             }
-        } else if (!isLeftSide()) {
+        } else {
             if (isSelected()) {
                 paint.setColor(RIGHT_COLOR_SELECTED);
             } else {
@@ -317,6 +318,11 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         contactInfoView.setComposeFooterInterface(composeFooterInterface);
         contactInfoView.setInvokeGenericWebViewInterface(invokeGenericWebViewInterface);
         addView(contactInfoView);
+
+        welcomeSummaryView = ViewProvider.getWelcomeSummaryView(context);
+        welcomeSummaryView.setComposeFooterInterface(composeFooterInterface);
+        addView(welcomeSummaryView);
+
 
         universalSearchView = ViewProvider.getUniversalSearchView(context);
         universalSearchView.setComposeFooterInterface(composeFooterInterface);
@@ -465,8 +471,6 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         addView(emptyTemplateView);
     }
 
-
-
     abstract void initializeBubbleBorderPass1();
 
     abstract void initializeBubbleBorderPass2();
@@ -522,6 +526,9 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         }
         if(contactInfoView != null){
             contactInfoView.setComposeFooterInterface(composeFooterInterface);
+        }
+        if(welcomeSummaryView !=null){
+            welcomeSummaryView.setComposeFooterInterface(composeFooterInterface);
         }
 
         if(universalSearchView !=null){
@@ -586,6 +593,7 @@ public abstract class KaBaseBubbleLayout extends ViewGroup {
         if(bankingFeedbackTemplateView != null) {
             bankingFeedbackTemplateView.setComposeFooterInterface(composeFooterInterface);
         }
+
         if(resultsTemplateView != null) {
             resultsTemplateView.setComposeFooterInterface(composeFooterInterface);
         }

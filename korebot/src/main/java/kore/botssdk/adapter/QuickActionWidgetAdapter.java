@@ -16,8 +16,7 @@ import java.util.List;
 import kore.botssdk.R;
 import kore.botssdk.event.KoreEventCenter;
 import kore.botssdk.events.EntityEditEvent;
-import kore.botssdk.models.WCalEventsTemplateModel;
-import kore.botssdk.models.Widget;
+import kore.botssdk.models.Widget.Action;
 import kore.botssdk.utils.Constants;
 import kore.botssdk.utils.DialogCaller;
 import kore.botssdk.utils.StringUtils;
@@ -26,7 +25,7 @@ import kore.botssdk.utils.Utility;
 public class QuickActionWidgetAdapter extends RecyclerView.Adapter<QuickActionWidgetAdapter.QuickActionViewHolder>  {
 
     private final Context context;
-    private List<Widget.Action> quickReplyTemplateList;
+    private List<Action> quickReplyTemplateList;
     private final String skillName;
 
 //    private VerticalListViewActionHelper verticalListViewActionHelper;
@@ -65,7 +64,7 @@ public class QuickActionWidgetAdapter extends RecyclerView.Adapter<QuickActionWi
                                 dialog.dismiss();
                             }
                         });
-                }
+                    }
                 }
             }
         });
@@ -82,7 +81,7 @@ public class QuickActionWidgetAdapter extends RecyclerView.Adapter<QuickActionWi
         return quickReplyTemplateList != null ? quickReplyTemplateList.size() : 0;
     }
 
-    public void setData(List<Widget.Action> quickReplyTemplateList) {
+    public void setData(List<Action> quickReplyTemplateList) {
         this.quickReplyTemplateList = quickReplyTemplateList;
         notifyDataSetChanged();
     }

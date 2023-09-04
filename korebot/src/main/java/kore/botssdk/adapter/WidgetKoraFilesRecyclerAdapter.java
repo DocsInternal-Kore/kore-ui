@@ -100,8 +100,8 @@ public class WidgetKoraFilesRecyclerAdapter extends RecyclerView.Adapter impleme
         }
         else {
             ViewHolder holder = (ViewHolder) holdermodel;
-            holder.koraFileLookupViewBinding.setFileModel(kaFileLookupModels.get(holder.getBindingAdapterPosition()));
-            String type = kaFileLookupModels.get(holder.getBindingAdapterPosition()).getData().getExt();
+            holder.koraFileLookupViewBinding.setFileModel(kaFileLookupModels.get(position));
+            String type = kaFileLookupModels.get(position).getData().getExt();
             holder.koraFileLookupViewBinding.image.setImageResource(FileUtils.getDrawableByExt(!StringUtils.isNullOrEmptyWithTrim(type) ? type.toLowerCase() : ""));
             if(position == kaFileLookupModels.size()-1 && kaFileLookupModels.size()<=3)
                 holder.koraFileLookupViewBinding.divider.setVisibility(View.GONE);

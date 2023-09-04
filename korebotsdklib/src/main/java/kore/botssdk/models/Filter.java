@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+import kore.botssdk.models.Widget;
+
 /**
  * Created by Ramachandra Pradeep on 08-Mar-19.
  */

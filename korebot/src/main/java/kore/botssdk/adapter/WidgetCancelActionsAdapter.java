@@ -105,7 +105,7 @@ public class WidgetCancelActionsAdapter extends RecyclerView.Adapter<WidgetCance
                                 dialog.dismiss();
                             }
                         });
-                                  }
+                    }
 
                 }
             }

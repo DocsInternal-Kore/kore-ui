@@ -49,17 +49,17 @@ public class AdvanceOptionsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
-        AdvanceOptionsAdapter.DetailsViewHolder holder;
+        DetailsViewHolder holder;
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.advance_options_view, null);
+            convertView = View.inflate(context, R.layout.advance_options_view, null);
             KaFontUtils.applyCustomFont(context, convertView);
-            holder = new AdvanceOptionsAdapter.DetailsViewHolder();
+            holder = new DetailsViewHolder();
             holder.tvBtnText = convertView.findViewById(R.id.tvBtnText);
             holder.ivOptions = convertView.findViewById(R.id.ivOptions);
             holder.llOptions = convertView.findViewById(R.id.llOptions);
             convertView.setTag(holder);
         } else {
-            holder = (AdvanceOptionsAdapter.DetailsViewHolder) convertView.getTag();
+            holder = (DetailsViewHolder) convertView.getTag();
         }
 
         populateData(holder, position);
@@ -67,7 +67,7 @@ public class AdvanceOptionsAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void populateData(AdvanceOptionsAdapter.DetailsViewHolder holder, int position) {
+    private void populateData(DetailsViewHolder holder, int position) {
         AdvanceOptionsModel dataObj = (AdvanceOptionsModel) getItem(position);
         holder.tvBtnText.setText(dataObj.getLabel());
         holder.ivOptions.setVisibility(View.VISIBLE);

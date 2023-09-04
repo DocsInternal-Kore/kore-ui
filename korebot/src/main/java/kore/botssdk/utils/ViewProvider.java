@@ -1,5 +1,6 @@
 package kore.botssdk.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -63,11 +64,13 @@ import kore.botssdk.view.TextMediaLayout;
 import kore.botssdk.view.TimeLineTextView;
 import kore.botssdk.view.UniversalSearchView;
 import kore.botssdk.view.VerticalListView;
+import kore.botssdk.view.WelcomeSummaryView;
 
 /**
  * Created by Shiva Krishna on 11/20/2017.
  */
 
+@SuppressLint("UnknownNullness")
 public class ViewProvider {
     private static final int TEXTVIEW_ID = 1980081;
     private static final int LIST_ID = 1980045;
@@ -294,6 +297,14 @@ public class ViewProvider {
         return contactInfoView;
     }
 
+    public static WelcomeSummaryView getWelcomeSummaryView(Context context){
+        WelcomeSummaryView welcomeSummaryView = new WelcomeSummaryView(context,"");
+        welcomeSummaryView.setId(WELCOME_SUMMARY_VIEW_ID);
+        return welcomeSummaryView;
+    }
+
+
+
     public static UniversalSearchView getUniversalSearchView(Context context){
         UniversalSearchView universalSearchView = new UniversalSearchView(context);
         universalSearchView.setId(UNIVERSAL_SEARCH_VIEW_ID);
@@ -458,5 +469,4 @@ public class ViewProvider {
         emptyTemplateView.setId(LIST_ID);
         return emptyTemplateView;
     }
-
 }

@@ -39,12 +39,12 @@ public class AdvanceTableListAdapter extends RecyclerView.Adapter<AdvanceTableLi
 
     @NonNull
     @Override
-    public AdvanceTableListAdapter.ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ButtonViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         return new ButtonViewHolder(inflater.inflate(R.layout.advance_table_list_cell, viewGroup, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdvanceTableListAdapter.ButtonViewHolder holder, int i) {
+    public void onBindViewHolder(@NonNull ButtonViewHolder holder, int i) {
 
         AdvanceListTableModel.AdvanceTableRowDataModel btn = buttons.get(i);
         holder.botListItemTitle.setText(btn.getTitle());
@@ -106,8 +106,9 @@ public class AdvanceTableListAdapter extends RecyclerView.Adapter<AdvanceTableLi
     }
 
     public static class ButtonViewHolder extends RecyclerView.ViewHolder {
-        private TextView botListItemTitle, botListItemSubtitle;
-        private ImageView botListItemImage;
+        private final TextView botListItemTitle;
+        private final TextView botListItemSubtitle;
+        private final ImageView botListItemImage;
 
         public ButtonViewHolder(@NonNull View itemView) {
             super(itemView);

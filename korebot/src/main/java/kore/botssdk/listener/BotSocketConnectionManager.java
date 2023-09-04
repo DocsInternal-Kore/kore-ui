@@ -4,6 +4,7 @@ import static kore.botssdk.listener.BaseSocketConnectionManager.CONNECTION_STATE
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -34,7 +35,6 @@ import kore.botssdk.net.RestResponse;
 import kore.botssdk.net.SDKConfiguration;
 import kore.botssdk.utils.BundleConstants;
 import kore.botssdk.utils.DateUtils;
-import kore.botssdk.utils.LogUtils;
 import kore.botssdk.utils.NetworkUtility;
 import kore.botssdk.utils.TTSSynthesizer;
 import kore.botssdk.utils.Utils;
@@ -196,11 +196,11 @@ public class BotSocketConnectionManager extends BaseSocketConnectionManager {
                     }
                     @Override
                     public void onNext(Boolean isSuccess) {
-                        LogUtils.d(LOG_TAG, "Persistence success");
+                        Log.d(LOG_TAG, "Persistence success");
                     }
                     @Override
                     public void onError(Throwable e) {
-                        LogUtils.d(LOG_TAG, "Persistence fail");
+                        Log.d(LOG_TAG, "Persistence fail");
                     }
                     @Override
                     public void onComplete() {
@@ -246,7 +246,7 @@ public class BotSocketConnectionManager extends BaseSocketConnectionManager {
 //                if (t instanceof NoNetworkException) {
 //                    Toast.makeText(mContext, "No Network", Toast.LENGTH_SHORT).show();
 //                } else {
-                LogUtils.d("token refresh", t.getMessage());
+                    Log.d("token refresh", t.getMessage());
 //                }
                 connection_state = isRefresh ? CONNECTION_STATE.CONNECTED_BUT_DISCONNECTED : DISCONNECTED;
             }
@@ -291,7 +291,7 @@ public class BotSocketConnectionManager extends BaseSocketConnectionManager {
 //                if (t instanceof NoNetworkException) {
 //                    Toast.makeText(mContext, "No Network", Toast.LENGTH_SHORT).show();
 //                } else {
-                LogUtils.d("token refresh", t.getMessage());
+                Log.d("token refresh", t.getMessage());
 //                }
                 connection_state = isRefresh ? CONNECTION_STATE.CONNECTED_BUT_DISCONNECTED : DISCONNECTED;
             }
@@ -553,8 +553,7 @@ public class BotSocketConnectionManager extends BaseSocketConnectionManager {
 
     public void stopTextToSpeech() {
         try {
-            if(ttsSynthesizer != null)
-                ttsSynthesizer.stopTextToSpeech();
+            ttsSynthesizer.stopTextToSpeech();
         } catch (IllegalArgumentException | NullPointerException exception) {
             exception.printStackTrace();
         }
@@ -679,7 +678,7 @@ public class BotSocketConnectionManager extends BaseSocketConnectionManager {
             };
             _handler.postDelayed(r, mDelay);
         } catch (Exception e) {
-            LogUtils.d("KoraSocketConnection", ":: The Exception is " + e);
+            Log.d("KoraSocketConnection", ":: The Exception is " + e);
         }
     }
     private static final Handler alertHandler = new Handler();
@@ -706,7 +705,7 @@ public class BotSocketConnectionManager extends BaseSocketConnectionManager {
 
             alertHandler.postDelayed(alertRunnable, mDelay);
         } catch (Exception e) {
-            LogUtils.d("KoraSocketConnection", ":: The Exception is " + e);
+            Log.d("KoraSocketConnection", ":: The Exception is " + e);
         }
     }
 

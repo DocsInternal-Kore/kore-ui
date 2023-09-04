@@ -2,10 +2,10 @@ package kore.botssdk.models;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-
 import java.io.Serializable;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by Ramachandra Pradeep on 02-Aug-18.
@@ -39,6 +39,17 @@ public class CalEventsTemplateModel extends BaseCalenderTemplateModel implements
     public void setmId(String mId) {
         this.mId = mId;
     }
+
+    public MeetJoin getMeetJoin() {
+        return meetJoin;
+    }
+
+    public void setMeetJoin(MeetJoin meetJoin) {
+        this.meetJoin = meetJoin;
+    }
+
+    private MeetJoin meetJoin;
+
 
     public String getDescription() {
 
@@ -75,7 +86,7 @@ public class CalEventsTemplateModel extends BaseCalenderTemplateModel implements
         return duration;
     }
 
-    public final void setDuration(Duration duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
@@ -165,7 +176,7 @@ public class CalEventsTemplateModel extends BaseCalenderTemplateModel implements
         this.reqTextToDisplayForDetails = reqTextToDisplayForDetails;
     }
 
-    public static class Duration  implements Serializable,Cloneable{
+    public class Duration  implements Serializable,Cloneable{
 
         private double start;
         private double end;
@@ -192,7 +203,7 @@ public class CalEventsTemplateModel extends BaseCalenderTemplateModel implements
         }
     }
 
-    public static class Attendee implements Serializable{
+    public class Attendee implements Serializable{
 
         private boolean optional;
         private boolean resource;
@@ -301,7 +312,7 @@ public class CalEventsTemplateModel extends BaseCalenderTemplateModel implements
 
     }
 
-    public static class Action implements Serializable {
+    public class Action implements Serializable {
         private String type;
         private String title;
         private String utterance;

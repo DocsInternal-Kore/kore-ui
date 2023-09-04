@@ -14,6 +14,11 @@ import kore.botssdk.models.KoreLoginResponse;
 import kore.botssdk.models.PdfResponseModel;
 import kore.botssdk.models.TokenResponseModel;
 import kore.botssdk.models.WebHookResponseDataModel;
+import kore.botssdk.models.WebHookResponseModel;
+import kore.botssdk.net.RestResponse.LoginResponse;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -81,7 +86,7 @@ public interface RestAPI {
             "X-HTTP-Method-Override:DELETE"
     })
     @POST("/api/users/{userId}/sdknotifications/unsubscribe")
-    Call<ResponseBody> unSubscribeForPushNotification(@Path("userId") String userId, @Header("Authorization") String token, @Body HashMap<String, Object> body);
+    Call<ResponseBody> unSubscribeForPushNotification(@Path("userId") String userId, @Body HashMap<String, Object> body);
 
 //    @GET("/api" + URL_VERSION + "/botmessages/rtm")
 //    Call<BotHistory> getHistory(@Header("Authorization") String token, @Query("botId") String botId, @Query("limit") int limit, @Query("msgId") String msgId, @Query("direction") int forward);
@@ -105,8 +110,10 @@ public interface RestAPI {
 
     @GET("chatbot/v2/webhook/{streamId}/poll/{pollId}")
     Call<WebHookResponseDataModel> getPollIdData(@Header("Authorization") String token, @Path("streamId") String streamId, @Path("pollId") String pollId);
+
     @POST
     Call<PdfResponseModel> getPdfBaseDetails(@Url String url, @HeaderMap HashMap<String, String> header, @Body JsonObject body);
+
     @POST
-    Call<ResponseBody> getPdfDetails(@Url String url, @HeaderMap HashMap<String, String> header,  @Body JsonObject body);
+    Call<ResponseBody> getPdfDetails(@Url String url, @HeaderMap HashMap<String, String> header, @Body JsonObject body);
 }

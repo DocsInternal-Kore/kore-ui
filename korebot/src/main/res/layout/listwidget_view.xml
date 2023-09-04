@@ -195,10 +195,7 @@
         android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        app:el_duration="400"
-        app:el_expanded="true"
-        app:el_parallax="0.5">
+        android:layout_marginTop="0dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/buttonsList"
