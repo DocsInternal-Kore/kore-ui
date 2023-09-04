@@ -5,6 +5,7 @@ package kore.botssdk.net;
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.View;
 
@@ -13,39 +14,16 @@ import java.util.HashMap;
 /**
  * This class is for defining properties
  */
+@SuppressLint("UnknownNullness")
 public class SDKConfiguration {
 
     public static String APP_REQ_COLOR = "#3942f6"; // KORA COLOR "#3942f6" // BMC COLOR 2f91e5
     /**
      * bot init text  and related settings
      */
-
-    private static boolean TRIGGER_INIT_MESSAGE = false;
-    private static String INIT_MESSAGE = "Welpro";
-    public static final String BOT_ICON_URL = "";
-
     private static boolean TIME_STAMPS_REQUIRED = true;
     private static boolean APPLY_FONT_STYLE = true;
-
     protected static HashMap<String , View> hsh = new HashMap<>();
-
-    public static boolean isTriggerInitMessage() {
-        return TRIGGER_INIT_MESSAGE;
-    }
-
-    public static void setTriggerInitMessage(boolean triggerInitMessage) {
-        TRIGGER_INIT_MESSAGE = triggerInitMessage;
-    }
-
-    public static String getInitMessage() {
-        return INIT_MESSAGE;
-    }
-
-    public static void setInitMessage(String initMessage) {
-        INIT_MESSAGE = initMessage;
-    }
-
-
     public static boolean isApplyFontStyle() {
         return APPLY_FONT_STYLE;
     }
@@ -65,21 +43,17 @@ public class SDKConfiguration {
 
     //JWTServer related configurations
     public static class JWTServer {
+        static  String JWT_SERVER_URL = "https://demo.kore.net";
         public static void setJwtServerUrl(String jwtServerUrl) {
             JWT_SERVER_URL = jwtServerUrl;
         }
-
-
-        static  String JWT_SERVER_URL = "https://demo.kore.net";
     }
 
     //Server related configurations
     public static class Server {
-
         public static void setKoreBotServerUrl(String koreBotServerUrl) {
             KORE_BOT_SERVER_URL = koreBotServerUrl;
         }
-
         public static void setServerUrl(String serverUrl) {
             SERVER_URL = serverUrl;
         }
@@ -107,6 +81,16 @@ public class SDKConfiguration {
         public static String TOKEN_SERVER_URL ="https://demodpd.kore.ai/";
         public static String Branding_SERVER_URL ="https://bankingassistant-qa-bots.kore.ai/";
         public static String koreAPIUrl = "https://qa1-bots.kore.ai/";
+
+        public static void setBrandingUrl(String url)
+        {
+            Branding_SERVER_URL = url;
+        }
+
+        public static void setTokenUrl(String url)
+        {
+            TOKEN_SERVER_URL = url;
+        }
     }
 
     public static class Client {
