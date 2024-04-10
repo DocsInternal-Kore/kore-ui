@@ -55,7 +55,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.audiocodes.mv.webrtcsdk.sip.enums.Transport;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -88,9 +87,6 @@ import kore.botssdk.adapter.WelcomeStarterButtonsAdapter;
 import kore.botssdk.adapter.WelcomeStaticLinkListAdapter;
 import kore.botssdk.adapter.WelcomeStaticLinksAdapter;
 import kore.botssdk.application.BotApplication;
-import kore.botssdk.audiocodes.webrtcclient.General.ACManager;
-import kore.botssdk.audiocodes.webrtcclient.General.Prefs;
-import kore.botssdk.audiocodes.webrtcclient.Structure.SipAccount;
 import kore.botssdk.bot.BotClient;
 import kore.botssdk.event.KoreEventCenter;
 import kore.botssdk.events.SocketDataTransferModel;
@@ -730,51 +726,27 @@ public class BotChatActivity extends BotAppCompactActivity implements ComposeFoo
             e.printStackTrace();
             if (e instanceof JsonSyntaxException) {
                 try {
+                    //This is the case Bot returning user sent message from another channel
                     if (botContentFragment != null) {
-                        EventModel eventModel = gson.fromJson(payload, EventModel.class);
-                        if (eventModel != null && eventModel.getMessage() != null) {
-                            if (!StringUtils.isNullOrEmpty(eventModel.getMessage().getSipURI())) {
-                                EventMessageModel eventMessageModel = eventModel.getMessage();
-                                SipAccount sipAccount = new SipAccount();
-                                sipAccount.setUsername(botClient.getUserId());
-                                sipAccount.setDisplayName(botClient.getUserId());
-                                sipAccount.setDomain(eventMessageModel.getDomain());
-                                sipAccount.setProxy(eventMessageModel.getDomain());
-                                sipAccount.setPort(5080);
-                                sipAccount.setTransport(Transport.UDP);
-
-                                Prefs.setSipAccount(sipAccount);
-                                Prefs.setAutoRedirect(true);
-
-                                showAlertDialog(eventModel);
-                            }
-                        }
+                        BotRequest botRequest = gson.fromJson(payload, BotRequest.class);
+                        botRequest.setCreatedOn(DateUtils.isoFormatter.format(new Date()));
+                        botContentFragment.updateContentListOnSend(botRequest);
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception e1) {
                     try {
-                        //This is the case Bot returning user sent message from another channel
-                        if (botContentFragment != null) {
-                            BotRequest botRequest = gson.fromJson(payload, BotRequest.class);
-                            botRequest.setCreatedOn(DateUtils.isoFormatter.format(new Date()));
-                            botContentFragment.updateContentListOnSend(botRequest);
+                        final BotResponsePayLoadText botResponse = gson.fromJson(payload, BotResponsePayLoadText.class);
+                        if (botResponse == null || botResponse.getMessage() == null || botResponse.getMessage().isEmpty()) {
+                            return;
                         }
-                    } catch (Exception e1) {
-                        try {
-                            final BotResponsePayLoadText botResponse = gson.fromJson(payload, BotResponsePayLoadText.class);
-                            if (botResponse == null || botResponse.getMessage() == null || botResponse.getMessage().isEmpty()) {
-                                return;
+                        LogUtils.d(LOG_TAG, payload);
+                        if (!botResponse.getMessage().isEmpty()) {
+                            ComponentModelPayloadText compModel = botResponse.getMessage().get(0).getComponent();
+                            if (compModel != null && !StringUtils.isNullOrEmpty(compModel.getPayload())) {
+                                displayMessage(compModel.getPayload(), BotResponse.COMPONENT_TYPE_TEXT, botResponse.getMessageId());
                             }
-                            LogUtils.d(LOG_TAG, payload);
-                            if (!botResponse.getMessage().isEmpty()) {
-                                ComponentModelPayloadText compModel = botResponse.getMessage().get(0).getComponent();
-                                if (compModel != null && !StringUtils.isNullOrEmpty(compModel.getPayload())) {
-                                    displayMessage(compModel.getPayload(), BotResponse.COMPONENT_TYPE_TEXT, botResponse.getMessageId());
-                                }
-                            }
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
                         }
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
                     }
                 }
             }
@@ -1769,7 +1741,6 @@ public class BotChatActivity extends BotAppCompactActivity implements ComposeFoo
                     eventModel.getMessage().setType("call_agent_webrtc_accepted");
                     botClient.sendMessage(gson.toJsonTree(eventModel.getMessage()));
 
-                    openNextScreen(eventModel.getMessage().getSipUser(), eventModel.getMessage().isVideoCall());
                     alertDialog.dismiss();
                 }
             }
@@ -1783,24 +1754,5 @@ public class BotChatActivity extends BotAppCompactActivity implements ComposeFoo
         });
 
         alertDialog.show();
-    }
-
-    void openNextScreen(String sipUser, boolean isVideoCall) {
-        Prefs.setFirstLogin(false);
-        //start login and open app main screen
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (!ACManager.getInstance().isRegisterState()) {
-                    ACManager.getInstance().startLogin(false, false);
-                }
-
-                if (!ACManager.getInstance().isRegisterState() && Prefs.getAutoLogin()) {
-                    Toast.makeText(BotChatActivity.this, R.string.no_registration, Toast.LENGTH_SHORT).show();
-                } else {
-                    ACManager.getInstance().callNumber(sipUser, isVideoCall);
-                }
-            }
-        }).start();
     }
 }

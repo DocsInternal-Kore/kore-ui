@@ -7,12 +7,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.util.Log;
 
-import com.google.firebase.FirebaseApp;
-
-import kore.botssdk.audiocodes.webrtcclient.General.Log;
-import kore.botssdk.audiocodes.webrtcclient.db.MySQLiteHelper;
-import kore.botssdk.fcm.FCMWrapper;
 import kore.botssdk.listener.NetworkStateReceiver;
 
 /**
@@ -23,22 +19,12 @@ public class BotApplication extends Application {
 
     AppControl appControl;
     private static Context globalContext;
-    private static MySQLiteHelper dataBase;
     private static Activity currentActivity;
     private static Activity previousActivity;
 
     public static Context getGlobalContext()
     {
         return globalContext;
-    }
-
-    public static void initDataBase()
-    {
-        dataBase = new MySQLiteHelper(globalContext);
-    }
-
-    public static MySQLiteHelper getDataBase() {
-        return dataBase;
     }
 
     @Override
