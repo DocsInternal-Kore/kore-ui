@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         btnBotConnect = findViewById(R.id.btnBotConnect);
 
         SDKConfig.setCustomTemplateView("link", new LinkTemplateView(MainActivity.this));
-        SDKConfig.setCustomTemplateView("button", new BotButtonView(MainActivity.this));
+//        SDKConfig.setCustomTemplateView("button", new BotButtonView(MainActivity.this));
         btnBotConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
