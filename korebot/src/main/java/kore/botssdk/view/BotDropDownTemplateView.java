@@ -83,8 +83,8 @@ public class BotDropDownTemplateView extends LinearLayout {
 
         dp1 = (int) DimensionUtil.dp1;
         selectionCurrent = snrSplitList.getSelectedItemPosition();
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int width = LayoutParams.WRAP_CONTENT;
+        int height = LayoutParams.WRAP_CONTENT;
         boolean focusable = true;
         popUpView = LayoutInflater.from(mContext).inflate(R.layout.theme_change_layout, null);
         popupWindow = new PopupWindow(popUpView, width, height, focusable);
@@ -152,7 +152,7 @@ public class BotDropDownTemplateView extends LinearLayout {
             if (convertView == null || convertView.getTag() == null) {
                 convertView = inflater.inflate(R.layout.bot_drop_down_item_cell, null);
                 holder = new ViewHolder();
-                holder.more_txt_view = (TextView) convertView.findViewById(R.id.more_txt_view);
+                holder.more_txt_view = convertView.findViewById(R.id.more_txt_view);
                 convertView.setTag(holder);
             } else
                 holder = (ViewHolder) convertView.getTag();

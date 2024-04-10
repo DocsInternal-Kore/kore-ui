@@ -19,6 +19,7 @@ import kore.botssdk.listener.InvokeGenericWebViewInterface;
 import kore.botssdk.models.FormActionTemplate;
 import kore.botssdk.models.QuickReplyTemplate;
 import kore.botssdk.view.AdvancedListTemplateView;
+import kore.botssdk.view.AdvancedMultiSelectView;
 import kore.botssdk.view.AgentTransferTemplateView;
 import kore.botssdk.view.AttendeeSlotSelectionView;
 import kore.botssdk.view.BankingFeedbackTemplateView;
@@ -26,6 +27,7 @@ import kore.botssdk.view.BarChartView;
 import kore.botssdk.view.BotBeneficiaryTemplateView;
 import kore.botssdk.view.BotButtonLinkTemplateView;
 import kore.botssdk.view.BotButtonView;
+import kore.botssdk.view.BotCarouselStacked;
 import kore.botssdk.view.BotCarouselView;
 import kore.botssdk.view.BotContactTemplateView;
 import kore.botssdk.view.BotCustomTableView;
@@ -66,11 +68,6 @@ import kore.botssdk.view.UniversalSearchView;
 import kore.botssdk.view.VerticalListView;
 import kore.botssdk.view.WelcomeSummaryView;
 
-/**
- * Created by Shiva Krishna on 11/20/2017.
- */
-
-@SuppressLint("UnknownNullness")
 public class ViewProvider {
     private static final int TEXTVIEW_ID = 1980081;
     private static final int LIST_ID = 1980045;
@@ -211,6 +208,11 @@ public class ViewProvider {
 
     public static BotCarouselView getBotCarousalView(Context context){
         BotCarouselView botCarouselView = new BotCarouselView(context);
+        botCarouselView.setId(CAROUSEL_VIEW_ID);
+        return botCarouselView;
+    }
+    public static BotCarouselStacked getBotCarousalStacked(Context context){
+        BotCarouselStacked botCarouselView = new BotCarouselStacked(context);
         botCarouselView.setId(CAROUSEL_VIEW_ID);
         return botCarouselView;
     }
@@ -464,9 +466,17 @@ public class ViewProvider {
         return multiSelectView;
     }
 
-    public static EmptyTemplateView getEmptyTemplateView(Context context) {
-        EmptyTemplateView emptyTemplateView = new EmptyTemplateView(context);
-        emptyTemplateView.setId(LIST_ID);
-        return emptyTemplateView;
+    public static EmptyTemplateView getEmptyTemplateView(Context context){
+        EmptyTemplateView multiSelectView = new EmptyTemplateView(context);
+        multiSelectView.setId(LIST_ID);
+        return multiSelectView;
     }
+
+    @SuppressLint("UnknownNullness")
+    public static AdvancedMultiSelectView getAdvancedMultiSelectView(Context context){
+        AdvancedMultiSelectView multiSelectView = new AdvancedMultiSelectView(context);
+        multiSelectView.setId(LIST_ID);
+        return multiSelectView;
+    }
+
 }

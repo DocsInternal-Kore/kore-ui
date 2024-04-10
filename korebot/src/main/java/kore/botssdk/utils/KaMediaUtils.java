@@ -6,12 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -70,12 +68,7 @@ public class KaMediaUtils {
             if (mExternalStorageAvailable && mExternalStorageWriteable) {
 //                KoreLogger.debugLog(LOG_TAG, "Storage available for read write");
                 String path = "";
-                if(Build.VERSION.SDK_INT  > Build.VERSION_CODES.M){
-                    path = KaEnvironment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
-                }else {
-                    path = KaEnvironment.getExternalStorageDirectory() + "/" + MEDIA_APP_FOLDER + "/" + userId;
-
-                } //File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), Constants.KORE_APP_FOLDER);
+                path = KaEnvironment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
                 if (type.equalsIgnoreCase(KoreMedia.MEDIA_TYPE_AUDIO))
                     mediaStorageDir = new File(path, DOWNLOADED_AUDIO_FOLDER);
                 else if (type.equalsIgnoreCase(KoreMedia.MEDIA_TYPE_VIDEO))
@@ -91,17 +84,6 @@ public class KaMediaUtils {
                 // Create the storage directory if it does not exist
                 if (!mediaStorageDir.exists()) {
                     mediaStorageDir.mkdirs();
-                    if (!mediaStorageDir.mkdirs()) {
-//                        KoreLogger.debugLog(LOG_TAG, "failed to create Kore.ai App directory");
-                    }
-                }
-
-                // Create the storage directory if it does not exist
-                if (!mediaStorageDir.exists()) {
-                    mediaStorageDir.mkdirs();
-                    if (!mediaStorageDir.mkdirs()) {
-//                        KoreLogger.debugLog(LOG_TAG, "failed to create Kore.ai App directory");
-                    }
                 }
             }
         } catch (Exception e) {
@@ -216,13 +198,13 @@ public class KaMediaUtils {
             int read = 0;
             byte[] bytes = new byte[1024];
 
-            while ((read = inputStream.read(bytes)) != -1) {
-                out.write(bytes, 0, read);
+            if(inputStream != null) {
+                while ((read = inputStream.read(bytes)) != -1) {
+                    out.write(bytes, 0, read);
+                }
             }
-            Log.d("file create","success scenario"+fileName+extn);
             return file.getAbsolutePath();
         }catch (Exception e){
-            Log.d("file create","fail scenario");
             e.printStackTrace();
         }
         finally {
@@ -241,15 +223,18 @@ public class KaMediaUtils {
 
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;
+        FileOutputStream fos = null;
+        FileInputStream fis = null;
 
         if (sourceFilePath == null)
             return;
 
         try {
-            bis = new BufferedInputStream(new FileInputStream(new File(sourceFilePath)));
-            bos = new BufferedOutputStream(new FileOutputStream(destinationFilePath, false));
+            fis = new FileInputStream(sourceFilePath);
+            bis = new BufferedInputStream(fis);
+            fos = new FileOutputStream(destinationFilePath, false);
+            bos = new BufferedOutputStream(fos);
             byte[] buf = new byte[1024];
-            bis.read(buf);
             do {
                 bos.write(buf);
             } while (bis.read(buf) != -1);
@@ -258,8 +243,22 @@ public class KaMediaUtils {
             e.printStackTrace();
         } finally {
             try {
-                if (bis != null) bis.close();
                 if (bos != null) bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (fos != null) fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (bis != null) bis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (fis != null) fis.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -275,13 +274,8 @@ public class KaMediaUtils {
         String audio_extn = null;
         String video_extn = null;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
-            audio_extn = ".m4a";
-            video_extn = ".mp4";
-        } else {
-            audio_extn = ".amr";
-            video_extn = ".3gp";
-        }
+        audio_extn = ".m4a";
+        video_extn = ".mp4";
         if (MEDIA_TYPE.equalsIgnoreCase(KoreMedia.MEDIA_TYPE_VIDEO)) {
             return video_extn;
         } else if (MEDIA_TYPE.equalsIgnoreCase(KoreMedia.MEDIA_TYPE_IMAGE)) {
@@ -292,11 +286,8 @@ public class KaMediaUtils {
     }
 
     public static String getRealPath(final Context context, final Uri uri) {
-
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -306,10 +297,7 @@ public class KaMediaUtils {
                 if ("primary".equalsIgnoreCase(type)) {
                     return KaEnvironment.getExternalStorageDirectory() + "/" + split[1];
                 }
-
-                // TODO handle non-primary volumes
             }
-            // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
 
                 final String id = DocumentsContract.getDocumentId(uri);
@@ -326,13 +314,13 @@ public class KaMediaUtils {
                     };
 
                     for (String contentUriPrefix : contentUriPrefixesToTry) {
-                        Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
+                        Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.parseLong(id));
                         try {
                             String path = getDataColumn(context, contentUri, null, null);
                             if (path != null) {
                                 return path;
                             }
-                        } catch (Exception e) {}
+                        } catch (Exception e) {e.printStackTrace();}
                     }
                 }
             }
@@ -549,7 +537,7 @@ public class KaMediaUtils {
                 // flushing output
                 output.flush();
             } catch (Exception e) {
-                Log.e("Error: ", e.getMessage());
+                LogUtils.e("Error: ", e.getMessage());
             }
             finally {
                 try {

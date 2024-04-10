@@ -13,8 +13,9 @@ import kore.botssdk.charts.formatter.IFillFormatter;
 import kore.botssdk.charts.interfaces.datasets.ILineDataSet;
 import kore.botssdk.charts.utils.ColorTemplate;
 import kore.botssdk.charts.utils.Utils;
+import kore.botssdk.utils.LogUtils;
 
-public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry> implements ILineDataSet {
+public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet {
     private Mode mMode;
     private List<Integer> mCircleColors;
     private int mCircleHoleColor;
@@ -28,7 +29,7 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
 
     public LineDataSet(List<Entry> yVals, String label) {
         super(yVals, label);
-        this.mMode = LineDataSet.Mode.LINEAR;
+        this.mMode = Mode.LINEAR;
         this.mCircleColors = null;
         this.mCircleHoleColor = -1;
         this.mCircleRadius = 8.0F;
@@ -50,7 +51,7 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
         List<Entry> entries = new ArrayList();
 
         for(int i = 0; i < this.mValues.size(); ++i) {
-            entries.add(((Entry)this.mValues.get(i)).copy());
+            entries.add(this.mValues.get(i).copy());
         }
 
         LineDataSet copied = new LineDataSet(entries, this.getLabel());
@@ -76,7 +77,7 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
         return this.mMode;
     }
 
-    public void setMode(LineDataSet.Mode mode) {
+    public void setMode(Mode mode) {
         this.mMode = mode;
     }
 
@@ -100,7 +101,7 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
         if (radius >= 1.0F) {
             this.mCircleRadius = Utils.convertDpToPixel(radius);
         } else {
-            Log.e("LineDataSet", "Circle radius cannot be < 1");
+            LogUtils.e("LineDataSet", "Circle radius cannot be < 1");
         }
 
     }
@@ -113,7 +114,7 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
         if (holeRadius >= 0.5F) {
             this.mCircleHoleRadius = Utils.convertDpToPixel(holeRadius);
         } else {
-            Log.e("LineDataSet", "Circle radius cannot be < 0.5");
+            LogUtils.e("LineDataSet", "Circle radius cannot be < 0.5");
         }
 
     }
@@ -161,13 +162,13 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
     /** @deprecated */
     @Deprecated
     public boolean isDrawCubicEnabled() {
-        return this.mMode == LineDataSet.Mode.CUBIC_BEZIER;
+        return this.mMode == Mode.CUBIC_BEZIER;
     }
 
     /** @deprecated */
     @Deprecated
     public boolean isDrawSteppedEnabled() {
-        return this.mMode == LineDataSet.Mode.STEPPED;
+        return this.mMode == Mode.STEPPED;
     }
 
     public List<Integer> getCircleColors() {
@@ -175,7 +176,7 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
     }
 
     public int getCircleColor(int index) {
-        return (Integer)this.mCircleColors.get(index);
+        return this.mCircleColors.get(index);
     }
 
     public int getCircleColorCount() {
@@ -196,16 +197,16 @@ public class LineDataSet extends LineRadarDataSet<kore.botssdk.charts.data.Entry
             clrs = new ArrayList();
         }
 
-        ((List)clrs).clear();
+        clrs.clear();
         int[] var4 = colors;
         int var5 = colors.length;
 
         for(int var6 = 0; var6 < var5; ++var6) {
             int color = var4[var6];
-            ((List)clrs).add(c.getResources().getColor(color));
+            clrs.add(c.getResources().getColor(color));
         }
 
-        this.mCircleColors = (List)clrs;
+        this.mCircleColors = clrs;
     }
 
     public void setCircleColor(int color) {

@@ -1,4 +1,3 @@
-/*
 package kore.botssdk.net;
 
 import java.util.HashMap;
@@ -15,8 +14,9 @@ import retrofit2.Response;
 public class RegisterPushNotificationRequest  {
 
 
-    private String userId, token;
-    private HashMap<String, Object> request;
+    private final String userId;
+    private final String token;
+    private final HashMap<String, Object> request;
 
     public RegisterPushNotificationRequest(String userId, String accessToken, HashMap<String, Object> request) {
         this.request = request;
@@ -45,4 +45,3 @@ public class RegisterPushNotificationRequest  {
         //return response;
     }
 }
-*/

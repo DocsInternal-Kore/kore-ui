@@ -15,11 +15,12 @@ import kore.botssdk.charts.data.ChartData;
 import kore.botssdk.charts.data.CombinedData;
 import kore.botssdk.charts.highlight.Highlight;
 import kore.botssdk.charts.utils.ViewPortHandler;
+import kore.botssdk.utils.LogUtils;
 
 public class CombinedChartRenderer extends DataRenderer {
     protected List<DataRenderer> mRenderers = new ArrayList(5);
-    protected WeakReference<Chart> mChart;
-    protected List<Highlight> mHighlightBuffer = new ArrayList();
+    protected final WeakReference<Chart> mChart;
+    protected final List<Highlight> mHighlightBuffer = new ArrayList();
 
     public CombinedChartRenderer(CombinedChart chart, ChartAnimator animator, ViewPortHandler viewPortHandler) {
         super(animator, viewPortHandler);
@@ -40,12 +41,12 @@ public class CombinedChartRenderer extends DataRenderer {
                 switch(order) {
                     case BAR:
                         if (chart.getBarData() != null) {
-                            this.mRenderers.add(new kore.botssdk.charts.renderer.BarChartRenderer(chart, this.mAnimator, this.mViewPortHandler));
+                            this.mRenderers.add(new BarChartRenderer(chart, this.mAnimator, this.mViewPortHandler));
                         }
                         break;
                     case BUBBLE:
                         if (chart.getBubbleData() != null) {
-                            this.mRenderers.add(new kore.botssdk.charts.renderer.BubbleChartRenderer(chart, this.mAnimator, this.mViewPortHandler));
+                            this.mRenderers.add(new BubbleChartRenderer(chart, this.mAnimator, this.mViewPortHandler));
                         }
                         break;
                     case LINE:
@@ -55,7 +56,7 @@ public class CombinedChartRenderer extends DataRenderer {
                         break;
                     case CANDLE:
                         if (chart.getCandleData() != null) {
-                            this.mRenderers.add(new kore.botssdk.charts.renderer.CandleStickChartRenderer(chart, this.mAnimator, this.mViewPortHandler));
+                            this.mRenderers.add(new CandleStickChartRenderer(chart, this.mAnimator, this.mViewPortHandler));
                         }
                         break;
                     case SCATTER:
@@ -89,7 +90,7 @@ public class CombinedChartRenderer extends DataRenderer {
     }
 
     public void drawValue(Canvas c, String valueText, float x, float y, int color) {
-        Log.e("MPAndroidChart", "Erroneous call to drawValue() in CombinedChartRenderer!");
+        LogUtils.e("MPAndroidChart", "Erroneous call to drawValue() in CombinedChartRenderer!");
     }
 
     public void drawValues(Canvas c) {
@@ -113,22 +114,22 @@ public class CombinedChartRenderer extends DataRenderer {
     }
 
     public void drawHighlighted(Canvas c, Highlight[] indices) {
-        Chart chart = (Chart)this.mChart.get();
+        Chart chart = this.mChart.get();
         if (chart != null) {
             Iterator var4 = this.mRenderers.iterator();
 
             while(var4.hasNext()) {
                 DataRenderer renderer = (DataRenderer)var4.next();
                 ChartData data = null;
-                if (renderer instanceof kore.botssdk.charts.renderer.BarChartRenderer) {
+                if (renderer instanceof BarChartRenderer) {
                     data = ((BarChartRenderer)renderer).mChart.getBarData();
                 } else if (renderer instanceof LineChartRenderer) {
                     data = ((LineChartRenderer)renderer).mChart.getLineData();
-                } else if (renderer instanceof kore.botssdk.charts.renderer.CandleStickChartRenderer) {
+                } else if (renderer instanceof CandleStickChartRenderer) {
                     data = ((CandleStickChartRenderer)renderer).mChart.getCandleData();
                 } else if (renderer instanceof ScatterChartRenderer) {
                     data = ((ScatterChartRenderer)renderer).mChart.getScatterData();
-                } else if (renderer instanceof kore.botssdk.charts.renderer.BubbleChartRenderer) {
+                } else if (renderer instanceof BubbleChartRenderer) {
                     data = ((BubbleChartRenderer)renderer).mChart.getBubbleData();
                 }
 
@@ -144,14 +145,14 @@ public class CombinedChartRenderer extends DataRenderer {
                     }
                 }
 
-                renderer.drawHighlighted(c, (Highlight[])this.mHighlightBuffer.toArray(new Highlight[this.mHighlightBuffer.size()]));
+                renderer.drawHighlighted(c, this.mHighlightBuffer.toArray(new Highlight[this.mHighlightBuffer.size()]));
             }
 
         }
     }
 
     public DataRenderer getSubRenderer(int index) {
-        return index < this.mRenderers.size() && index >= 0 ? (DataRenderer)this.mRenderers.get(index) : null;
+        return index < this.mRenderers.size() && index >= 0 ? this.mRenderers.get(index) : null;
     }
 
     public List<DataRenderer> getSubRenderers() {

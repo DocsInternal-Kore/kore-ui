@@ -3,7 +3,6 @@ package kore.botssdk.net;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 import kore.botssdk.models.Authorization;
 import kore.botssdk.models.BotInfoModel;
@@ -94,7 +93,7 @@ public class RestResponse {
     }
 
     public static class BotMessage {
-        private String body;
+        private Object body;
         private BotCustomData customData;
         public HashMap<String, Object> getParams() {
             return params;
@@ -106,6 +105,10 @@ public class RestResponse {
 
         private HashMap<String, Object> params;
         private ArrayList<HashMap<String, String>> attachments = new ArrayList<>();
+
+        public BotMessage(Object body) {
+            this.body = body;
+        }
 
         public BotMessage(String body) {
             this.body = body;
@@ -124,7 +127,7 @@ public class RestResponse {
             this.attachments = attachments;
         }
 
-        public String getBody() {
+        public Object getBody() {
             return body;
         }
 
@@ -144,8 +147,8 @@ public class RestResponse {
     public static class BotResponses extends ArrayList<BotResponse>{}
 
     public static class Meta{
-        public String timezone;
-        public String locale;
+        public final String timezone;
+        public final String locale;
         public Meta(String timezone, String locale){
             this.timezone = timezone;
             this.locale = locale;
@@ -153,21 +156,26 @@ public class RestResponse {
     }
 
     public static class BotPayLoad {
-
-
         private BotMessage message;
-        private String resourceid = "/bot.message";
+        private final String resourceid = "/bot.message";
         private BotInfoModel botInfo;
         private int clientMessageId = (int)System.currentTimeMillis();
         private Meta meta;
         private int id = clientMessageId;
         private String client = "Android";
 
+        private String event;
+
         public void setMessage(BotMessage message) {
             this.message = message;
         }
         public void setBotInfo(BotInfoModel botInfo){
             this.botInfo = botInfo;
+        }
+
+        public void setEvent(String event)
+        {
+            this.event = event;
         }
 
         public int getClientMessageId() {

@@ -3,7 +3,6 @@ package kore.botssdk.models;
 import java.util.HashMap;
 
 /**
- * Created by Pradeep Mahato on 21/7/17.
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
 public class BotButtonModel implements MultiSelectBase {
@@ -34,7 +33,6 @@ public class BotButtonModel implements MultiSelectBase {
     }
 
     HashMap<String,Object> customData;
-
     private boolean isSamePageNavigation;
 
     public boolean isSamePageNavigation() {

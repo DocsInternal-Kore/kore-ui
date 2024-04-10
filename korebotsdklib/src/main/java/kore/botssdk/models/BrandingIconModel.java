@@ -1,12 +1,15 @@
 package kore.botssdk.models;
 
-public class BrandingIconModel {
+import java.io.Serializable;
+
+public class BrandingIconModel implements Serializable {
     private String icon_url;
     private String size;
     private String shape;
     private boolean show;
     private String color;
     private String icon;
+    private String type;
     private BrandingQuickStartButtonActionModel action;
 
     public void setAction(BrandingQuickStartButtonActionModel action) {
@@ -43,6 +46,14 @@ public class BrandingIconModel {
 
     public String getSize() {
         return size;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getIcon_url() {

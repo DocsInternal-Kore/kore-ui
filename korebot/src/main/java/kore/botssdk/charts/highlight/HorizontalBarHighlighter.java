@@ -17,14 +17,14 @@ public class HorizontalBarHighlighter extends BarHighlighter {
         super(chart);
     }
 
-    public kore.botssdk.charts.highlight.Highlight getHighlight(float x, float y) {
-        BarData barData = ((BarDataProvider)this.mChart).getBarData();
+    public Highlight getHighlight(float x, float y) {
+        BarData barData = this.mChart.getBarData();
         MPPointD pos = this.getValsForTouch(y, x);
-        kore.botssdk.charts.highlight.Highlight high = this.getHighlightForX((float)pos.y, y, x);
+        Highlight high = this.getHighlightForX((float)pos.y, y, x);
         if (high == null) {
             return null;
         } else {
-            IBarDataSet set = (IBarDataSet)barData.getDataSetByIndex(high.getDataSetIndex());
+            IBarDataSet set = barData.getDataSetByIndex(high.getDataSetIndex());
             if (set.isStacked()) {
                 return this.getStackedHighlight(high, set, (float)pos.y, (float)pos.x);
             } else {
@@ -34,11 +34,11 @@ public class HorizontalBarHighlighter extends BarHighlighter {
         }
     }
 
-    protected List<kore.botssdk.charts.highlight.Highlight> buildHighlights(IDataSet set, int dataSetIndex, float xVal, DataSet.Rounding rounding) {
-        ArrayList<kore.botssdk.charts.highlight.Highlight> highlights = new ArrayList();
+    protected List<Highlight> buildHighlights(IDataSet set, int dataSetIndex, float xVal, DataSet.Rounding rounding) {
+        ArrayList<Highlight> highlights = new ArrayList<>();
         List<Entry> entries = set.getEntriesForXValue(xVal);
         if (entries.size() == 0) {
-            Entry closest = set.getEntryForXValue(xVal, 0.0F / 0.0F, rounding);
+            Entry closest = set.getEntryForXValue(xVal, Float.NaN, rounding);
             if (closest != null) {
                 entries = set.getEntriesForXValue(closest.getX());
             }
@@ -47,12 +47,10 @@ public class HorizontalBarHighlighter extends BarHighlighter {
         if (entries.size() == 0) {
             return highlights;
         } else {
-            Iterator var10 = entries.iterator();
 
-            while(var10.hasNext()) {
-                Entry e = (Entry)var10.next();
-                MPPointD pixels = ((BarDataProvider)this.mChart).getTransformer(set.getAxisDependency()).getPixelForValues(e.getY(), e.getX());
-                highlights.add(new Highlight(e.getX(), e.getY(), (float)pixels.x, (float)pixels.y, dataSetIndex, set.getAxisDependency()));
+            for (Entry e : entries) {
+                MPPointD pixels = this.mChart.getTransformer(set.getAxisDependency()).getPixelForValues(e.getY(), e.getX());
+                highlights.add(new Highlight(e.getX(), e.getY(), (float) pixels.x, (float) pixels.y, dataSetIndex, set.getAxisDependency()));
             }
 
             return highlights;

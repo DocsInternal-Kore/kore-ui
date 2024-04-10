@@ -2,11 +2,14 @@ package kore.botssdk.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class BrandingFooterComposeBarModel {
+import java.io.Serializable;
+
+public class BrandingFooterComposeBarModel implements Serializable {
     private String bg_color;
     @SerializedName("outline-color")
     private String outline_color;
     private String placeholder;
+    private String inline_color;
 
     public void setBg_color(String bg_color) {
         this.bg_color = bg_color;
@@ -30,5 +33,13 @@ public class BrandingFooterComposeBarModel {
 
     public String getPlaceholder() {
         return placeholder;
+    }
+
+    public void setInline_color(String inline_color) {
+        this.inline_color = inline_color;
+    }
+
+    public String getInline_color() {
+        return inline_color;
     }
 }

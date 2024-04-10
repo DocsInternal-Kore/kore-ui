@@ -54,8 +54,8 @@ public class CandleEntry extends Entry {
         return super.getY();
     }
 
-    public kore.botssdk.charts.data.CandleEntry copy() {
-        kore.botssdk.charts.data.CandleEntry c = new kore.botssdk.charts.data.CandleEntry(this.getX(), this.mShadowHigh, this.mShadowLow, this.mOpen, this.mClose, this.getData());
+    public CandleEntry copy() {
+        CandleEntry c = new CandleEntry(this.getX(), this.mShadowHigh, this.mShadowLow, this.mOpen, this.mClose, this.getData());
         return c;
     }
 

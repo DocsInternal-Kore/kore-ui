@@ -24,7 +24,7 @@ public class HeaderLayout extends ViewGroup {
     private TextView headerTextView;
     private float dp1;
 
-    int gravity = 0;
+    final int gravity = 0;
 
     public static final int HEADER_TEXTVIEW_ID = 1980091;
 
@@ -70,11 +70,7 @@ public class HeaderLayout extends ViewGroup {
         headerTextView.setId(HEADER_TEXTVIEW_ID);
         float dp5 = dp1 * 5;
         headerTextView.setPadding(0, 0, 0, (int) dp5);
-        if (gravity == BubbleConstants.GRAVITY_LEFT) {
-            headerTextView.setGravity(Gravity.LEFT);
-        } else if (gravity == BubbleConstants.GRAVITY_RIGHT) {
-            headerTextView.setGravity(Gravity.RIGHT);
-        }
+        headerTextView.setGravity(Gravity.START);
         headerTextView.setFocusable(false);
         headerTextView.setClickable(false);
         headerTextView.setLongClickable(false);
@@ -106,14 +102,10 @@ public class HeaderLayout extends ViewGroup {
             View child = getChildAt(i);
             int childHeight = 0, childWidth = 0;
 
-            switch (child.getId()) {
-                case HEADER_TEXTVIEW_ID:
-                    childWidthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-                    MeasureUtils.measure(child, childWidthSpec, wrapSpec);
-                    childHeight = child.getMeasuredHeight();
-                    break;
-                default:
-
+            if (child.getId() == HEADER_TEXTVIEW_ID) {
+                childWidthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+                MeasureUtils.measure(child, childWidthSpec, wrapSpec);
+                childHeight = child.getMeasuredHeight();
             }
 
             totalHeight += childHeight;

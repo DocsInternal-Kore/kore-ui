@@ -22,7 +22,7 @@ public class BankingFeedbackButtonsAdapter extends RecyclerView.Adapter<BankingF
     private final Context context;
     private final ArrayList<BotButtonModel> botButtonModels;
     private float dp1;
-    private final FeedbackExperienceUpdateListner feedbackExperienceUpdateListner;
+    final FeedbackExperienceUpdateListner feedbackExperienceUpdateListner;
     private final boolean isEnabled;
 
     public BankingFeedbackButtonsAdapter(Context context, ArrayList<BotButtonModel> botButtonModels, FeedbackExperienceUpdateListner feedbackExperienceUpdateListner, boolean isEnabled) {
@@ -34,7 +34,7 @@ public class BankingFeedbackButtonsAdapter extends RecyclerView.Adapter<BankingF
 
     @NonNull
     @Override
-    public BankingFeedbackButtonsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View listItem = layoutInflater.inflate(R.layout.banking_feedback_button_cell, parent, false);
@@ -44,7 +44,7 @@ public class BankingFeedbackButtonsAdapter extends RecyclerView.Adapter<BankingF
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BankingFeedbackButtonsAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         BotButtonModel botListModel = botButtonModels.get(position);
         holder.tvButton.setText(botListModel.getLabel());
 
@@ -65,11 +65,11 @@ public class BankingFeedbackButtonsAdapter extends RecyclerView.Adapter<BankingF
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvButton;
+        final TextView tvButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.tvButton = (TextView) itemView.findViewById(R.id.tvButton);
+            this.tvButton = itemView.findViewById(R.id.tvButton);
         }
     }
 }

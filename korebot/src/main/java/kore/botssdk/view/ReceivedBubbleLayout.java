@@ -167,7 +167,7 @@ public class ReceivedBubbleLayout extends BaseBubbleLayout {
 
         // Default out everything
         botButtonView.populateButtonList(null,false);
-        botListTemplateView.populateListTemplateView(null, null);
+        botListTemplateView.populateListTemplateView(null, null, false);
 
         botListTemplateView.setVisibility(View.GONE);
         botCarouselView.populateCarouselView(null);
@@ -223,7 +223,7 @@ public class ReceivedBubbleLayout extends BaseBubbleLayout {
                 }else if (BotResponse.TEMPLATE_TYPE_LIST.equalsIgnoreCase(payInner.getTemplate_type())) {
                     botListTemplateView.setVisibility(View.VISIBLE);
                     botListTemplateView.setRestrictedMaxWidth(BUBBLE_CONTENT_LEFT_MARGIN - dp1 + BubbleViewUtil.getBubbleContentWidth() - dp1 + BUBBLE_CONTENT_RIGHT_MARGIN);
-                    botListTemplateView.populateListTemplateView(payInner.getListElements(), payInner.getButtons());
+                    botListTemplateView.populateListTemplateView(payInner.getListElements(), payInner.getButtons(), isEnabled());
                 }/*else if(BotResponse.TEMPLATE_TYPE_TABLE.equalsIgnoreCase(payInner.getTemplate_type())){
                     tableView.setVisibility(View.VISIBLE);
                     bubbleTextMediaLayout.populateText(payInner.getText());

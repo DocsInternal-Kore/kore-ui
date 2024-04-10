@@ -3,20 +3,23 @@
     <!--<color name="colorAccent">#2f91e5</color>--><!-- HSBC - #db0012, BMC Helix - #2f91e5 -->
     <color name="bgBlueSignup">#3F51B5</color>
     <color name="bgLightBlue">#9fa8da</color>
-
+    <color name="green">#00ff00</color>
+    <color name="grey">#808080</color>
+    <color name="ac">#124680</color>
+    <color name="red">#FF0000</color>
+    <color name="incoming_call_reject">#BB0000</color>
+    <color name="incoming_call_accept">#00BB00</color>
+    <color name="color_hint_composer">#dfe2e7</color>
+    <color name="bgBlueSignupAlpha">#503942f6</color>
+    <color name="color_c8c8c8">#c8c8c8</color>
+    <color name="background_tab_pressed">#efeffc</color>
 <!--    General Theme-->
     <color name="colorPrimaryKa">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorPrimary">@color/colorPrimaryKa</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="color_c8c8c8">#c8c8c8</color>
-    <color name="background_tab_pressed">#efeffc</color>
-    <color name="tab_strip_text_color">#667277</color>
-    <color name="transparent">#00000000</color>
-    <color name="color_737ae9">#737ae9</color>
-    <color name="color_6d6d72">#6d6d72</color>
-    <color name="color_hint_composer">#dfe2e7</color>
-    <color name="bgBlueSignupAlpha">#503942f6</color>
+    <color name="color_blue_1_1">#0076FF</color>
+
 <!--    Associated Bank Theme-->
     <color name="colorPrimaryKa_associated">#0ea84d</color>
     <color name="colorPrimaryDark_associated">#0ea84d</color>
@@ -163,12 +166,13 @@
     <color name="color_ffeaec">#ffeaec</color>
     <color name="color_404051">#404051</color>
     <color name="color_eeeef0">#EEEEF0</color>
-    <color name="color_blue_1_1">#0076FF</color>
+
     <color name="color_A7A9BE">#A7A9BE</color>
 
 
     <color name="color_626281">#3e3e51</color>
     <color name="transparent_widget">#40000000</color>
+    <color name="transparent">#00000000</color>
     <color name="transparent_card">#E0FFFFFF</color>
     <color name="color_728296">#485260</color>
     <color name="color_626281_widget">#3e3e51</color>
@@ -205,4 +209,7 @@
     <color name="color_3E3E51">#3e3e51</color>
     <color name="listview_cost">#008000</color>
     <color name="txtFontBlack">#000000</color>
+    <color name="kora_grey">#202124</color>
+    <color name="gray_modern">#4B5565</color>
+    <color name="neutral">#404040</color>
 </resources>

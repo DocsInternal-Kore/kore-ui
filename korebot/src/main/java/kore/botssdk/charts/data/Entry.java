@@ -50,8 +50,8 @@ public class Entry extends BaseEntry implements Parcelable {
         this.x = x;
     }
 
-    public kore.botssdk.charts.data.Entry copy() {
-        kore.botssdk.charts.data.Entry e = new kore.botssdk.charts.data.Entry(this.x, this.getY(), this.getData());
+    public Entry copy() {
+        Entry e = new Entry(this.x, this.getY(), this.getData());
         return e;
     }
 

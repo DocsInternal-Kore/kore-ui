@@ -3,6 +3,8 @@ package kore.botssdk.charts.data;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import kore.botssdk.utils.LogUtils;
+
 public class PieEntry extends Entry {
     private String label;
 
@@ -58,18 +60,18 @@ public class PieEntry extends Entry {
     @Deprecated
     public void setX(float x) {
         super.setX(x);
-        Log.i("DEPRECATED", "Pie entries do not have x values");
+        LogUtils.i("DEPRECATED", "Pie entries do not have x values");
     }
 
     /** @deprecated */
     @Deprecated
     public float getX() {
-        Log.i("DEPRECATED", "Pie entries do not have x values");
+        LogUtils.i("DEPRECATED", "Pie entries do not have x values");
         return super.getX();
     }
 
-    public kore.botssdk.charts.data.PieEntry copy() {
-        kore.botssdk.charts.data.PieEntry e = new kore.botssdk.charts.data.PieEntry(this.getY(), this.label, this.getData());
+    public PieEntry copy() {
+        PieEntry e = new PieEntry(this.getY(), this.label, this.getData());
         return e;
     }
 }

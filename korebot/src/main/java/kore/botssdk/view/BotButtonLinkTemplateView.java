@@ -4,8 +4,11 @@ import static org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
+import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -17,13 +20,17 @@ import android.widget.TextView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.text.HtmlCompat;
 
+import java.util.Locale;
+
 import kore.botssdk.R;
 import kore.botssdk.adapter.BotButtonLinkTemplateAdapter;
+import kore.botssdk.application.AppControl;
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
 import kore.botssdk.listener.RadioListListner;
 import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.PayloadInner;
+import kore.botssdk.net.SDKConfiguration;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.utils.markdown.MarkdownImageTagHandler;
 import kore.botssdk.utils.markdown.MarkdownTagHandler;

@@ -15,7 +15,7 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
         return this.poolId;
     }
 
-    public static synchronized ObjectPool create(int withCapacity, ObjectPool.Poolable object) {
+    public static synchronized ObjectPool create(int withCapacity, Poolable object) {
         ObjectPool result = new ObjectPool(withCapacity, object);
         result.poolId = ids++;
         return result;
@@ -74,13 +74,13 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
         }
 
         T result = (T) this.objects[this.objectsPointer];
-        result.currentOwnerId = ObjectPool.Poolable.NO_OWNER;
+        result.currentOwnerId = Poolable.NO_OWNER;
         --this.objectsPointer;
         return result;
     }
 
     public synchronized void recycle(T object) {
-        if (object.currentOwnerId != ObjectPool.Poolable.NO_OWNER) {
+        if (object.currentOwnerId != Poolable.NO_OWNER) {
             if (object.currentOwnerId == this.poolId) {
                 throw new IllegalArgumentException("The object passed is already stored in this pool!");
             } else {
@@ -105,8 +105,8 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
         int objectsListSize = objects.size();
 
         for(int i = 0; i < objectsListSize; ++i) {
-            T object = (T) objects.get(i);
-            if (object.currentOwnerId != ObjectPool.Poolable.NO_OWNER) {
+            T object = objects.get(i);
+            if (object.currentOwnerId != Poolable.NO_OWNER) {
                 if (object.currentOwnerId == this.poolId) {
                     throw new IllegalArgumentException("The object passed is already stored in this pool!");
                 }
@@ -126,9 +126,7 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
         this.desiredCapacity *= 2;
         Object[] temp = new Object[this.desiredCapacity];
 
-        for(int i = 0; i < oldCapacity; ++i) {
-            temp[i] = this.objects[i];
-        }
+        if (oldCapacity >= 0) System.arraycopy(this.objects, 0, temp, 0, oldCapacity);
 
         this.objects = temp;
     }
@@ -142,13 +140,13 @@ public class ObjectPool<T extends ObjectPool.Poolable> {
     }
 
     public abstract static class Poolable {
-        public static int NO_OWNER = -1;
+        public static final int NO_OWNER = -1;
         int currentOwnerId;
 
         public Poolable() {
             this.currentOwnerId = NO_OWNER;
         }
 
-        protected abstract ObjectPool.Poolable instantiate();
+        protected abstract Poolable instantiate();
     }
 }

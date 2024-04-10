@@ -8,7 +8,7 @@ import kore.botssdk.charts.charts.Chart;
 import kore.botssdk.charts.highlight.Highlight;
 
 public abstract class ChartTouchListener<T extends Chart<?>> extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
-    protected kore.botssdk.charts.listener.ChartTouchListener.ChartGesture mLastGesture;
+    protected ChartGesture mLastGesture;
     protected static final int NONE = 0;
     protected static final int DRAG = 1;
     protected static final int X_ZOOM = 2;
@@ -18,11 +18,11 @@ public abstract class ChartTouchListener<T extends Chart<?>> extends GestureDete
     protected static final int ROTATE = 6;
     protected int mTouchMode;
     protected Highlight mLastHighlighted;
-    protected GestureDetector mGestureDetector;
-    protected T mChart;
+    protected final GestureDetector mGestureDetector;
+    protected final T mChart;
 
     public ChartTouchListener(T chart) {
-        this.mLastGesture = kore.botssdk.charts.listener.ChartTouchListener.ChartGesture.NONE;
+        this.mLastGesture = ChartGesture.NONE;
         this.mTouchMode = 0;
         this.mChart = chart;
         this.mGestureDetector = new GestureDetector(chart.getContext(), this);
@@ -52,7 +52,7 @@ public abstract class ChartTouchListener<T extends Chart<?>> extends GestureDete
         return this.mTouchMode;
     }
 
-    public kore.botssdk.charts.listener.ChartTouchListener.ChartGesture getLastGesture() {
+    public ChartGesture getLastGesture() {
         return this.mLastGesture;
     }
 
@@ -61,7 +61,7 @@ public abstract class ChartTouchListener<T extends Chart<?>> extends GestureDete
             this.mChart.highlightValue(h, true);
             this.mLastHighlighted = h;
         } else {
-            this.mChart.highlightValue((Highlight)null, true);
+            this.mChart.highlightValue(null, true);
             this.mLastHighlighted = null;
         }
 
@@ -70,7 +70,7 @@ public abstract class ChartTouchListener<T extends Chart<?>> extends GestureDete
     protected static float distance(float eventX, float startX, float eventY, float startY) {
         float dx = eventX - startX;
         float dy = eventY - startY;
-        return (float)Math.sqrt((double)(dx * dx + dy * dy));
+        return (float)Math.sqrt(dx * dx + dy * dy);
     }
 
     public enum ChartGesture {

@@ -6,12 +6,12 @@ import java.util.List;
 import kore.botssdk.charts.interfaces.datasets.IPieDataSet;
 import kore.botssdk.charts.utils.Utils;
 
-public class PieDataSet extends kore.botssdk.charts.data.DataSet<PieEntry> implements IPieDataSet {
+public class PieDataSet extends DataSet<PieEntry> implements IPieDataSet {
     private float mSliceSpace = 0.0F;
     private boolean mAutomaticallyDisableSliceSpacing;
     private float mShift = 18.0F;
-    private kore.botssdk.charts.data.PieDataSet.ValuePosition mXValuePosition;
-    private kore.botssdk.charts.data.PieDataSet.ValuePosition mYValuePosition;
+    private ValuePosition mXValuePosition;
+    private ValuePosition mYValuePosition;
     private boolean mUsingSliceColorAsValueLineColor;
     private int mValueLineColor;
     private float mValueLineWidth;
@@ -22,8 +22,8 @@ public class PieDataSet extends kore.botssdk.charts.data.DataSet<PieEntry> imple
 
     public PieDataSet(List<PieEntry> yVals, String label) {
         super(yVals, label);
-        this.mXValuePosition = kore.botssdk.charts.data.PieDataSet.ValuePosition.INSIDE_SLICE;
-        this.mYValuePosition = kore.botssdk.charts.data.PieDataSet.ValuePosition.INSIDE_SLICE;
+        this.mXValuePosition = ValuePosition.INSIDE_SLICE;
+        this.mYValuePosition = ValuePosition.INSIDE_SLICE;
         this.mUsingSliceColorAsValueLineColor = false;
         this.mValueLineColor = -16777216;
         this.mValueLineWidth = 1.0F;
@@ -37,15 +37,15 @@ public class PieDataSet extends kore.botssdk.charts.data.DataSet<PieEntry> imple
         List<PieEntry> entries = new ArrayList();
 
         for(int i = 0; i < this.mValues.size(); ++i) {
-            entries.add(((PieEntry)this.mValues.get(i)).copy());
+            entries.add(this.mValues.get(i).copy());
         }
 
-        kore.botssdk.charts.data.PieDataSet copied = new kore.botssdk.charts.data.PieDataSet(entries, this.getLabel());
+        PieDataSet copied = new PieDataSet(entries, this.getLabel());
         this.copy(copied);
         return copied;
     }
 
-    protected void copy(kore.botssdk.charts.data.PieDataSet pieDataSet) {
+    protected void copy(PieDataSet pieDataSet) {
         super.copy(pieDataSet);
     }
 
@@ -87,19 +87,19 @@ public class PieDataSet extends kore.botssdk.charts.data.DataSet<PieEntry> imple
         return this.mShift;
     }
 
-    public kore.botssdk.charts.data.PieDataSet.ValuePosition getXValuePosition() {
+    public ValuePosition getXValuePosition() {
         return this.mXValuePosition;
     }
 
-    public void setXValuePosition(kore.botssdk.charts.data.PieDataSet.ValuePosition xValuePosition) {
+    public void setXValuePosition(ValuePosition xValuePosition) {
         this.mXValuePosition = xValuePosition;
     }
 
-    public kore.botssdk.charts.data.PieDataSet.ValuePosition getYValuePosition() {
+    public ValuePosition getYValuePosition() {
         return this.mYValuePosition;
     }
 
-    public void setYValuePosition(kore.botssdk.charts.data.PieDataSet.ValuePosition yValuePosition) {
+    public void setYValuePosition(ValuePosition yValuePosition) {
         this.mYValuePosition = yValuePosition;
     }
 

@@ -1,17 +1,23 @@
 package kore.botssdk.adapter;
 
+import static kore.botssdk.view.viewUtils.DimensionUtil.dp1;
+
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.squareup.picasso.Picasso;
 
@@ -22,6 +28,7 @@ import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
 import kore.botssdk.models.BotListElementButton;
 import kore.botssdk.models.BotListModel;
+import kore.botssdk.models.BotResponse;
 import kore.botssdk.utils.BundleConstants;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.view.viewUtils.RoundedCornersTransform;
@@ -31,31 +38,45 @@ import kore.botssdk.view.viewUtils.RoundedCornersTransform;
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
 public class BotListTemplateAdapter extends BaseAdapter {
-
-    String LOG_TAG = BotListTemplateAdapter.class.getSimpleName();
-
     ArrayList<BotListModel> botListModelArrayList = new ArrayList<>();
     ComposeFooterInterface composeFooterInterface;
     InvokeGenericWebViewInterface invokeGenericWebViewInterface;
-    LayoutInflater ownLayoutInflator;
-    Context context;
-    RoundedCornersTransform roundedCornersTransform;
-    ListView parentListView;
+    final LayoutInflater ownLayoutInflator;
+    final Context context;
+    final RoundedCornersTransform roundedCornersTransform;
+    final ListView parentListView;
+    String splashColour, disabledColour, textColor, disabledTextColor;
+    boolean isEnabled;
 
     public BotListTemplateAdapter(Context context, ListView parentListView) {
         this.ownLayoutInflator = LayoutInflater.from(context);
         this.context = context;
         this.roundedCornersTransform = new RoundedCornersTransform();
         this.parentListView = parentListView;
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
+        splashColour = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.colorPrimary));
+        disabledColour = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.meetingsDisabled));
+        textColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.white));
+        disabledTextColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.white));
+
+        splashColour = sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_BG_COLOR, splashColour);
+        disabledColour = sharedPreferences.getString(BotResponse.BUTTON_INACTIVE_BG_COLOR, disabledColour);
+        textColor = sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_TXT_COLOR, textColor);
+        disabledTextColor = sharedPreferences.getString(BotResponse.BUTTON_INACTIVE_TXT_COLOR, disabledTextColor);
     }
 
     @Override
     public int getCount() {
         if (botListModelArrayList != null) {
-            return botListModelArrayList.size() >3 ? 3 : botListModelArrayList.size();
+            return Math.min(botListModelArrayList.size(), 3);
         } else {
             return 0;
         }
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
     @Override
@@ -76,7 +97,7 @@ public class BotListTemplateAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = ownLayoutInflator.inflate(R.layout.bot_list_template_item_layout, null);
+            convertView = View.inflate(context, R.layout.bot_list_template_item_layout, null);
         }
 
         if (convertView.getTag() == null) {
@@ -110,6 +131,10 @@ public class BotListTemplateAdapter extends BaseAdapter {
             holder.botListItemButton.setVisibility(View.VISIBLE);
             holder.botListItemButton.setText(botListModel.getButtons().get(0).getTitle());
             holder.botListItemButton.setTag(botListModel.getButtons().get(0));
+
+            ((GradientDrawable) holder.botListItemButton.getBackground()).setColor(isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
+            ((GradientDrawable) holder.botListItemButton.getBackground()).setStroke((int)(2 * dp1), isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
+            holder.botListItemButton.setTextColor(isEnabled ? Color.parseColor(textColor) : Color.parseColor(disabledTextColor));
 
             holder.botListItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -161,11 +186,11 @@ public class BotListTemplateAdapter extends BaseAdapter {
     private void initializeViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
 
-        holder.botListItemRoot = (RelativeLayout) view.findViewById(R.id.bot_list_item_root);
-        holder.botListItemImage = (ImageView) view.findViewById(R.id.bot_list_item_image);
-        holder.botListItemTitle = (TextView) view.findViewById(R.id.bot_list_item_title);
-        holder.botListItemSubtitle = (TextView) view.findViewById(R.id.bot_list_item_subtitle);
-        holder.botListItemButton = (Button) view.findViewById(R.id.bot_list_item_button);
+        holder.botListItemRoot = view.findViewById(R.id.bot_list_item_root);
+        holder.botListItemImage = view.findViewById(R.id.bot_list_item_image);
+        holder.botListItemTitle = view.findViewById(R.id.bot_list_item_title);
+        holder.botListItemSubtitle = view.findViewById(R.id.bot_list_item_subtitle);
+        holder.botListItemButton = view.findViewById(R.id.bot_list_item_button);
 
         view.setTag(holder);
     }
@@ -175,6 +200,6 @@ public class BotListTemplateAdapter extends BaseAdapter {
         ImageView botListItemImage;
         TextView botListItemTitle;
         TextView botListItemSubtitle;
-        Button botListItemButton;
+        TextView botListItemButton;
     }
 }

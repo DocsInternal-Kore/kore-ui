@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -22,39 +23,34 @@ import kore.botssdk.utils.KaFontUtils;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.view.viewUtils.RoundedCornersTransform;
 
-public class AdvanceListdetailsAdapter extends BaseAdapter
-{
+public class AdvanceListdetailsAdapter extends BaseAdapter {
     private final Context context;
     private final ArrayList<Widget.Button> contentModels;
     private final LayoutInflater layoutInflater;
 
-    protected AdvanceListdetailsAdapter(Context context, ArrayList<Widget.Button> contentModels)
-    {
+    protected AdvanceListdetailsAdapter(Context context, ArrayList<Widget.Button> contentModels) {
         this.context = context;
         this.contentModels = contentModels;
         this.layoutInflater = LayoutInflater.from(context);
     }
+
     @Override
-    public int getCount()
-    {
+    public int getCount() {
         return contentModels.size();
     }
 
     @Override
-    public Object getItem(int i)
-    {
+    public Object getItem(int i) {
         return contentModels.get(i);
     }
 
     @Override
-    public long getItemId(int i)
-    {
+    public long getItemId(int i) {
         return i;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup)
-    {
+    public View getView(int position, View convertView, ViewGroup viewGroup) {
         DetailsViewHolder holder;
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.listwidget_details_item, null);
@@ -76,26 +72,20 @@ public class AdvanceListdetailsAdapter extends BaseAdapter
         Widget.Button dataObj = (Widget.Button) getItem(position);
         holder.tvBtnText.setText(dataObj.getTitle());
 
-        if(!StringUtils.isNullOrEmpty(dataObj.getIcon()))
-        {
+        if (!StringUtils.isNullOrEmpty(dataObj.getIcon())) {
             holder.ivListBtnIcon.setVisibility(View.VISIBLE);
             try {
                 String imageData;
                 imageData = dataObj.getIcon();
-                if (imageData.contains(","))
-                {
+                if (imageData.contains(",")) {
                     imageData = imageData.substring(imageData.indexOf(",") + 1);
                     byte[] decodedString = Base64.decode(imageData.getBytes(), Base64.DEFAULT);
                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                     holder.ivListBtnIcon.setImageBitmap(decodedByte);
-                }
-                else
-                {
+                } else {
                     Picasso.get().load(dataObj.getIcon()).transform(new RoundedCornersTransform()).into(holder.ivListBtnIcon);
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 holder.ivListBtnIcon.setVisibility(GONE);
             }
         }

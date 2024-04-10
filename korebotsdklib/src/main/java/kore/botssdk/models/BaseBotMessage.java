@@ -1,14 +1,16 @@
 package kore.botssdk.models;
 
+import androidx.annotation.NonNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import kore.botssdk.utils.DateUtils;
 
 /**
- * Created by Pradeep Mahato on 03-Jun-16.
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
 
@@ -56,14 +58,11 @@ public abstract class BaseBotMessage {
 
     private long getTimeInMillis(String timeStamp, boolean timezoneModifiedRequired) throws ParseException {
         if (timeStamp == null || timeStamp.isEmpty()) return System.currentTimeMillis();
-        return isoFormatter.parse(timeStamp).getTime() + ((timezoneModifiedRequired) ? TimeZone.getDefault().getRawOffset() : 0);
+        return Objects.requireNonNull(isoFormatter.parse(timeStamp)).getTime() + ((timezoneModifiedRequired) ? TimeZone.getDefault().getRawOffset() : 0);
 
     }
 
-    public void setCreatedInMillis(long createdInMillis) {
-        this.createdInMillis = createdInMillis;
-    }
-
+    @NonNull
     public String getFormattedDate() {
         return DateUtils.formattedSentDateV6(getCreatedInMillis());
     }

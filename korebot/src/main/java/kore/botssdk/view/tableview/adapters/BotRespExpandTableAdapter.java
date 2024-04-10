@@ -23,7 +23,7 @@ public class BotRespExpandTableAdapter extends TableRespExpandDataAdapter<MiniTa
     private static final int HEADER_TEXT_SIZE = 12;
     private final String[] alignment;
     private final String[]  headers;
-    int dp1;
+    final int dp1;
     private final PayloadInner payloadInner;
 
     public BotRespExpandTableAdapter(final Context context, final List<MiniTableModel> data, String[] alignment, String[]  headers, PayloadInner payloadInner) {
@@ -36,37 +36,43 @@ public class BotRespExpandTableAdapter extends TableRespExpandDataAdapter<MiniTa
 
     @Override
     public View getCellView(int rowIndex, int columnIndex, ViewGroup parentView, boolean showDivider) {
-        String  str;
-        if(getRowData(rowIndex).getElements().get(columnIndex) instanceof Double){
-            str = Double.toString((Double) getRowData(rowIndex).getElements().get(columnIndex));
-        }else if(getRowData(rowIndex).getElements().get(columnIndex) instanceof String){
-            str = (String) getRowData(rowIndex).getElements().get(columnIndex);
-        }else{
-            str = "";
+        try {
+            String  str;
+            if(getRowData(rowIndex).getElements().get(columnIndex) instanceof Double){
+                str = Double.toString((Double) getRowData(rowIndex).getElements().get(columnIndex));
+            }else if(getRowData(rowIndex).getElements().get(columnIndex) instanceof String){
+                str = (String) getRowData(rowIndex).getElements().get(columnIndex);
+            }else{
+                str = "";
+            }
+
+            return renderString(columnIndex,str, headers[columnIndex], showDivider);
         }
-
-        View renderedView = null;
-        renderedView = renderString(columnIndex,str, headers[columnIndex], showDivider);
-
-        return renderedView;
+        catch (Exception e)
+        {
+            return renderGroupString(columnIndex,"");
+        }
     }
 
     @Override
     public View getGroupedView(int rowIndex, int columnIndex, ViewGroup parentView)
     {
-        String  str;
-        if(getRowData(rowIndex).getElements().get(columnIndex) instanceof Double){
-            str = Double.toString((Double) getRowData(rowIndex).getElements().get(columnIndex));
-        }else if(getRowData(rowIndex).getElements().get(columnIndex) instanceof String){
-            str = (String) getRowData(rowIndex).getElements().get(columnIndex);
-        }else{
-            str = "";
+        try {
+            String  str;
+            if(getRowData(rowIndex).getElements().get(columnIndex) instanceof Double){
+                str = Double.toString((Double) getRowData(rowIndex).getElements().get(columnIndex));
+            }else if(getRowData(rowIndex).getElements().get(columnIndex) instanceof String){
+                str = (String) getRowData(rowIndex).getElements().get(columnIndex);
+            }else{
+                str = "";
+            }
+
+            return renderGroupString(columnIndex,str);
         }
-
-        View renderedView = null;
-        renderedView = renderGroupString(columnIndex,str);
-
-        return renderedView;
+        catch (Exception e)
+        {
+            return renderGroupString(columnIndex,"");
+        }
     }
 
     private int getGravity(int columnIndex){
@@ -102,9 +108,9 @@ public class BotRespExpandTableAdapter extends TableRespExpandDataAdapter<MiniTa
 
     private View renderString(int columnIndex, final String value, String header, boolean showDivider) {
         LinearLayout renderView = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.table_responsive_child_layout, null);
-        TextView tvColumnName1 = (TextView)renderView.findViewById(R.id.tvColumnName1);
-        TextView tvValue1 = (TextView)renderView.findViewById(R.id.tvValue1);
-        ImageView ivChildDivider = (ImageView)renderView.findViewById(R.id.ivChildDivider);
+        TextView tvColumnName1 = renderView.findViewById(R.id.tvColumnName1);
+        TextView tvValue1 = renderView.findViewById(R.id.tvValue1);
+        ImageView ivChildDivider = renderView.findViewById(R.id.ivChildDivider);
 
         tvColumnName1.setText(header);
         tvValue1.setText(value);
@@ -129,7 +135,7 @@ public class BotRespExpandTableAdapter extends TableRespExpandDataAdapter<MiniTa
 
     private View renderGroupString(int columnIndex, final String value) {
         LinearLayout renderView = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.table_responsive_group_layout, null);
-        TextView tvViewGroup1 = (TextView)renderView.findViewById(R.id.tvViewGroup1);
+        TextView tvViewGroup1 = renderView.findViewById(R.id.tvViewGroup1);
 
 //        final TextView textView = new TextView(getContext());
         tvViewGroup1.setText(value);

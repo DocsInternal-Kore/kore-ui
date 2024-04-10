@@ -27,8 +27,8 @@ public class BubbleEntry extends Entry {
         this.mSize = size;
     }
 
-    public kore.botssdk.charts.data.BubbleEntry copy() {
-        kore.botssdk.charts.data.BubbleEntry c = new kore.botssdk.charts.data.BubbleEntry(this.getX(), this.getY(), this.mSize, this.getData());
+    public BubbleEntry copy() {
+        BubbleEntry c = new BubbleEntry(this.getX(), this.getY(), this.mSize, this.getData());
         return c;
     }
 

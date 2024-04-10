@@ -14,12 +14,12 @@ public class Legend extends ComponentBase {
     private LegendEntry[] mEntries;
     private LegendEntry[] mExtraEntries;
     private boolean mIsLegendCustom;
-    private kore.botssdk.charts.components.Legend.LegendHorizontalAlignment mHorizontalAlignment;
-    private kore.botssdk.charts.components.Legend.LegendVerticalAlignment mVerticalAlignment;
-    private kore.botssdk.charts.components.Legend.LegendOrientation mOrientation;
+    private LegendHorizontalAlignment mHorizontalAlignment;
+    private LegendVerticalAlignment mVerticalAlignment;
+    private LegendOrientation mOrientation;
     private boolean mDrawInside;
-    private kore.botssdk.charts.components.Legend.LegendDirection mDirection;
-    private kore.botssdk.charts.components.Legend.LegendForm mShape;
+    private LegendDirection mDirection;
+    private LegendForm mShape;
     private float mFormSize;
     private float mFormLineWidth;
     private DashPathEffect mFormLineDashEffect;
@@ -40,12 +40,12 @@ public class Legend extends ComponentBase {
     public Legend() {
         this.mEntries = new LegendEntry[0];
         this.mIsLegendCustom = false;
-        this.mHorizontalAlignment = kore.botssdk.charts.components.Legend.LegendHorizontalAlignment.LEFT;
-        this.mVerticalAlignment = kore.botssdk.charts.components.Legend.LegendVerticalAlignment.BOTTOM;
-        this.mOrientation = kore.botssdk.charts.components.Legend.LegendOrientation.HORIZONTAL;
+        this.mHorizontalAlignment = LegendHorizontalAlignment.LEFT;
+        this.mVerticalAlignment = LegendVerticalAlignment.BOTTOM;
+        this.mOrientation = LegendOrientation.HORIZONTAL;
         this.mDrawInside = false;
-        this.mDirection = kore.botssdk.charts.components.Legend.LegendDirection.LEFT_TO_RIGHT;
-        this.mShape = kore.botssdk.charts.components.Legend.LegendForm.SQUARE;
+        this.mDirection = LegendDirection.LEFT_TO_RIGHT;
+        this.mShape = LegendForm.SQUARE;
         this.mFormSize = 8.0F;
         this.mFormLineWidth = 3.0F;
         this.mFormLineDashEffect = null;
@@ -77,7 +77,7 @@ public class Legend extends ComponentBase {
     }
 
     public void setEntries(List<LegendEntry> entries) {
-        this.mEntries = (LegendEntry[])entries.toArray(new LegendEntry[entries.size()]);
+        this.mEntries = entries.toArray(new LegendEntry[entries.size()]);
     }
 
     public LegendEntry[] getEntries() {
@@ -134,7 +134,7 @@ public class Legend extends ComponentBase {
     }
 
     public void setExtra(List<LegendEntry> entries) {
-        this.mExtraEntries = (LegendEntry[])entries.toArray(new LegendEntry[entries.size()]);
+        this.mExtraEntries = entries.toArray(new LegendEntry[entries.size()]);
     }
 
     public void setExtra(LegendEntry[] entries) {
@@ -154,16 +154,16 @@ public class Legend extends ComponentBase {
             entry.label = labels[i];
             if (entry.formColor != 1122868 && entry.formColor != 0) {
                 if (entry.formColor == 1122867) {
-                    entry.form = kore.botssdk.charts.components.Legend.LegendForm.EMPTY;
+                    entry.form = LegendForm.EMPTY;
                 }
             } else {
-                entry.form = kore.botssdk.charts.components.Legend.LegendForm.NONE;
+                entry.form = LegendForm.NONE;
             }
 
             entries.add(entry);
         }
 
-        this.mExtraEntries = (LegendEntry[])entries.toArray(new LegendEntry[entries.size()]);
+        this.mExtraEntries = entries.toArray(new LegendEntry[entries.size()]);
     }
 
     public void setCustom(LegendEntry[] entries) {
@@ -172,7 +172,7 @@ public class Legend extends ComponentBase {
     }
 
     public void setCustom(List<LegendEntry> entries) {
-        this.mEntries = (LegendEntry[])entries.toArray(new LegendEntry[entries.size()]);
+        this.mEntries = entries.toArray(new LegendEntry[entries.size()]);
         this.mIsLegendCustom = true;
     }
 
@@ -184,27 +184,27 @@ public class Legend extends ComponentBase {
         return this.mIsLegendCustom;
     }
 
-    public kore.botssdk.charts.components.Legend.LegendHorizontalAlignment getHorizontalAlignment() {
+    public LegendHorizontalAlignment getHorizontalAlignment() {
         return this.mHorizontalAlignment;
     }
 
-    public void setHorizontalAlignment(kore.botssdk.charts.components.Legend.LegendHorizontalAlignment value) {
+    public void setHorizontalAlignment(LegendHorizontalAlignment value) {
         this.mHorizontalAlignment = value;
     }
 
-    public kore.botssdk.charts.components.Legend.LegendVerticalAlignment getVerticalAlignment() {
+    public LegendVerticalAlignment getVerticalAlignment() {
         return this.mVerticalAlignment;
     }
 
-    public void setVerticalAlignment(kore.botssdk.charts.components.Legend.LegendVerticalAlignment value) {
+    public void setVerticalAlignment(LegendVerticalAlignment value) {
         this.mVerticalAlignment = value;
     }
 
-    public kore.botssdk.charts.components.Legend.LegendOrientation getOrientation() {
+    public LegendOrientation getOrientation() {
         return this.mOrientation;
     }
 
-    public void setOrientation(kore.botssdk.charts.components.Legend.LegendOrientation value) {
+    public void setOrientation(LegendOrientation value) {
         this.mOrientation = value;
     }
 
@@ -216,19 +216,19 @@ public class Legend extends ComponentBase {
         this.mDrawInside = value;
     }
 
-    public kore.botssdk.charts.components.Legend.LegendDirection getDirection() {
+    public LegendDirection getDirection() {
         return this.mDirection;
     }
 
-    public void setDirection(kore.botssdk.charts.components.Legend.LegendDirection pos) {
+    public void setDirection(LegendDirection pos) {
         this.mDirection = pos;
     }
 
-    public kore.botssdk.charts.components.Legend.LegendForm getForm() {
+    public LegendForm getForm() {
         return this.mShape;
     }
 
-    public void setForm(kore.botssdk.charts.components.Legend.LegendForm shape) {
+    public void setForm(LegendForm shape) {
         this.mShape = shape;
     }
 
@@ -341,7 +341,7 @@ public class Legend extends ComponentBase {
 
                 for(int i = 0; i < entryCount; ++i) {
                     LegendEntry e = entries[i];
-                    boolean drawingForm = e.form != kore.botssdk.charts.components.Legend.LegendForm.NONE;
+                    boolean drawingForm = e.form != LegendForm.NONE;
                     float formSize = Float.isNaN(e.formSize) ? defaultFormSize : Utils.convertDpToPixel(e.formSize);
                     String label = e.label;
                     if (!wasStacked) {
@@ -398,7 +398,7 @@ public class Legend extends ComponentBase {
 
                 for(int i = 0; i < entryCount; ++i) {
                     LegendEntry e = entries[i];
-                    boolean drawingForm = e.form != kore.botssdk.charts.components.Legend.LegendForm.NONE;
+                    boolean drawingForm = e.form != LegendForm.NONE;
                     float formSize = Float.isNaN(e.formSize) ? defaultFormSize : Utils.convertDpToPixel(e.formSize);
                     String label = e.label;
                     this.mCalculatedLabelBreakPoints.add(false);
@@ -411,7 +411,7 @@ public class Legend extends ComponentBase {
                     if (label != null) {
                         this.mCalculatedLabelSizes.add(Utils.calcTextSize(labelpaint, label));
                         requiredWidth += drawingForm ? formToTextSpace + formSize : 0.0F;
-                        requiredWidth += ((FSize)this.mCalculatedLabelSizes.get(i)).width;
+                        requiredWidth += this.mCalculatedLabelSizes.get(i).width;
                     } else {
                         this.mCalculatedLabelSizes.add(FSize.getInstance(0.0F, 0.0F));
                         requiredWidth += drawingForm ? formSize : 0.0F;

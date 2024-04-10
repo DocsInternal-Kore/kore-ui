@@ -15,28 +15,28 @@ public class YAxis extends AxisBase {
     protected float mZeroLineWidth = 1.0F;
     protected float mSpacePercentTop = 10.0F;
     protected float mSpacePercentBottom = 10.0F;
-    private kore.botssdk.charts.components.YAxis.YAxisLabelPosition mPosition;
-    private final kore.botssdk.charts.components.YAxis.AxisDependency mAxisDependency;
+    private YAxisLabelPosition mPosition;
+    private final AxisDependency mAxisDependency;
     protected float mMinWidth;
     protected float mMaxWidth;
 
     public YAxis() {
-        this.mPosition = kore.botssdk.charts.components.YAxis.YAxisLabelPosition.OUTSIDE_CHART;
+        this.mPosition = YAxisLabelPosition.OUTSIDE_CHART;
         this.mMinWidth = 0.0F;
         this.mMaxWidth = 1.0F / 0.0F;
-        this.mAxisDependency = kore.botssdk.charts.components.YAxis.AxisDependency.LEFT;
+        this.mAxisDependency = AxisDependency.LEFT;
         this.mYOffset = 0.0F;
     }
 
-    public YAxis(kore.botssdk.charts.components.YAxis.AxisDependency position) {
-        this.mPosition = kore.botssdk.charts.components.YAxis.YAxisLabelPosition.OUTSIDE_CHART;
+    public YAxis(AxisDependency position) {
+        this.mPosition = YAxisLabelPosition.OUTSIDE_CHART;
         this.mMinWidth = 0.0F;
         this.mMaxWidth = 1.0F / 0.0F;
         this.mAxisDependency = position;
         this.mYOffset = 0.0F;
     }
 
-    public kore.botssdk.charts.components.YAxis.AxisDependency getAxisDependency() {
+    public AxisDependency getAxisDependency() {
         return this.mAxisDependency;
     }
 
@@ -56,11 +56,11 @@ public class YAxis extends AxisBase {
         this.mMaxWidth = maxWidth;
     }
 
-    public kore.botssdk.charts.components.YAxis.YAxisLabelPosition getLabelPosition() {
+    public YAxisLabelPosition getLabelPosition() {
         return this.mPosition;
     }
 
-    public void setPosition(kore.botssdk.charts.components.YAxis.YAxisLabelPosition pos) {
+    public void setPosition(YAxisLabelPosition pos) {
         this.mPosition = pos;
     }
 
@@ -160,7 +160,7 @@ public class YAxis extends AxisBase {
     }
 
     public boolean needsOffset() {
-        return this.isEnabled() && this.isDrawLabelsEnabled() && this.getLabelPosition() == kore.botssdk.charts.components.YAxis.YAxisLabelPosition.OUTSIDE_CHART;
+        return this.isEnabled() && this.isDrawLabelsEnabled() && this.getLabelPosition() == YAxisLabelPosition.OUTSIDE_CHART;
     }
 
     /** @deprecated */

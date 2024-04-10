@@ -3,7 +3,6 @@ package kore.botssdk.models;
 import java.util.HashMap;
 
 /**
- * Created by Pradeep Mahato on 06-Jun-16.
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
 public class BotInfoModel {
@@ -38,7 +37,7 @@ public class BotInfoModel {
     }
 
 
-    public HashMap<Object,Object> customData;
+    public final HashMap<Object,Object> customData;
 
 
     public BotInfoModel(String chatBot, String taskBotId,HashMap customData) {

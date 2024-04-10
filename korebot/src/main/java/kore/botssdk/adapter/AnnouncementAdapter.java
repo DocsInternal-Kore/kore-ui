@@ -24,7 +24,6 @@ import kore.botssdk.listener.RecyclerViewDataAccessor;
 import kore.botssdk.listener.VerticalListViewActionHelper;
 import kore.botssdk.models.AnnoucementResModel;
 import kore.botssdk.utils.BundleConstants;
-import kore.botssdk.utils.DateUtils;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.utils.WidgetViewMoreEnum;
 
@@ -33,7 +32,7 @@ public class AnnouncementAdapter extends RecyclerView.Adapter implements Recycle
     private static final int DATA_FOUND = 1;
     private static final int NO_DATA = 0;
     private static final int MESSAGE = 2;
-    Context context;
+    final Context context;
     String msg;
     boolean isFromWidget;
     Drawable errorIcon;
@@ -43,7 +42,7 @@ public class AnnouncementAdapter extends RecyclerView.Adapter implements Recycle
 
     ArrayList<AnnoucementResModel> data;
     boolean isViewMore;
-    private VerticalListViewActionHelper verticalListViewActionHelper;
+    VerticalListViewActionHelper verticalListViewActionHelper;
 
     public AnnouncementAdapter(Context context) {
         this.context = context;
@@ -82,11 +81,9 @@ public class AnnouncementAdapter extends RecyclerView.Adapter implements Recycle
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof AnnouncementViewHolder) {
-            holder = (AnnouncementViewHolder) holder;
             AnnoucementResModel annoucementResModel = data.get(position);
             ((AnnouncementViewHolder) holder).binding.setAnnoucement(annoucementResModel);
 
-            ((AnnouncementViewHolder) holder).binding.tvTime.setText(DateUtils.getFormattedSendDateInTimeFormatCoreFunctionality2(context, annoucementResModel.getLastMod()));
             ((AnnouncementViewHolder) holder).binding.userProfileName.setCircle(true);
             if (annoucementResModel.getOwner() != null && annoucementResModel.getOwner().getFullName() != null) {
                 ((AnnouncementViewHolder) holder).binding.userProfileName.setText(StringUtils.getInitials(annoucementResModel.getOwner().getFullName()));
@@ -187,19 +184,19 @@ public class AnnouncementAdapter extends RecyclerView.Adapter implements Recycle
     }
 
     public static class AnnouncementViewHolder extends RecyclerView.ViewHolder {
-        AnnouncementCardLayoutBinding binding;
+        final AnnouncementCardLayoutBinding binding;
 
         public AnnouncementViewHolder(@NonNull AnnouncementCardLayoutBinding binding) {
-            super((View) binding.getRoot());
+            super(binding.getRoot());
             this.binding = binding;
 
         }
     }
 
     class EmptyAnnocementViewHolder extends RecyclerView.ViewHolder {
-        TextView tv_message;
-        RelativeLayout view_action;
-        ImageView img_icon;
+        final TextView tv_message;
+        final RelativeLayout view_action;
+        final ImageView img_icon;
 
         public EmptyAnnocementViewHolder(@NonNull View itemView) {
             super(itemView);

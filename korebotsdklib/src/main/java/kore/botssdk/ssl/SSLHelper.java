@@ -1,4 +1,5 @@
 package kore.botssdk.ssl;
+
 import android.content.Context;
 
 import java.io.BufferedInputStream;
@@ -21,7 +22,6 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import kore.botssdk.net.SDKConfiguration;
-
 
 public class SSLHelper {
 
@@ -134,6 +134,6 @@ public class SSLHelper {
 
     public static String getCertificatePath(String serverURL)
     {
-        return "certificates/"+ SDKConfiguration.SSLConfig.sslCertificatePath;
+        return "certificates/"+ SDKConfiguration.Client.identity;
     }
 }

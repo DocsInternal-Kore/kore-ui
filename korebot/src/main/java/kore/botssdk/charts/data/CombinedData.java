@@ -8,13 +8,14 @@ import java.util.List;
 
 import kore.botssdk.charts.highlight.Highlight;
 import kore.botssdk.charts.interfaces.datasets.IBarLineScatterCandleBubbleDataSet;
+import kore.botssdk.utils.LogUtils;
 
 public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<? extends Entry>> {
     private LineData mLineData;
-    private kore.botssdk.charts.data.BarData mBarData;
+    private BarData mBarData;
     private ScatterData mScatterData;
-    private kore.botssdk.charts.data.CandleData mCandleData;
-    private kore.botssdk.charts.data.BubbleData mBubbleData;
+    private CandleData mCandleData;
+    private BubbleData mBubbleData;
 
     public CombinedData() {
     }
@@ -24,7 +25,7 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
         this.notifyDataChanged();
     }
 
-    public void setData(kore.botssdk.charts.data.BarData data) {
+    public void setData(BarData data) {
         this.mBarData = data;
         this.notifyDataChanged();
     }
@@ -34,12 +35,12 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
         this.notifyDataChanged();
     }
 
-    public void setData(kore.botssdk.charts.data.CandleData data) {
+    public void setData(CandleData data) {
         this.mCandleData = data;
         this.notifyDataChanged();
     }
 
-    public void setData(kore.botssdk.charts.data.BubbleData data) {
+    public void setData(BubbleData data) {
         this.mBubbleData = data;
         this.notifyDataChanged();
     }
@@ -147,7 +148,7 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
     }
 
     public BarLineScatterCandleBubbleData getDataByIndex(int index) {
-        return (BarLineScatterCandleBubbleData)this.getAllData().get(index);
+        return this.getAllData().get(index);
     }
 
     public void notifyDataChanged() {
@@ -231,21 +232,21 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
     /** @deprecated */
     @Deprecated
     public boolean removeDataSet(int index) {
-        Log.e("MPAndroidChart", "removeDataSet(int index) not supported for CombinedData");
+        LogUtils.e("MPAndroidChart", "removeDataSet(int index) not supported for CombinedData");
         return false;
     }
 
     /** @deprecated */
     @Deprecated
     public boolean removeEntry(Entry e, int dataSetIndex) {
-        Log.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData");
+        LogUtils.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData");
         return false;
     }
 
     /** @deprecated */
     @Deprecated
     public boolean removeEntry(float xValue, int dataSetIndex) {
-        Log.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData");
+        LogUtils.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData");
         return false;
     }
 }

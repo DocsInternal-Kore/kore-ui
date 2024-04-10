@@ -51,8 +51,8 @@ public class ReUsableListViewActionSheet extends Dialog {
     }
 
     public void findViews(View layoutView) {
-        optionsListView = (ListView) layoutView.findViewById(R.id.template_selection_tasksListView);
-        TextView _view = (TextView) findViewById(R.id.template_empty_text);
+        optionsListView = layoutView.findViewById(R.id.template_selection_tasksListView);
+        TextView _view = findViewById(R.id.template_empty_text);
         _view.setVisibility(View.VISIBLE);
         optionsListView.setEmptyView(_view);
     }
@@ -62,7 +62,7 @@ public class ReUsableListViewActionSheet extends Dialog {
         optionsListView.setAdapter(adapter);
 
         ViewGroup.LayoutParams params = optionsListView.getLayoutParams();
-        params.height = (int)(53 * dp1) * (adapter.getCount() - 1);
+        params.height = (int)(70 * dp1) * (adapter.getCount() - 1);
         optionsListView.setLayoutParams(params);
     }
 

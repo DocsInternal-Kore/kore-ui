@@ -13,13 +13,13 @@ public class LimitLine extends ComponentBase {
     private Paint.Style mTextStyle;
     private String mLabel;
     private DashPathEffect mDashPathEffect;
-    private kore.botssdk.charts.components.LimitLine.LimitLabelPosition mLabelPosition;
+    private LimitLabelPosition mLabelPosition;
 
     public LimitLine(float limit) {
         this.mTextStyle = Paint.Style.FILL_AND_STROKE;
         this.mLabel = "";
         this.mDashPathEffect = null;
-        this.mLabelPosition = kore.botssdk.charts.components.LimitLine.LimitLabelPosition.RIGHT_TOP;
+        this.mLabelPosition = LimitLabelPosition.RIGHT_TOP;
         this.mLimit = limit;
     }
 
@@ -27,7 +27,7 @@ public class LimitLine extends ComponentBase {
         this.mTextStyle = Paint.Style.FILL_AND_STROKE;
         this.mLabel = "";
         this.mDashPathEffect = null;
-        this.mLabelPosition = kore.botssdk.charts.components.LimitLine.LimitLabelPosition.RIGHT_TOP;
+        this.mLabelPosition = LimitLabelPosition.RIGHT_TOP;
         this.mLimit = limit;
         this.mLabel = label;
     }
@@ -84,11 +84,11 @@ public class LimitLine extends ComponentBase {
         return this.mTextStyle;
     }
 
-    public void setLabelPosition(kore.botssdk.charts.components.LimitLine.LimitLabelPosition pos) {
+    public void setLabelPosition(LimitLabelPosition pos) {
         this.mLabelPosition = pos;
     }
 
-    public kore.botssdk.charts.components.LimitLine.LimitLabelPosition getLabelPosition() {
+    public LimitLabelPosition getLabelPosition() {
         return this.mLabelPosition;
     }
 

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
+import kore.botssdk.models.PayloadInner;
 
 public abstract class CustomTemplateView extends LinearLayout
 {

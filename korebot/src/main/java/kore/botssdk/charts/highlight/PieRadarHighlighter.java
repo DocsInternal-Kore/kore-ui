@@ -7,14 +7,14 @@ import kore.botssdk.charts.charts.PieChart;
 import kore.botssdk.charts.charts.PieRadarChartBase;
 
 public abstract class PieRadarHighlighter<T extends PieRadarChartBase> implements IHighlighter {
-    protected T mChart;
-    protected List<kore.botssdk.charts.highlight.Highlight> mHighlightBuffer = new ArrayList();
+    protected final T mChart;
+    protected final List<Highlight> mHighlightBuffer = new ArrayList();
 
     public PieRadarHighlighter(T chart) {
         this.mChart = chart;
     }
 
-    public kore.botssdk.charts.highlight.Highlight getHighlight(float x, float y) {
+    public Highlight getHighlight(float x, float y) {
         float touchDistanceToCenter = this.mChart.distanceToCenter(x, y);
         if (touchDistanceToCenter > this.mChart.getRadius()) {
             return null;

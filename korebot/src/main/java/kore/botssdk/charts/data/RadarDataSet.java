@@ -78,10 +78,10 @@ public class RadarDataSet extends LineRadarDataSet<RadarEntry> implements IRadar
         List<RadarEntry> entries = new ArrayList();
 
         for(int i = 0; i < this.mValues.size(); ++i) {
-            entries.add(((RadarEntry)this.mValues.get(i)).copy());
+            entries.add(this.mValues.get(i).copy());
         }
 
-        kore.botssdk.charts.data.RadarDataSet copied = new kore.botssdk.charts.data.RadarDataSet(entries, this.getLabel());
+        RadarDataSet copied = new RadarDataSet(entries, this.getLabel());
         this.copy(copied);
         return copied;
     }

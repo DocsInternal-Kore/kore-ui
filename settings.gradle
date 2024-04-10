@@ -18,3 +18,4 @@ rootProject.name = "KoreUI"
 include ':app'
 include ':korebot'
 include ':korebotsdklib'
+include ':webrtcsdk-release'

@@ -56,32 +56,26 @@ public class CardTemplateListAdapter extends RecyclerView.Adapter<CardTemplateLi
         holder.tvDescriptionTitle.setVisibility(GONE);
         holder.ivListBtnIcon.setVisibility(GONE);
 
-        if(!StringUtils.isNullOrEmpty(btn.getDescription())) {
+        if (!StringUtils.isNullOrEmpty(btn.getDescription())) {
             holder.tvDescriptionTitle.setVisibility(View.VISIBLE);
             holder.tvDescriptionTitle.setText(btn.getTitle());
             holder.tvBtnText.setText(btn.getDescription());
         }
 
-        if(!StringUtils.isNullOrEmpty(btn.getIcon()))
-        {
+        if (!StringUtils.isNullOrEmpty(btn.getIcon())) {
             holder.ivListBtnIcon.setVisibility(View.VISIBLE);
             try {
                 String imageData;
                 imageData = btn.getIcon();
-                if (imageData.contains(","))
-                {
+                if (imageData.contains(",")) {
                     imageData = imageData.substring(imageData.indexOf(",") + 1);
                     byte[] decodedString = Base64.decode(imageData.getBytes(), Base64.DEFAULT);
                     Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                     holder.ivListBtnIcon.setImageBitmap(decodedByte);
-                }
-                else
-                {
+                } else {
                     Picasso.get().load(btn.getIcon()).transform(new RoundedCornersTransform()).into(holder.ivListBtnIcon);
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 holder.ivListBtnIcon.setVisibility(GONE);
             }
         }

@@ -1,9 +1,12 @@
 package kore.botssdk.models;
 
-public class BrandingHeaderModel {
+import java.io.Serializable;
+
+public class BrandingHeaderModel implements Serializable {
     private String bg_color;
     private String size;
     private String style;
+    private String icons_color;
     private BrandingIconModel icon;
     private BrandingTitleModel title;
     private BrandingTitleModel sub_title;
@@ -39,6 +42,14 @@ public class BrandingHeaderModel {
 
     public BrandingIconModel getIcon() {
         return icon;
+    }
+
+    public String getIcons_color() {
+        return icons_color;
+    }
+
+    public void setIcons_color(String icons_color) {
+        this.icons_color = icons_color;
     }
 
     public String getStyle() {

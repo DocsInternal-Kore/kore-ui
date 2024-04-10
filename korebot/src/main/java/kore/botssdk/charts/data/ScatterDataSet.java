@@ -14,24 +14,24 @@ import kore.botssdk.charts.renderer.scatter.SquareShapeRenderer;
 import kore.botssdk.charts.renderer.scatter.TriangleShapeRenderer;
 import kore.botssdk.charts.renderer.scatter.XShapeRenderer;
 
-public class ScatterDataSet extends LineScatterCandleRadarDataSet<kore.botssdk.charts.data.Entry> implements IScatterDataSet {
+public class ScatterDataSet extends LineScatterCandleRadarDataSet<Entry> implements IScatterDataSet {
     private float mShapeSize = 15.0F;
     protected IShapeRenderer mShapeRenderer = new SquareShapeRenderer();
     private float mScatterShapeHoleRadius = 0.0F;
     private int mScatterShapeHoleColor = 1122867;
 
-    public ScatterDataSet(List<kore.botssdk.charts.data.Entry> yVals, String label) {
+    public ScatterDataSet(List<Entry> yVals, String label) {
         super(yVals, label);
     }
 
-    public DataSet<kore.botssdk.charts.data.Entry> copy() {
-        List<kore.botssdk.charts.data.Entry> entries = new ArrayList();
+    public DataSet<Entry> copy() {
+        List<Entry> entries = new ArrayList();
 
         for(int i = 0; i < this.mValues.size(); ++i) {
-            entries.add(((Entry)this.mValues.get(i)).copy());
+            entries.add(this.mValues.get(i).copy());
         }
 
-        kore.botssdk.charts.data.ScatterDataSet copied = new kore.botssdk.charts.data.ScatterDataSet(entries, this.getLabel());
+        ScatterDataSet copied = new ScatterDataSet(entries, this.getLabel());
         this.copy(copied);
         return copied;
     }

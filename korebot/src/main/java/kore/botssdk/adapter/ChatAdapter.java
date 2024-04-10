@@ -1,10 +1,13 @@
 package kore.botssdk.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,28 +25,27 @@ import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.ComponentModel;
 import kore.botssdk.models.PayloadInner;
 import kore.botssdk.models.PayloadOuter;
+import kore.botssdk.net.SDKConfiguration;
 import kore.botssdk.utils.SelectionUtils;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.view.KaBaseBubbleContainer;
 import kore.botssdk.view.KaBaseBubbleLayout;
-import kore.botssdk.view.KaReceivedBubbleContainer;
-import kore.botssdk.view.KaReceivedBubbleLayout;
-import kore.botssdk.view.KaSendBubbleContainer;
-import kore.botssdk.view.KaSendBubbleLayout;
 import kore.botssdk.view.viewUtils.BubbleViewUtil;
 
 /**
  * edit : Only for bots SDK
  */
+@SuppressLint("UnknownNullness")
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
 
+    private int lastPosition = -1;
 //    private static String LOG_TAG = ChatAdapter.class.getSimpleName();
-    Context context;
+final Context context;
     private Activity activityContext;
     private final LayoutInflater ownLayoutInflater;
     private final HashMap<String, Integer> headersMap = new HashMap<>();
     private boolean isAlpha = false;
-    private int selectedItem = -1;
+    int selectedItem = -1;
 
 
     public ComposeFooterInterface getComposeFooterInterface() {
@@ -90,25 +92,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new ViewHolder(ownLayoutInflater.inflate( i == BUBBLE_RIGHT_LAYOUT ?  R.layout.ka_bubble_layout_right : R.layout.ka_bubble_layout_left, null),i);
-    }
-
-    private boolean isClickable(int position, BaseBotMessage message){
-        boolean clickable = false;
-        if(!message.isSend()){
-            BotResponse resp = (BotResponse) message;
-            ComponentModel model = resp.getMessage().get(0).getComponent();
-            if (model != null && model.getPayload() != null && model.getPayload().getPayload() != null) {
-                PayloadOuter outer = model.getPayload();
-                PayloadInner inner = outer.getPayload();
-                if(!StringUtils.isNullOrEmpty(inner.getTemplate_type()) && inner.getTemplate_type().equals(BotResponse.TEMPLATE_TYPE_HIDDEN_DIALOG)){
-                    clickable = (position == getItemCount() -2) ;
-                }else{
-                    clickable = (position == getItemCount() -1) ;
-                }
-            }
-        }
-        return clickable;
+        return new ViewHolder(ownLayoutInflater.inflate(i == BUBBLE_RIGHT_LAYOUT ? R.layout.ka_bubble_layout_right : R.layout.ka_bubble_layout_left, null), i);
     }
 
     @Override
@@ -127,18 +111,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
         if(headersMap.isEmpty()) {
             prepareHeaderMap();
         }
-        //TODO Need to re visit : Handled crash in a bad way(if you change time zone and come back app crashing)
         boolean fDate = false;
         try {
-            fDate = headersMap.get(getItem(position).getFormattedDate()) == position;
+            fDate = headersMap.get(getItem(holder.getBindingAdapterPosition()).getFormattedDate()) == holder.getBindingAdapterPosition();
         }catch (Exception e){
             e.printStackTrace();
         }
-        holder.headerView.setVisibility(getItem(position) != null && fDate ? View.VISIBLE : View.GONE);
-        if(selectedItem == position){
+        holder.headerView.setVisibility(getItem(holder.getBindingAdapterPosition()) != null && fDate ? View.VISIBLE : View.GONE);
+        if(selectedItem == holder.getBindingAdapterPosition()){
             holder.baseBubbleLayout.setTimeStampVisible();
         }
-        if(getItemViewType(position) == BUBBLE_RIGHT_LAYOUT) {
+
+        if(getItemViewType(holder.getBindingAdapterPosition()) == BUBBLE_RIGHT_LAYOUT)
+        {
+            // call Animation function
+            setAnimation(holder.itemView, position);
+
             holder.baseBubbleLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -154,10 +142,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
                 @Override
                 public void onClick(View v) {
                     BotRequest botRequest = (BotRequest) getItem(holder.getBindingAdapterPosition());
-//                    if(composeFooterInterface != null)  composeFooterInterface.copyMessageToComposer(botRequest.getMessage().getBody(), false);
+                    if(composeFooterInterface != null)  composeFooterInterface.copyMessageToComposer((String) botRequest.getMessage().getBody(), false);
                 }
             });
         }
+        else
+            setLeftAnimation(holder.itemView, position);
+
     }
 
     private boolean checkIsContinuous(int position) {
@@ -166,13 +157,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
         }else return !getItem(position).isSend() && !getItem(position - 1).isSend();
     }
 
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            ScaleAnimation anim = new ScaleAnimation(0.7f, 1.0f, 0.7f, 1.0f, Animation.REVERSE, 1.0f, Animation.REVERSE, 1.0f);
+            anim.setDuration(800);//to make duration random number between [0,501)
+            viewToAnimate.startAnimation(anim);
+            lastPosition = position;
+        }
+    }
+    private void setLeftAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            ScaleAnimation anim = new ScaleAnimation(-0.5f, 1.0f, -0.5f, 1.0f, Animation.REVERSE, 0.0f, Animation.REVERSE, 0.5f);
+            anim.setDuration(1000);
+            viewToAnimate.startAnimation(anim);
+            lastPosition = position;
+        }
+    }
+
 
     @Override
     public int getItemViewType(int position) {
 
         BaseBotMessage baseBotMessage = getItem(position);
-
-        if (baseBotMessage.isSend()) {
+        if (SDKConfiguration.BubbleColors.isArabic != baseBotMessage.isSend()) {
             return BUBBLE_RIGHT_LAYOUT;
         } else {
             return BUBBLE_LEFT_LAYOUT;
@@ -193,7 +202,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
     }
 
     @Override
-
     public int getItemCount() {
         return baseBotMessageArrayList.size();
     }
@@ -208,21 +216,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
 
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
-        KaBaseBubbleContainer baseBubbleContainer;
-        KaBaseBubbleLayout baseBubbleLayout;
-        View headerView;
-        TextView textView;
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+        final KaBaseBubbleContainer baseBubbleContainer;
+        final KaBaseBubbleLayout baseBubbleLayout;
+        final View headerView;
+        final TextView textView;
         public ViewHolder(View view,int viewType){
             super(view);
             if ( viewType== BUBBLE_RIGHT_LAYOUT) {
                 // Right Side
-                baseBubbleLayout = (KaSendBubbleLayout) view.findViewById(R.id.sendBubbleLayout);
-                baseBubbleContainer = (KaSendBubbleContainer) view.findViewById(R.id.send_bubble_layout_container);
+                baseBubbleLayout = view.findViewById(R.id.sendBubbleLayout);
+                baseBubbleContainer = view.findViewById(R.id.send_bubble_layout_container);
             } else {
                 // Left Side
-                baseBubbleLayout = (KaReceivedBubbleLayout) view.findViewById(R.id.receivedBubbleLayout);
-                baseBubbleContainer = (KaReceivedBubbleContainer) view.findViewById(R.id.received_bubble_layout_container);
+                baseBubbleLayout = view.findViewById(R.id.receivedBubbleLayout);
+                baseBubbleContainer = view.findViewById(R.id.received_bubble_layout_container);
             }
             headerView = view.findViewById(R.id.headerLayout);
             textView = view.findViewById(R.id.filesSectionHeader);
@@ -240,7 +248,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
         SelectionUtils.resetSelectionTasks();
         SelectionUtils.resetSelectionSlots();
         isAlpha = false;
-        notifyDataSetChanged();
+        notifyItemInserted(baseBotMessageArrayList.size() -1);
     }
 
 

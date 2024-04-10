@@ -28,7 +28,7 @@ public class ScatterChart extends BarLineChartBase<ScatterData> implements Scatt
     }
 
     public ScatterData getScatterData() {
-        return (ScatterData)this.mData;
+        return this.mData;
     }
 
     public enum ScatterShape {
@@ -50,8 +50,8 @@ public class ScatterChart extends BarLineChartBase<ScatterData> implements Scatt
             return this.shapeIdentifier;
         }
 
-        public static kore.botssdk.charts.charts.ScatterChart.ScatterShape[] getAllDefaultShapes() {
-            return new kore.botssdk.charts.charts.ScatterChart.ScatterShape[]{SQUARE, CIRCLE, TRIANGLE, CROSS, X, CHEVRON_UP, CHEVRON_DOWN};
+        public static ScatterShape[] getAllDefaultShapes() {
+            return new ScatterShape[]{SQUARE, CIRCLE, TRIANGLE, CROSS, X, CHEVRON_UP, CHEVRON_DOWN};
         }
     }
 }

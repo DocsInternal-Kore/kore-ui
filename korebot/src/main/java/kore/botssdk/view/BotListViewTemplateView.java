@@ -23,6 +23,7 @@ import kore.botssdk.listener.VerticalListViewActionHelper;
 import kore.botssdk.models.BotButtonModel;
 import kore.botssdk.models.BotListModel;
 import kore.botssdk.models.BotListViewMoreDataModel;
+import kore.botssdk.utils.LogUtils;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.view.viewUtils.DimensionUtil;
 
@@ -58,10 +59,10 @@ public class BotListViewTemplateView extends LinearLayout {
 
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.bot_custom_list_view_template, this, true);
-        botCustomListRoot = (LinearLayout) findViewById(R.id.botCustomListRoot);
-        autoExpandListView = (AutoExpandListView) findViewById(R.id.botCustomListView);
-        botCustomListViewButton = (TextView) findViewById(R.id.botCustomListViewButton);
-        workBenchListViewButton = (TextView) findViewById(R.id.workBenchListViewButton);
+        botCustomListRoot = findViewById(R.id.botCustomListRoot);
+        autoExpandListView = findViewById(R.id.botCustomListView);
+        botCustomListViewButton = findViewById(R.id.botCustomListViewButton);
+        workBenchListViewButton = findViewById(R.id.workBenchListViewButton);
         dp1 = (int) DimensionUtil.dp1;
         layoutItemHeight = getResources().getDimension(R.dimen.list_item_view_height);
 
@@ -70,7 +71,7 @@ public class BotListViewTemplateView extends LinearLayout {
     public void populateListTemplateView(String title, BotListViewMoreDataModel botListViewMoreDataModel, ArrayList<BotListModel> botListModelArrayList, final ArrayList<BotButtonModel> botButtonModelArrayList, int moreCount, String seeMore) {
 
         if(botListViewMoreDataModel != null)
-            Log.e("More Data", botListViewMoreDataModel.getTab1().toString());
+            LogUtils.e("More Data", botListViewMoreDataModel.getTab1().toString());
 
         if (botListModelArrayList != null && botListModelArrayList.size() > 0)
         {

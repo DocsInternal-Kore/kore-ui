@@ -46,22 +46,26 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
     private final ArrayList<Widget.Button> buttons;
     private final Context mContext;
     private String skillName;
-    private final String type;
-    final AdvanceButtonClickListner advanceButtonClickListner;
-    AdvanceOptionsAdapter advanceOptionsAdapter;
-    final ComposeFooterInterface composeFooterInterface;
-    InvokeGenericWebViewInterface invokeGenericWebViewInterface;
+    private String type;
+    private final AdvanceButtonClickListner advanceButtonClickListner;
+    private AdvanceOptionsAdapter advanceOptionsAdapter;
+    private final ComposeFooterInterface composeFooterInterface;
+    private InvokeGenericWebViewInterface invokeGenericWebViewInterface;
     private PopupWindow popupWindow;
     private int count;
 
-    public AdvanceListButtonAdapter(Context context, ArrayList<Widget.Button> buttons, String type, AdvanceButtonClickListner advanceButtonClickListner, ComposeFooterInterface composeFooterInterface, InvokeGenericWebViewInterface invokeGenericWebViewInterface) {
+    public AdvanceListButtonAdapter(Context context, ArrayList<Widget.Button> buttons, AdvanceButtonClickListner advanceButtonClickListner, ComposeFooterInterface composeFooterInterface, InvokeGenericWebViewInterface invokeGenericWebViewInterface) {
         this.buttons = buttons;
         this.inflater = LayoutInflater.from(context);
         mContext = context;
-        this.type = type;
         this.advanceButtonClickListner = advanceButtonClickListner;
         this.composeFooterInterface = composeFooterInterface;
         this.invokeGenericWebViewInterface = invokeGenericWebViewInterface;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
     }
 
     @NonNull
@@ -70,6 +74,7 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
         if (!StringUtils.isNullOrEmpty(type) && type.equalsIgnoreCase(BundleConstants.FULL_WIDTH)) {
             return new ButtonViewHolder(inflater.inflate(R.layout.advance_button_fullwidth, viewGroup, false));
         }
+
         return new ButtonViewHolder(inflater.inflate(R.layout.widget_button_list_item, viewGroup, false));
     }
 
@@ -194,7 +199,7 @@ public class AdvanceListButtonAdapter extends RecyclerView.Adapter<AdvanceListBu
     public static class ButtonViewHolder extends RecyclerView.ViewHolder {
         private final TextView tv;
         private final ImageView ivBtnImage;
-        final LinearLayout layout_deails;
+        private final LinearLayout layout_deails;
 
         public ButtonViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -9,6 +9,7 @@ import java.util.List;
 import kore.botssdk.charts.formatter.DefaultAxisValueFormatter;
 import kore.botssdk.charts.formatter.ValueFormatter;
 import kore.botssdk.charts.utils.Utils;
+import kore.botssdk.utils.LogUtils;
 
 public abstract class AxisBase extends ComponentBase {
     protected ValueFormatter mAxisValueFormatter;
@@ -30,7 +31,7 @@ public abstract class AxisBase extends ComponentBase {
     protected boolean mCenterAxisLabels = false;
     private DashPathEffect mAxisLineDashPathEffect = null;
     private DashPathEffect mGridDashPathEffect = null;
-    protected List<LimitLine> mLimitLines;
+    protected final List<LimitLine> mLimitLines;
     protected boolean mDrawLimitLineBehindData = false;
     protected boolean mDrawGridLinesBehindData = true;
     protected float mSpaceMin = 0.0F;
@@ -158,7 +159,7 @@ public abstract class AxisBase extends ComponentBase {
     public void addLimitLine(LimitLine l) {
         this.mLimitLines.add(l);
         if (this.mLimitLines.size() > 6) {
-            Log.e("MPAndroiChart", "Warning! You have more than 6 LimitLines on your axis, do you really want that?");
+            LogUtils.e("MPAndroiChart", "Warning! You have more than 6 LimitLines on your axis, do you really want that?");
         }
 
     }

@@ -2,17 +2,18 @@ package kore.botssdk.fileupload.core;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -23,19 +24,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.SocketTimeoutException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
-import javax.crypto.CipherInputStream;
 import javax.net.ssl.HttpsURLConnection;
 
 import kore.botssdk.fileupload.configurations.Constants;
@@ -52,6 +55,7 @@ import kore.botssdk.fileupload.models.UploadError;
 import kore.botssdk.fileupload.services.KoreFileUploadServiceExecutor;
 import kore.botssdk.fileupload.ssl.KoreHttpsUrlConnectionBuilder;
 import kore.botssdk.fileupload.utils.StringUtils;
+import kore.botssdk.utils.LogUtils;
 
 
 public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListener {
@@ -82,14 +86,14 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 	private int noOfMergeAttempts;
 	private final String host;
 
-	BotDBManager helper;
+	final BotDBManager helper;
 //	KoreBaseDao<FileUploadInfo, String> fileDao;
-	FileUploadInfo uploadInfo = new FileUploadInfo();
+final FileUploadInfo uploadInfo = new FileUploadInfo();
     public static final long FILE_SIZE_20MB = 20 * 1024*1024;
 //	KoreBaseDao<FileUploadInfo, String> uploadDao;
 
 
-	ExecutorService executor = KoreFileUploadServiceExecutor.getInstance().getExecutor();
+	final ExecutorService executor = KoreFileUploadServiceExecutor.getInstance().getExecutor();
     private ProgressDialog pDialog;
 	private final boolean isAnonymousUser;
 	private final boolean isWebHook;
@@ -120,17 +124,6 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 		userOrTeamId = userId;
 		
 		helper = BotDBManager.getInstance();
-		
-		/*if(fileDao == null){
-			try {
-				fileDao = KoreDBManager.getHelperInstance(context, this.userId).getDao(FileUploadInfo.class);
-				uploadInfo = fileDao.queryForId(fileName);
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-		}*/
-		
-		
 	}
 
     private void upLoadProgressState(final int progress ,final boolean show){
@@ -159,25 +152,25 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
                 }
             }
         };
-        Log.d("progress",progress+" done");
+		LogUtils.d("progress",progress+" done");
         mainHandler.post(myRunnable);
 
     }
 
 
     @Override
-	public synchronized void fileTokenRecievedSuccessfully(Hashtable<String, String> hsh) {
+	public synchronized void fileTokenRecievedSuccessfully(Hashtable<String, String> hsh) throws IOException {
 		fileToken = hsh.get("fileToken");
 		startUpload();
 	}
 
 	@Override
 	public void fileTokenRecievedWithFailure(String errCode, String reason) {
-		Log.d(LOG_TAG,"file upload failed because of getting file token and the reason is "+ reason);
+		LogUtils.d(LOG_TAG,"file upload failed because of getting file token and the reason is "+ reason);
 		sendUploadFailedNotice(false);
 	}
 
-	private synchronized void startUpload() {
+	private synchronized void startUpload() throws IOException {
 		noOfMergeAttempts = 1;
 		ByteArrayOutputStream chunkbaos = new ByteArrayOutputStream();
 
@@ -186,14 +179,14 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 
 		int totalbyteswritten = 0;
 		byte[] buffer = new byte[BUFFER_SIZE];
+		FileInputStream fis = null;
 
 		try {
-			FileInputStream fis =  new FileInputStream(outFilePath);
-//				FileInputStream fisForChunkCount = new FileInputStream(outFilePath);
+			fis =  new FileInputStream(outFilePath);
 			if(fis.getChannel().size() > FILE_SIZE_20MB){
 				sendUploadFailedNotice(false);
 				showToastMsg("File size can't be more than 20 MB!");
-				Log.d(LOG_TAG, "File size can't be more than 20 mb");
+				LogUtils.d(LOG_TAG, "File size can't be more than 20 mb");
 				return;
 			}
 				if (fis.available() > 0) {
@@ -202,23 +195,20 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 						chunkCount++;
 					}
 					setChunkCount(chunkCount);
-//					fisForChunkCount.close();
 				} else {
 					sendUploadFailedNotice(false);
 					showToastMsg("File not available");
-					Log.d(LOG_TAG, "File not available");
+					LogUtils.d(LOG_TAG, "File not available");
 					return;
 				}
 
 			if (fis.available() > 0) {
-//				uploadDao = helper.getDao(FileUploadInfo.class);
 				int chunkNo = 0;
 				while ((dataSizeRead = fis.read(buffer)) > 0) {
 					chunkbaos.write(buffer, 0, dataSizeRead);
 					chunkbaos.flush();
 					totalbyteswritten += dataSizeRead;
-					Log.d(LOG_TAG, "5#################################The chunk number is " + chunkNo);
-
+					LogUtils.d(LOG_TAG, "5#################################The chunk number is " + chunkNo);
 
 					ChunkInfo chunkInfo = new ChunkInfo();
 					chunkInfo.setFileName(fileName);
@@ -226,17 +216,15 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 					chunkInfo.setOffset(totalbyteswritten - buffer.length);
 					chunkInfo.setSize(dataSizeRead);
 
-
 					if(helper.getChunkInfoMap().get(fileToken) != null) {
-						helper.getChunkInfoMap().get(fileToken).put(chunkNo, chunkInfo);
+						Objects.requireNonNull(helper.getChunkInfoMap().get(fileToken)).put(chunkNo, chunkInfo);
 					}else{
 						HashMap<Integer, ChunkInfo> hMap = new HashMap<>(1);
 						hMap.put(chunkNo, chunkInfo);
 						helper.getChunkInfoMap().put(fileToken,hMap);
 					}
-					Thread.sleep(10);
-					System.gc();
-                    upLoadProgressState(0,true);
+
+					upLoadProgressState(0,true);
 					executor.execute(new UploadExecutor(context, fileName, fileToken, accessToken, userOrTeamId, chunkbaos.toByteArray(), chunkNo, this, host,isAnonymousUser, isWebHook, botId));
 					chunkNo++;
 					chunkbaos.reset(); /*chunk size doubles in next iteration*/
@@ -244,13 +232,15 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 
 			}
 
-			if (chunkbaos != null)
-				chunkbaos.close();
-			if (fis != null)
-				fis.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			showToastMsg("Unable to attach file");
+		}
+		finally {
+			if (fis != null)
+				fis.close();
+
+			chunkbaos.close();
 		}
 	}
 
@@ -269,26 +259,22 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 		mainHandler.post(myRunnable);
 	}
 
-	private synchronized void startUploadFailedChunks(ArrayList<String> failedChunkList) {
+	private synchronized void startUploadFailedChunks(ArrayList<String> failedChunkList) throws IOException {
 		ByteArrayOutputStream chunkbaos = new ByteArrayOutputStream();
 
 		int dataSizeRead = 0;
-		int totalBytesWritten = 0;
 		byte[] buffer = new byte[BUFFER_SIZE];
+		InputStream fis = null;
 
 		try {
-			InputStream fis;
 				fis = new FileInputStream(outFilePath);
                 if (fis.available() > 0) {
                     int chunkNo = 0;
-                    while ((dataSizeRead = fis.read(buffer)) > 0) {
-                        chunkbaos.write(buffer, 0, dataSizeRead);
-                        chunkbaos.flush();
-                        totalBytesWritten += dataSizeRead;
-                        Log.d(LOG_TAG, "6########################The chunk number is " + chunkNo);
-
-                        Thread.sleep(10);
-                        System.gc();
+                    while ((dataSizeRead = fis.read(buffer)) > 0)
+					{
+						chunkbaos.write(buffer, 0, dataSizeRead);
+						chunkbaos.flush();
+						LogUtils.d(LOG_TAG, "6########################The chunk number is " + chunkNo);
 
                         if(failedChunkList.contains(chunkNo+"")) {
                             executor.execute(new UploadExecutor(context, fileName, fileToken, accessToken, userOrTeamId, chunkbaos.toByteArray(), chunkNo, this, host,isAnonymousUser, isWebHook, botId));
@@ -297,54 +283,42 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
                         chunkbaos.reset(); /*chunk size doubles in next iteration*/
                     }
                 }
-
-//			}
-			if (chunkbaos != null)
-				chunkbaos.close();
-			if (fis != null)
-				fis.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally {
+
+			if (fis != null)
+				fis.close();
+
+			chunkbaos.close();
 		}
 	}
 
 	@Override
 	public synchronized void notifyChunkUploadCompleted(String chunkNo, String fileName) {
-//		uploadCount.addAndGet(1);
 		try {
-//			uploadDao.refresh(uploadInfo);
 			uploadInfo.setUploadCount(uploadInfo.getUploadCount()+1);
             upLoadProgressState(uploadInfo.getUploadCount() * 100/uploadInfo.getTotalChunks(),true);
-			ChunkInfo chInfo = helper.getChunkInfoMap().get(fileToken).get(Integer.parseInt(chunkNo));
+			ChunkInfo chInfo = Objects.requireNonNull(helper.getChunkInfoMap().get(fileToken)).get(Integer.parseInt(chunkNo));
+			assert chInfo != null;
 			chInfo.setUploaded(true);
-			helper.getChunkInfoMap().get(fileToken).put(Integer.parseInt(chunkNo),chInfo);
+			Objects.requireNonNull(helper.getChunkInfoMap().get(fileToken)).put(Integer.parseInt(chunkNo),chInfo);
 			helper.getFileUploadInfoMap().put(fileToken,uploadInfo);
-//			uploadDao.update(uploadInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
-//		if(isRecorded ){
-			if(uploadInfo.getTotalChunks() == uploadInfo.getUploadCount()){
 
-				Log.d(LOG_TAG, "Sending merge request"+fileName +"as no failed chunks in recorded");
-				try {
-					sendMergeSignal(uploadInfo.getTotalChunks(), fileContext);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-//			}
-			}/*else if(!isRecorded && uploadInfo.getTotalChunks() == uploadInfo.getUploadCount()){
-				KoreLogger.debugLog(LOG_TAG, "Sending merge request"+fileName +"as no failed chunks");
-				sendMergeSignal(chunkCount, fileContext);
-			}*/
+		if(uploadInfo.getTotalChunks() == uploadInfo.getUploadCount()){
+
+			LogUtils.d(LOG_TAG, "Sending merge request"+fileName +"as no failed chunks in recorded");
+			try {
+				sendMergeSignal(uploadInfo.getTotalChunks(), fileContext);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
-	/*@Override
-	public synchronized void chunkUploadFailed(String chunkNo, String fileName, byte[] dataToPost, String fileToken) {
-		executor.execute(new UploadExecutor(context, fileName,fileToken,accessToken,userOrTeamId,dataToPost, Integer.parseInt(chunkNo), this,isTeam));
-	}*/
+	}
 
 	@Override
 	public void initiateFileUpload(FileUploadedListener listener) {
@@ -364,242 +338,294 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 		}
 	}
 	private void sendMergeSignal(final int dataCount, String fileContext) throws IOException {
-			Log.d(LOG_TAG,"(((( re attempt count "+noOfMergeAttempts);
-			if(noOfMergeAttempts > Constants.MERGE_RE_ATTEMPT_COUNT){
-				sendUploadFailedNotice(true);
-				return;
+		LogUtils.d(LOG_TAG,"(((( re attempt count "+noOfMergeAttempts);
+		if(noOfMergeAttempts > Constants.MERGE_RE_ATTEMPT_COUNT){
+			sendUploadFailedNotice(true);
+			return;
+		}
+		noOfMergeAttempts++;
+		String fileID = "";
+		HttpsURLConnection httpsURLConnection = null;
+		InputStream fis = null;
+		ByteArrayOutputStream thumbBaos = null;
+		BufferedReader input = null;
+		InputStreamReader inputStreamReader = null;
+		OutputStream outputStream = null;
+		DataOutputStream dataOutputStream = null;
+		InputStream inputStream = null;
+
+		try {
+			KoreHttpsUrlConnectionBuilder koreHttpsUrlConnectionBuilder;
+			if(isAnonymousUser)
+			{
+				if(!isWebHook)
+					koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context, host + String.format(FileUploadEndPoints.ANONYMOUS_MERGE, userOrTeamId,fileToken));
+				else
+					koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context, host + String.format(FileUploadEndPoints.WEBHOOK_ANONYMOUS_MERGE, botId, fileToken));
 			}
-			noOfMergeAttempts++;
-			String fileID = "";
-			HttpsURLConnection httpsURLConnection = null;
-			try {
-				KoreHttpsUrlConnectionBuilder koreHttpsUrlConnectionBuilder;
-				if(isAnonymousUser)
-				{
-					if(!isWebHook)
-						koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context, host + String.format(FileUploadEndPoints.ANONYMOUS_MERGE, userOrTeamId,fileToken));
-					else
-						koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context, host + String.format(FileUploadEndPoints.WEBHOOK_ANONYMOUS_MERGE, botId, fileToken));
+			else
+			{
+				if(!isWebHook)
+					koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context,host + String.format(FileUploadEndPoints.MERGE_FILE, userOrTeamId,fileToken));
+				else
+					koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context, host + String.format(FileUploadEndPoints.WEBHOOK_ANONYMOUS_MERGE, botId, fileToken));
+			}
+
+			httpsURLConnection = koreHttpsUrlConnectionBuilder.getHttpsURLConnection();
+			httpsURLConnection.setConnectTimeout(Constants.CONNECTION_TIMEOUT);
+			httpsURLConnection.setUseCaches(false);
+			httpsURLConnection.setDoOutput(true);
+			httpsURLConnection.setDoInput(true);
+			httpsURLConnection.setReadTimeout(Constants.CONNECTION_READ_TIMEOUT);
+
+			MultipartEntity reqEntity = new MultipartEntity();
+
+			if(thumbnailFilePath != null && !thumbnailFilePath.equalsIgnoreCase("") && fileContext.equalsIgnoreCase("knowledge")){
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+					fis = Files.newInputStream(Paths.get(thumbnailFilePath));
 				}
 				else
+					fis = new FileInputStream(thumbnailFilePath);
+
+				if (fis.available() > 0)
 				{
-					if(!isWebHook)
-						koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context,host + String.format(FileUploadEndPoints.MERGE_FILE, userOrTeamId,fileToken));
-					else
-						koreHttpsUrlConnectionBuilder = new KoreHttpsUrlConnectionBuilder(context, host + String.format(FileUploadEndPoints.WEBHOOK_ANONYMOUS_MERGE, botId, fileToken));
-				}
+					thumbBaos=new ByteArrayOutputStream();
+					reqEntity.addPart("thumbnailUpload", new StringBody("true", ContentType.TEXT_PLAIN));
+					int startInd = thumbnailFilePath.lastIndexOf(File.separator) + 1;
+					int endInd = thumbnailFilePath.indexOf(".",startInd);
+					String thfileName = thumbnailFilePath.substring(startInd,endInd);
 
-//				koreHttpsUrlConnectionBuilder.pinKoreCertificateToConnection();
-				httpsURLConnection = koreHttpsUrlConnectionBuilder.getHttpsURLConnection();
-				httpsURLConnection.setConnectTimeout(Constants.CONNECTION_TIMEOUT);
-				httpsURLConnection.setUseCaches(false);
-				httpsURLConnection.setDoOutput(true);
-				httpsURLConnection.setDoInput(true);
-				httpsURLConnection.setReadTimeout(Constants.CONNECTION_READ_TIMEOUT);
-				
-				MultipartEntity reqEntity = new MultipartEntity();
-				
-//				thumbnailFilePath = thumbnailFilePath;
-				if(thumbnailFilePath != null && !thumbnailFilePath.equalsIgnoreCase("") && fileContext.equalsIgnoreCase("knowledge")){
-
-					InputStream fis = null;
-					try {
-
-                            fis = new FileInputStream(thumbnailFilePath);
-					}catch(FileNotFoundException e){
-						e.printStackTrace();
+					int dataRead=0;
+					byte[] buff=new byte[2*1024];
+					/*file size is less than BUFFER_SIZE..just send the file*/
+					while((dataRead=fis.read(buff))!=-1){
+						thumbBaos.write(buff,0,dataRead);
 					}
-					ByteArrayOutputStream thumbBaos = null;
 
+					reqEntity.addPart("thumbnail", new ByteArrayBody(thumbBaos.toByteArray(),ContentType.getByMimeType("image/png"),thfileName));
+					reqEntity.addPart("thumbnailExtension",new StringBody("png", ContentType.TEXT_PLAIN));
+					LogUtils.d(LOG_TAG, "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP     Thumbnail uploaded");
 
-					if (fis != null && (fis instanceof CipherInputStream || fis.available() > 0)) {
-						thumbBaos=new ByteArrayOutputStream();
-						reqEntity.addPart("thumbnailUpload", new StringBody("true"));
-						int startInd = thumbnailFilePath.lastIndexOf(File.separator) + 1;
-						int endInd = thumbnailFilePath.indexOf(".",startInd);
-						String thfileName = thumbnailFilePath.substring(startInd,endInd);
-						
-						int dataRead=0;
-						byte[] buff=new byte[2*1024];
-						/*file size is less than BUFFER_SIZE..just send the file*/
-						while((dataRead=fis.read(buff))!=-1){
-							thumbBaos.write(buff,0,dataRead);
-						}
-						
-						
-						
-						reqEntity.addPart("thumbnail", new ByteArrayBody(thumbBaos.toByteArray(),"image/png",thfileName));
-						reqEntity.addPart("thumbnailExtension",new StringBody("png"));
-						Log.d(LOG_TAG, "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP     Thumbnail uploaded");
-						
-					}else{
-						reqEntity.addPart("thumbnailUpload", new StringBody("false"));
-					}
-					if(fis != null)fis.close();
-					
 				}else{
-					reqEntity.addPart("thumbnailUpload", new StringBody("false"));
+					reqEntity.addPart("thumbnailUpload", new StringBody("false", ContentType.TEXT_PLAIN));
+				}
+			}else{
+				reqEntity.addPart("thumbnailUpload", new StringBody("false", ContentType.TEXT_PLAIN));
 
-				Log.d(LOG_TAG, "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP   No Thumbnail ");
-			}
+				LogUtils.d(LOG_TAG, "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP   No Thumbnail ");
+		}
 
-		Log.d(LOG_TAG,"M#####The chunk number is "+ dataCount);
+		LogUtils.d(LOG_TAG,"M#####The chunk number is "+ dataCount);
 
-		reqEntity.addPart("totalChunks", new StringBody(dataCount + ""));
-		reqEntity.addPart("fileExtension", new StringBody(fileExtn));
-		reqEntity.addPart("fileToken", new StringBody(fileToken));
+		reqEntity.addPart("totalChunks", new StringBody(dataCount + "", ContentType.TEXT_PLAIN));
+		reqEntity.addPart("fileExtension", new StringBody(fileExtn, ContentType.TEXT_PLAIN));
+		reqEntity.addPart("fileToken", new StringBody(fileToken, ContentType.TEXT_PLAIN));
 		if(!StringUtils.isNullOrEmpty(fileName))
-			reqEntity.addPart("filename",new StringBody(fileName));
+			reqEntity.addPart("filename",new StringBody(fileName, ContentType.TEXT_PLAIN));
 
 
 		if (fileContext !=null) {
-			Log.d(LOG_TAG,"Adding fileContext  !!!");
-			reqEntity.addPart("fileContext", new StringBody(fileContext));
+			LogUtils.d(LOG_TAG,"Adding fileContext  !!!");
+			reqEntity.addPart("fileContext", new StringBody(fileContext, ContentType.TEXT_PLAIN));
 		}
 		else{
-			Log.d(LOG_TAG, "There is no fileContext !!");
+			LogUtils.d(LOG_TAG, "There is no fileContext !!");
 		}
-		Log.d(LOG_TAG, "***********AccessToken in SendMergeSignal**********" + accessToken);
+			LogUtils.d(LOG_TAG, "***********AccessToken in SendMergeSignal**********" + accessToken);
+
 		httpsURLConnection.setRequestProperty("User-Agent", Constants.getUserAgent());
 		httpsURLConnection.setRequestProperty("Cache-Control", "no-cache");
 		httpsURLConnection.setRequestProperty("Authorization", accessToken);
 		httpsURLConnection.setRequestMethod("PUT");
 
-    			/*if(Cookie != null && !Cookie.equalsIgnoreCase("")){
-					httpsURLConnection.setRequestProperty("Cookie", Cookie);
-    			}*/
+		httpsURLConnection.setRequestProperty(reqEntity.getContentType().getName(),reqEntity.getContentType().getValue());
+		outputStream = httpsURLConnection.getOutputStream();
+		dataOutputStream = new DataOutputStream(outputStream);
+		reqEntity.writeTo(dataOutputStream);
 
-				httpsURLConnection.setRequestProperty(reqEntity.getContentType().getName(),reqEntity.getContentType().getValue());
-				DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
-				reqEntity.writeTo(dataOutputStream);
-				dataOutputStream.close();
+		inputStream = httpsURLConnection.getInputStream();
+		inputStreamReader = new InputStreamReader(inputStream);
+		input = new BufferedReader(inputStreamReader);
 
-				BufferedReader input = new BufferedReader(new InputStreamReader(httpsURLConnection.getInputStream()));
+		StringBuilder serverResponse = new StringBuilder();
+		for( int c = input.read(); c != -1; c = input.read() ) {
+			serverResponse.append((char) c);
+		}
 
-				String serverResponse = "";
-				for( int c = input.read(); c != -1; c = input.read() ) {
-					serverResponse = serverResponse + (char)c;
+		upLoadProgressState(100,false);
+		LogUtils.d(LOG_TAG, "Got serverResponse for merge " + serverResponse);
+		int statusCode = httpsURLConnection.getResponseCode();
+
+		LogUtils.d(LOG_TAG, "status code for merge" + statusCode);
+		if (statusCode == 200) {
+			uploadInfo.setUploaded(true);
+			JSONObject jsonObject = new JSONObject(serverResponse.toString());
+			String thumbnailURL = null;
+			jsonObject.get("fileId");
+			fileID = (String) jsonObject.get("fileId");
+
+			if(jsonObject.has("thumbnailURL")){
+				thumbnailURL = (String)jsonObject.get("thumbnailURL");
+			}
+			uploadInfo.setFileId(fileID);
+
+			uploadInfo.setMergeTriggered(true);
+
+			Message msg = Message.obtain();
+			Bundle data = new Bundle();
+			data.putBoolean("success",true);
+			data.putString(Constants.MESSAGE_ID, messageId);
+			data.putString("fileExtn", fileExtn);
+			data.putString("filePath", outFilePath);
+			data.putString("fileId", fileID);
+			data.putString("fileName", fileName);
+			data.putString("componentType", componentType);
+			data.putString("fileSize", getFileSizeMegaBytes(new File(outFilePath)));
+			data.putString("thumbnailURL",thumbnailURL);
+			data.putString("orientation",orientation);
+			msg.setData(data); //put the data here
+			messenger.send(msg);
+			if(listener !=null)
+				listener.fileUploaded(/*comp, messageId, fileExtn,messenger*/);
+			LogUtils.d(LOG_TAG, "The fileId is " + fileID +" is listener is null "+(listener == null?"True ":"false"));
+		} else {
+			LogUtils.d(LOG_TAG,"The Resp is "+ serverResponse);
+			sendUploadFailedNotice(true);
+		}
+
+		}
+		catch (Exception e) {
+			if(e instanceof SocketTimeoutException)
+			{
+				sendUploadFailedNotice(true);
+			}
+			else if(httpsURLConnection != null)
+			{
+				int resCode = -1;
+				try{
+					resCode = httpsURLConnection.getResponseCode();
+				}catch(Exception ignored){
 				}
-				input.close();
-				httpsURLConnection.disconnect();
-                upLoadProgressState(100,false);
-				Log.d(LOG_TAG, "Got serverResponse for merge " + serverResponse);
-				int statusCode = httpsURLConnection.getResponseCode();
-				
-				Log.d(LOG_TAG, "status code for merge" + statusCode);
-				if (statusCode == 200) {
-					uploadInfo.setUploaded(true);
-//					RecordingStatus.setThumbnailFilePath(null);
-//					String serverResponse = EntityUtils.toString(response.getEntity());
-					JSONObject jsonObject = new JSONObject(serverResponse);
-          			String thumbnailURL = null;
-        			if (jsonObject.get("fileId")!=null) {
-        				fileID = (String) jsonObject.get("fileId");
-
-        				if(jsonObject.has("thumbnailURL")){
-        					thumbnailURL = (String)jsonObject.get("thumbnailURL");
-						}
-        				if(fileID != null){
-    						uploadInfo.setFileId(fileID);
-    					}
-    					
-    					uploadInfo.setMergeTriggered(true);
-    					
-        				 Message msg = Message.obtain();
-    					 Bundle data = new Bundle();
-    					 data.putBoolean("success",true);
-    					 data.putString(Constants.MESSAGE_ID, messageId);
-    					 data.putString("fileExtn", fileExtn);
-						 data.putString("filePath", outFilePath);
-    					 data.putString("fileId", fileID);
-    					 data.putString("fileName", fileName);
-						 data.putString("componentType", componentType);
-						 data.putString("fileSize", getFileSizeMegaBytes(new File(outFilePath)));
-						 data.putString("thumbnailURL",thumbnailURL);
-						 data.putString("orientation",orientation);
-//						if(isTeam)
-//							data.putString(Constants.TEAM_ID,userOrTeamId);
-    					 msg.setData(data); //put the data here
-    					 try {
-    						 messenger.send(msg);
-    					 } catch (RemoteException e) {
-    						 Log.d("error", "error"+ e);
-    					 }
-        				if(listener !=null)
-        					listener.fileUploaded(/*comp, messageId, fileExtn,messenger*/);
-        				Log.d(LOG_TAG, "The fileId is " + fileID +" is listener is null "+(listener == null?"True ":"false"));
-        			}
-					
-					//Updating file sent status into DB
-					
-					// TODO Here insert the file sent status with fileId
-					
-				} else {
-
-//					String serverResponse = EntityUtils.toString(response.getEntity());
-					Log.d(LOG_TAG,"The Resp is "+ serverResponse);
-					sendUploadFailedNotice(true);
-
-//					throw new Exception("Response code not 200");
-				}
-				
-
-				
-			} catch (Exception e) {
-				if(e instanceof SocketTimeoutException){
-					sendUploadFailedNotice(true);
-				}else if(httpsURLConnection != null){
-					int resCode = -1;
-					try{
-						resCode = httpsURLConnection.getResponseCode();
-					}catch(Exception t){
-					}
-					Log.d(LOG_TAG, "Hi res code is " + resCode);
-					if(resCode == Constants.UPLOAD_ERROR_CODE_404){
-						handleErr404(httpsURLConnection.getErrorStream(),fileName);
-					}else{
-						sendUploadFailedNotice(true);
-					}
+				LogUtils.d(LOG_TAG, "Hi res code is " + resCode);
+				if(resCode == Constants.UPLOAD_ERROR_CODE_404){
+					handleErr404(httpsURLConnection.getErrorStream(),fileName);
 				}else{
 					sendUploadFailedNotice(true);
 				}
-
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Failed to send the merge initiation message " + e);
-			}finally {
-//				KoreBaseDao<FileUploadInfo, String> uploadDao = null;
-				try {
-//					uploadDao = helper.getDao(FileUploadInfo.class);
-//					uploadDao.update(uploadInfo);
-					helper.getFileUploadInfoMap().put(fileToken,uploadInfo);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
+			}else{
+				sendUploadFailedNotice(true);
 			}
+
+			try {
+				if(outputStream != null)
+					outputStream.close();
+
+				if(inputStream != null)
+					inputStream.close();
+
+				if(dataOutputStream != null)
+					dataOutputStream.close();
+
+				if(inputStreamReader != null)
+					inputStreamReader.close();
+
+				if(httpsURLConnection != null)
+					httpsURLConnection.disconnect();
+
+				if(fis != null)
+					fis.close();
+
+				if(thumbBaos != null)
+					thumbBaos.close();
+
+				if(input != null)
+					input.close();
+
+				helper.getFileUploadInfoMap().put(fileToken,uploadInfo);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+			e.printStackTrace();
+			LogUtils.e(LOG_TAG, "Failed to send the merge initiation message " + e);
+		}
+		finally {
+			try {
+				if(outputStream != null)
+					outputStream.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(inputStream != null)
+					inputStream.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(dataOutputStream != null)
+					dataOutputStream.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(inputStreamReader != null)
+					inputStreamReader.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(fis != null)
+					fis.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(thumbBaos != null)
+					thumbBaos.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(input != null)
+					input.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if(httpsURLConnection != null)
+					httpsURLConnection.disconnect();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			helper.getFileUploadInfoMap().put(fileToken,uploadInfo);
+		}
 	}
 	private  String getFileSizeMegaBytes(File file) {
 		if(file.length() < (1024*1024)){
 			return df2.format((double) file.length() / (1024)) + "kb";
-		}else	return df2.format((double) file.length() / (1024 * 1024)) + "mb";
+		}else
+			return df2.format((double) file.length() / (1024 * 1024)) + "mb";
 	}
 
-	private void handleErr404(InputStream errorStream , String fileName) {
-		Log.d(LOG_TAG,"Starting upload failed chunks");
-		String response="";
+	private void handleErr404(InputStream errorStream , String fileName) throws IOException {
+		LogUtils.d(LOG_TAG,"Starting upload failed chunks");
+		StringBuilder response= new StringBuilder();
 		String line;
-		BufferedReader br=new BufferedReader(new InputStreamReader(errorStream));
-		try {
-			while ((line=br.readLine()) != null) {
-                response+=line;
-            }
-			if(!StringUtils.isNullOrEmpty(response)){
-				Log.d(LOG_TAG,"Failed chunks are "+response);
-				MissingChunks msc = new Gson().fromJson(response, MissingChunks.class);
-				if(msc != null){
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(errorStream))) {
+			while ((line = br.readLine()) != null) {
+				response.append(line);
+			}
+			if (!StringUtils.isNullOrEmpty(response.toString())) {
+				LogUtils.d(LOG_TAG, "Failed chunks are " + response);
+				MissingChunks msc = new Gson().fromJson(response.toString(), MissingChunks.class);
+				if (msc != null) {
 					UploadError uE = msc.getErrors().get(0);
-					ArrayList<String> missingChunks = new ArrayList<String>(Arrays.asList(uE.getMsg().substring(1,uE.getMsg().length()-1).split("\\s*,\\s*")));
-					changeUploadInfoForFailedChunks(missingChunks,fileName);
+					ArrayList<String> missingChunks = new ArrayList<String>(Arrays.asList(uE.getMsg().substring(1, uE.getMsg().length() - 1).split("\\s*,\\s*")));
+					changeUploadInfoForFailedChunks(missingChunks, fileName);
 					startUploadFailedChunks(missingChunks);
 				}
 			}
@@ -610,12 +636,13 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 
 	private void changeUploadInfoForFailedChunks(ArrayList<String> chunkNumbers, String fileName){
 		try {
-//			uploadDao.refresh(uploadInfo);
 			uploadInfo.setUploadCount(uploadInfo.getUploadCount() - chunkNumbers.size());
 			for(String chunkNo:chunkNumbers){
-				ChunkInfo chInfo = helper.getChunkInfoMap().get(fileToken).get(chunkNo);
-				chInfo.setUploaded(false);
-				helper.getChunkInfoMap().get(fileToken).put(Integer.parseInt(chunkNo),chInfo);
+				ChunkInfo chInfo = Objects.requireNonNull(helper.getChunkInfoMap().get(fileToken)).get(chunkNo);
+				if(chInfo != null) {
+					chInfo.setUploaded(false);
+					Objects.requireNonNull(helper.getChunkInfoMap().get(fileToken)).put(Integer.parseInt(chunkNo), chInfo);
+				}
 			}
 			uploadInfo.setUploaded(false);
 			helper.getFileUploadInfoMap().put(fileToken,uploadInfo);
@@ -634,20 +661,20 @@ public class UploadBulkFile implements Work, FileTokenListener, ChunkUploadListe
 		data.putString("fileName", fileName);
 		data.putString("filePath", outFilePath);
 		data.putString("componentType", componentType);
-        data.putBoolean("success",false);
-//		if(isTeam)
-//			data.putString(Constants.TEAM_ID,userOrTeamId);
+		data.putBoolean("success",false);
 		msg.setData(data); //put the data here
 
 		try {
 			messenger.send(msg);
 		} catch (RemoteException e) {
-			Log.d("error", "error");
+			LogUtils.d("error", "error");
 		}
-		if(listener !=null)
-			listener.fileUploaded(/*comp, messageId, fileExtn,messenger*/);
 
-        upLoadProgressState(100,false);
+		if(listener !=null) {
+			listener.fileUploaded(/*comp, messageId, fileExtn,messenger*/);
+		}
+
+		upLoadProgressState(100,false);
 		uploadInfo.setMergeTriggered(isFromMergeSignal);
 	}
 }

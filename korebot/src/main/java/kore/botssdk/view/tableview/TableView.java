@@ -1,21 +1,18 @@
 package kore.botssdk.view.tableview;
 
-import android.animation.Animator;
 import android.animation.LayoutTransition;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 
 import java.util.ArrayList;
@@ -25,6 +22,7 @@ import kore.botssdk.application.AppControl;
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
 import kore.botssdk.models.PayloadInner;
+import kore.botssdk.view.AutoExpandListView;
 import kore.botssdk.view.tableview.colorizers.TableDataRowColorizer;
 import kore.botssdk.view.tableview.listeners.OnScrollListener;
 import kore.botssdk.view.tableview.listeners.SwipeToRefreshListener;
@@ -36,35 +34,17 @@ import kore.botssdk.view.tableview.model.TableColumnWeightModel;
 import kore.botssdk.view.tableview.providers.TableDataRowBackgroundProvider;
 import kore.botssdk.view.tableview.toolkit.TableDataRowBackgroundProviders;
 
-
+@SuppressLint("UnknownNullness")
 public class TableView<T> extends LinearLayout {
-
-    private final String LOG_TAG = TableView.class.getName();
-
-    private final int DEFAULT_COLUMN_COUNT = 4;
-    private final int DEFAULT_HEADER_ELEVATION = 1;
-//    private static final int DEFAULT_HEADER_COLOR = 0xFFCCCCCC;
-
-    /*private final Set<TableDataLongClickListener<T>> dataLongClickListeners = new HashSet<>();
-    private final Set<TableDataClickListener<T>> dataClickListeners = new HashSet<>();
-    private final Set<OnScrollListener> onScrollListeners = new HashSet<>();*/
-    private final LayoutTransition layoutTransition;
 
     private TableDataRowBackgroundProvider<? super T> dataRowBackgroundProvider =
             TableDataRowBackgroundProviders.similarRowColor(0x00000000);
     private TableColumnModel columnModel;
     protected TableHeaderView tableHeaderView;
-    protected ListView tableDataView;
+    protected AutoExpandListView tableDataView;
     private TableDataAdapter<T> tableDataAdapter;
     private TableHeaderAdapter tableHeaderAdapter;
-    private final float dp1;
-    private PayloadInner payloadInner;
     private int headerElevation;
-    private Dialog dialog;
-    private ComposeFooterInterface composeFooterInterface;
-    private InvokeGenericWebViewInterface invokeGenericWebViewInterface;
-//    private int headerColor;
-
 
     /**
      * Creates a new TableView with the given context.\n
@@ -96,13 +76,13 @@ public class TableView<T> extends LinearLayout {
      */
     public TableView(final Context context, final AttributeSet attributes, final int styleAttributes) {
         super(context, attributes, styleAttributes);
-        this.dp1 = AppControl.getInstance().getDimensionUtil().density;
+        float dp1 = AppControl.getInstance().getDimensionUtil().density;
         setOrientation(LinearLayout.VERTICAL);
         setAttributes(attributes);
         setupTableHeaderView(attributes);
         setupTableDataView(attributes, styleAttributes);
-        setBackground(context.getDrawable(R.drawable.round_rect));
-        layoutTransition = new LayoutTransition();
+        setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.round_rect, context.getTheme()));
+        LayoutTransition layoutTransition = new LayoutTransition();
     }
 
     /**
@@ -114,7 +94,7 @@ public class TableView<T> extends LinearLayout {
         this.tableHeaderView = headerView;
 
         tableHeaderView.setAdapter(tableHeaderAdapter);
-        tableHeaderView.setBackground(getContext().getDrawable(R.drawable.round_rect_table_header));
+        tableHeaderView.setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.round_rect_table_header, getContext().getTheme()));
         tableHeaderView.setId(R.id.table_header_view);
 
         if (getChildCount() == 2) {
@@ -169,15 +149,12 @@ public class TableView<T> extends LinearLayout {
 
     public void setPayloadInner(PayloadInner payloadInner)
     {
-        this.payloadInner = payloadInner;
     }
 
     public void setTableComposeFooterInterface(ComposeFooterInterface composeFooterInterface) {
-        this.composeFooterInterface = composeFooterInterface;
     }
 
     public void setTableInvokeGenericWebViewInterface(InvokeGenericWebViewInterface invokeGenericWebViewInterface) {
-        this.invokeGenericWebViewInterface = invokeGenericWebViewInterface;
     }
 
     /**
@@ -537,7 +514,9 @@ public class TableView<T> extends LinearLayout {
         final TypedArray styledAttributes = getContext().obtainStyledAttributes(attributes, R.styleable.TableView);
 
 //        headerColor = styledAttributes.getInt(R.styleable.TableView_tableView_headerColor, DEFAULT_HEADER_COLOR);
+        int DEFAULT_HEADER_ELEVATION = 1;
         headerElevation = styledAttributes.getInt(R.styleable.TableView_tableView_headerElevation, DEFAULT_HEADER_ELEVATION);
+        int DEFAULT_COLUMN_COUNT = 4;
         final int columnCount = styledAttributes.getInt(R.styleable.TableView_tableView_columnCount, DEFAULT_COLUMN_COUNT);
         columnModel = new TableColumnWeightModel(columnCount);
 
@@ -547,19 +526,19 @@ public class TableView<T> extends LinearLayout {
     private void setupTableHeaderView(final AttributeSet attributes) {
         tableHeaderAdapter = new DefaultTableHeaderAdapter(getContext());
         final TableHeaderView tableHeaderView = new TableHeaderView(getContext());
-        tableHeaderView.setBackground(getContext().getDrawable(R.drawable.round_rect_table_header));
+        tableHeaderView.setBackground(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.round_rect_table_header, getContext().getTheme()));
         setHeaderView(tableHeaderView);
     }
 
     private void setupTableDataView(final AttributeSet attributes, final int styleAttributes) {
-        final LayoutParams dataViewLayoutParams = new LayoutParams(getWidthAttribute(attributes), LayoutParams.WRAP_CONTENT);
+        final LayoutParams dataViewLayoutParams = new LayoutParams(getWidthAttribute(attributes), 500);
 
         tableDataAdapter = new DefaultTableDataAdapter(getContext());
         tableDataAdapter.setRowBackgroundProvider(dataRowBackgroundProvider);
 
-        tableDataView = new ListView(getContext(), attributes, styleAttributes);
+        tableDataView = new AutoExpandListView(getContext(), attributes, styleAttributes);
         tableDataView.setVerticalScrollBarEnabled(false);
-        tableDataView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        tableDataView.setLayoutParams(dataViewLayoutParams);
         tableDataView.setAdapter(tableDataAdapter);
         tableDataView.setId(R.id.table_data_view);
         addView(tableDataView);

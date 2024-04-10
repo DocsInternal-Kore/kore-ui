@@ -5,9 +5,6 @@ import static android.view.View.GONE;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.StrikethroughSpan;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -58,21 +55,21 @@ public class CarouselItemViewHelper {
     public static void initializeViewHolder(View view) {
         CarouselViewHolder carouselViewHolder = new CarouselViewHolder();
 
-        carouselViewHolder.carouselItemRoot = (CardView) view.findViewById(R.id.carousel_item_root);
-        carouselViewHolder.carouselItemImage = (ImageView) view.findViewById(R.id.carousel_item_image);
-        carouselViewHolder.carouselItemTitle = (TextView) view.findViewById(R.id.carousel_item_title);
-        carouselViewHolder.carouselItemSubTitle = (TextView) view.findViewById(R.id.carousel_item_subtitle);
-        carouselViewHolder.carouselButtonListview = (ListView) view.findViewById(R.id.carousel_button_listview);
+        carouselViewHolder.carouselItemRoot = view.findViewById(R.id.carousel_item_root);
+        carouselViewHolder.carouselItemImage = view.findViewById(R.id.carousel_item_image);
+        carouselViewHolder.carouselItemTitle = view.findViewById(R.id.carousel_item_title);
+        carouselViewHolder.carouselItemSubTitle = view.findViewById(R.id.carousel_item_subtitle);
+        carouselViewHolder.carouselButtonListview = view.findViewById(R.id.carousel_button_listview);
 
-        carouselViewHolder.hashTagsView = (TextView) view.findViewById(R.id.hash_tags_view);
-        carouselViewHolder.knowledgeType = (TextView) view.findViewById(R.id.knowledge_type);
-        carouselViewHolder.knowledgeMode = (TextView) view.findViewById(R.id.knowledge_mode);
-        carouselViewHolder.koraItems = (RelativeLayout) view.findViewById(R.id.kora_items);
-        carouselViewHolder.carouselOfferPrice_FL =  (FrameLayout) view.findViewById(R.id.offer_price_fl);
-        carouselViewHolder.carouselSavedPrice_FL =  (FrameLayout) view.findViewById(R.id.saved_price_fl);
+        carouselViewHolder.hashTagsView = view.findViewById(R.id.hash_tags_view);
+        carouselViewHolder.knowledgeType = view.findViewById(R.id.knowledge_type);
+        carouselViewHolder.knowledgeMode = view.findViewById(R.id.knowledge_mode);
+        carouselViewHolder.koraItems = view.findViewById(R.id.kora_items);
+        carouselViewHolder.carouselOfferPrice_FL = view.findViewById(R.id.offer_price_fl);
+        carouselViewHolder.carouselSavedPrice_FL = view.findViewById(R.id.saved_price_fl);
 
-        carouselViewHolder.carousel_item_offer = (TextView) view.findViewById(R.id.carousel_item_offer);
-        carouselViewHolder.carousel_item_save_price= (TextView) view.findViewById(R.id.carousel_item_saved);
+        carouselViewHolder.carousel_item_offer = view.findViewById(R.id.carousel_item_offer);
+        carouselViewHolder.carousel_item_save_price= view.findViewById(R.id.carousel_item_saved);
 
         view.setTag(carouselViewHolder);
     }
@@ -116,24 +113,24 @@ public class CarouselItemViewHelper {
 
             String text = (price+" "+ cost_price).trim();
 
-            SpannableStringBuilder ssBuilder = new SpannableStringBuilder(text);
+//            SpannableStringBuilder ssBuilder = new SpannableStringBuilder(text);
 
             // Initialize a new StrikeThroughSpan to display strike through text
-            StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
+//            StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
 
             // Apply the strike through text to the span
-            ssBuilder.setSpan(
-                    strikethroughSpan, // Span to add
-                    text.indexOf(price), // Start of the span (inclusive)
-                    text.indexOf(price) + price.length(), // End of the span (exclusive)
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE // Do not extend the span when text add later
-            );
+//            ssBuilder.setSpan(
+//                    strikethroughSpan, // Span to add
+//                    text.indexOf(price), // Start of the span (inclusive)
+//                    text.indexOf(price) + price.length(), // End of the span (exclusive)
+//                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE // Do not extend the span when text add later
+//            );
 
             if(!Utils.isNullOrEmpty(botCarouselModel.getPrice()) || !Utils.isNullOrEmpty(botCarouselModel.getCost_price())) {
                 carouselViewHolder.carouselOfferPrice_FL.setVisibility(View.VISIBLE);
-                if(!Utils.isNullOrEmpty(botCarouselModel.getCost_price()))
-                    carouselViewHolder.carousel_item_offer.setText(ssBuilder);
-                else
+//                if(!Utils.isNullOrEmpty(botCarouselModel.getCost_price()))
+//                    carouselViewHolder.carousel_item_offer.setText(ssBuilder);
+//                else
                     carouselViewHolder.carousel_item_offer.setText(text);
             }else{
                 carouselViewHolder.carouselOfferPrice_FL.setVisibility(View.GONE);

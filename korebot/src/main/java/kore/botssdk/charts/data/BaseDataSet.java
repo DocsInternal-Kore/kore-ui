@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import kore.botssdk.charts.components.Legend;
 import kore.botssdk.charts.components.YAxis;
@@ -78,11 +79,11 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
     }
 
     public int getColor() {
-        return (Integer)this.mColors.get(0);
+        return this.mColors.get(0);
     }
 
     public int getColor(int index) {
-        return (Integer)this.mColors.get(index % this.mColors.size());
+        return this.mColors.get(index % this.mColors.size());
     }
 
     public GradientColor getGradientColor() {
@@ -94,7 +95,7 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
     }
 
     public GradientColor getGradientColor(int index) {
-        return (GradientColor)this.mGradientColors.get(index % this.mGradientColors.size());
+        return this.mGradientColors.get(index % this.mGradientColors.size());
     }
 
     public void setColors(List<Integer> colors) {
@@ -214,11 +215,11 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
     }
 
     public int getValueTextColor() {
-        return (Integer)this.mValueColors.get(0);
+        return this.mValueColors.get(0);
     }
 
     public int getValueTextColor(int index) {
-        return (Integer)this.mValueColors.get(index % this.mValueColors.size());
+        return this.mValueColors.get(index % this.mValueColors.size());
     }
 
     public Typeface getValueTypeface() {
@@ -342,7 +343,7 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
 
     public boolean contains(T e) {
         for(int i = 0; i < this.getEntryCount(); ++i) {
-            if (this.getEntryForIndex(i).equals(e)) {
+            if (Objects.equals(this.getEntryForIndex(i), e)) {
                 return true;
             }
         }

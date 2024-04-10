@@ -1,8 +1,11 @@
 package kore.botssdk.models;
 
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class BrandingQuickStartButtons
+public class BrandingQuickStartButtons implements Serializable
 {
     private boolean show;
     private String style;
@@ -10,17 +13,19 @@ public class BrandingQuickStartButtons
     private String input;
     private BrandingQuickStartButtonActionModel action;
 
-    public void setAction(BrandingQuickStartButtonActionModel action) {
+    public void setAction( BrandingQuickStartButtonActionModel action) {
         this.action = action;
     }
 
-    public void setInput(String input) {
+    public void setInput( String input) {
         this.input = input;
     }
+
 
     public BrandingQuickStartButtonActionModel getAction() {
         return action;
     }
+
 
     public String getInput() {
         return input;
@@ -38,11 +43,11 @@ public class BrandingQuickStartButtons
         this.show = show;
     }
 
-    public void setStyle(String style) {
+    public void setStyle( String style) {
         this.style = style;
     }
 
-    public void setButtons(ArrayList<BrandingQuickStartButtonButtonsModel> buttons) {
+    public void setButtons( ArrayList<BrandingQuickStartButtonButtonsModel> buttons) {
         this.buttons = buttons;
     }
 

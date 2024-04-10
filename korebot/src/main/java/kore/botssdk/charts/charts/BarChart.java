@@ -3,7 +3,6 @@ package kore.botssdk.charts.charts;
 import android.content.Context;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import kore.botssdk.charts.components.YAxis;
 import kore.botssdk.charts.data.BarData;
@@ -13,9 +12,10 @@ import kore.botssdk.charts.highlight.Highlight;
 import kore.botssdk.charts.interfaces.dataprovider.BarDataProvider;
 import kore.botssdk.charts.interfaces.datasets.IBarDataSet;
 import kore.botssdk.charts.renderer.BarChartRenderer;
+import kore.botssdk.utils.LogUtils;
 
 public class BarChart extends BarLineChartBase<BarData> implements BarDataProvider {
-    protected boolean mHighlightFullBarEnabled = false;
+    protected final boolean mHighlightFullBarEnabled = false;
     private boolean mDrawValueAboveBar = true;
     private boolean mDrawBarShadow = false;
     private boolean mFitBars = false;
@@ -42,18 +42,18 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
     protected void calcMinMax() {
         if (this.mFitBars) {
-            this.mXAxis.calculate(((BarData)this.mData).getXMin() - ((BarData)this.mData).getBarWidth() / 2.0F, ((BarData)this.mData).getXMax() + ((BarData)this.mData).getBarWidth() / 2.0F);
+            this.mXAxis.calculate(this.mData.getXMin() - this.mData.getBarWidth() / 2.0F, this.mData.getXMax() + this.mData.getBarWidth() / 2.0F);
         } else {
-            this.mXAxis.calculate(((BarData)this.mData).getXMin(), ((BarData)this.mData).getXMax());
+            this.mXAxis.calculate(this.mData.getXMin(), this.mData.getXMax());
         }
 
-        this.mAxisLeft.calculate(((BarData)this.mData).getYMin(YAxis.AxisDependency.LEFT), ((BarData)this.mData).getYMax(YAxis.AxisDependency.LEFT));
-        this.mAxisRight.calculate(((BarData)this.mData).getYMin(YAxis.AxisDependency.RIGHT), ((BarData)this.mData).getYMax(YAxis.AxisDependency.RIGHT));
+        this.mAxisLeft.calculate(this.mData.getYMin(YAxis.AxisDependency.LEFT), this.mData.getYMax(YAxis.AxisDependency.LEFT));
+        this.mAxisRight.calculate(this.mData.getYMin(YAxis.AxisDependency.RIGHT), this.mData.getYMax(YAxis.AxisDependency.RIGHT));
     }
 
     public Highlight getHighlightByTouchPoint(float x, float y) {
         if (this.mData == null) {
-            Log.e("MPAndroidChart", "Can't select by touch. No data set.");
+            LogUtils.e("MPAndroidChart", "Can't select by touch. No data set.");
             return null;
         } else {
             Highlight h = this.getHighlighter().getHighlight(x, y);
@@ -61,24 +61,18 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         }
     }
 
-    public RectF getBarBounds(BarEntry e) {
-        RectF bounds = new RectF();
-        this.getBarBounds(e, bounds);
-        return bounds;
-    }
-
     public void getBarBounds(BarEntry e, RectF outputRect) {
-        IBarDataSet set = (IBarDataSet)((BarData)this.mData).getDataSetForEntry(e);
+        IBarDataSet set = this.mData.getDataSetForEntry(e);
         if (set == null) {
             outputRect.set(1.4E-45F, 1.4E-45F, 1.4E-45F, 1.4E-45F);
         } else {
             float y = e.getY();
             float x = e.getX();
-            float barWidth = ((BarData)this.mData).getBarWidth();
+            float barWidth = this.mData.getBarWidth();
             float left = x - barWidth / 2.0F;
             float right = x + barWidth / 2.0F;
-            float top = y >= 0.0F ? y : 0.0F;
-            float bottom = y <= 0.0F ? y : 0.0F;
+            float top = Math.max(y, 0.0F);
+            float bottom = Math.min(y, 0.0F);
             outputRect.set(left, top, right, bottom);
             this.getTransformer(set.getAxisDependency()).rectValueToPixel(outputRect);
         }
@@ -100,20 +94,12 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         return this.mDrawBarShadow;
     }
 
-    public void setHighlightFullBarEnabled(boolean enabled) {
-        this.mHighlightFullBarEnabled = enabled;
-    }
-
     public boolean isHighlightFullBarEnabled() {
         return this.mHighlightFullBarEnabled;
     }
 
-    public void highlightValue(float x, int dataSetIndex, int stackIndex) {
-        this.highlightValue(new Highlight(x, dataSetIndex, stackIndex), false);
-    }
-
     public BarData getBarData() {
-        return (BarData)this.mData;
+        return this.mData;
     }
 
     public void setFitBars(boolean enabled) {

@@ -1,13 +1,10 @@
 package kore.botssdk.models;
 
-/**
- * Created by Ramachandra Pradeep on 12/15/2016.
- */
 public class ButtonTemplate {
 
     private String type;
     private String title;
-    private String payload;
+    private Object payload;
 
     public String getType() {
         return type;
@@ -17,11 +14,11 @@ public class ButtonTemplate {
         this.type = type;
     }
 
-    public String getPayload() {
+    public Object getPayload() {
         return payload;
     }
 
-    public void setPayload(String payload) {
+    public void setPayload(Object payload) {
         this.payload = payload;
     }
 

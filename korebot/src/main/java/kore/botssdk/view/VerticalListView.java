@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
@@ -41,7 +41,6 @@ import kore.botssdk.models.BotButtonModel;
 import kore.botssdk.models.BotCaourselButtonModel;
 import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.CalEventsTemplateModel;
-import kore.botssdk.models.CalEventsTemplateModel.Duration;
 import kore.botssdk.models.ContactViewListModel;
 import kore.botssdk.models.KnowledgeCollectionModel;
 import kore.botssdk.models.TaskTemplateResponse;
@@ -62,7 +61,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
     private View rootLayout;
     private int dp1;
     private TextView viewMore;
-    private Duration _cursor;
+    private CalEventsTemplateModel.Duration _cursor;
 
     public ComposeFooterInterface getComposeFooterInterface() {
         return composeFooterInterface;
@@ -99,7 +98,8 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
         recyclerView.setItemAnimator(null);
         viewMore = view.findViewById(R.id.view_more);
         rootLayout = view.findViewById(R.id.rootLayoutvertical);
-        LayerDrawable shape = (LayerDrawable) getResources().getDrawable(R.drawable.shadow_layer_background);
+        LayerDrawable shape = (LayerDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.shadow_layer_background, getContext().getTheme());
+        assert shape != null;
         GradientDrawable outer = (GradientDrawable) shape.findDrawableByLayerId(R.id.inner);
         outer.setColor(Color.parseColor(SDKConfiguration.BubbleColors.getProfileColor())+ BundleConstants.TRANSPERANCY_50_PERCENT);
         rootLayout.setBackground(shape);
@@ -119,7 +119,8 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
     }
 
     public void onEvent(ProfileColorUpdateEvent event){
-        LayerDrawable shape = (LayerDrawable) getResources().getDrawable(R.drawable.shadow_layer_background);
+        LayerDrawable shape = (LayerDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.shadow_layer_background, getContext().getTheme());
+        assert shape != null;
         GradientDrawable outer = (GradientDrawable) shape.findDrawableByLayerId(R.id.inner);
         outer.setColor(Color.parseColor(SDKConfiguration.BubbleColors.getProfileColor())+BundleConstants.TRANSPERANCY_50_PERCENT);
         rootLayout.setBackground(shape);
@@ -141,7 +142,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
             if(composeFooterInterface != null)
                 composeFooterInterface.openFullView(BotResponse.TEMPLATE_TYPE_TASK_VIEW, gson.toJson(((TasksListAdapter) recyclerView.getAdapter()).getTaskTemplateResponse()), null, 0);
         } else {
-            Duration _duration = null;
+            CalEventsTemplateModel.Duration _duration = null;
             if(adapter instanceof CalendarEventsAdapter){
                 _duration = ((CalendarEventsAdapter) adapter).getCursorDuration();
             }
@@ -182,7 +183,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
         int totalHeight = getPaddingTop();
         int childWidthSpec;
 
-        childWidthSpec = MeasureSpec.makeMeasureSpec((int) parentWidth - 28 * dp1, MeasureSpec.EXACTLY);
+        childWidthSpec = MeasureSpec.makeMeasureSpec(parentWidth - 28 * dp1, MeasureSpec.EXACTLY);
         MeasureUtils.measure(rootLayout, childWidthSpec, wrapSpec);
 
         totalHeight += rootLayout.getMeasuredHeight() + getPaddingBottom() + getPaddingTop();
@@ -215,7 +216,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
         setAdapter(tasksListAdapter);
         if (SelectionUtils.getSelectedTasks().size() > 0) {
             tasksListAdapter.setSelectedTasks(SelectionUtils.getSelectedTasks());
-            tasksListAdapter.notifyDataSetChanged();
+            tasksListAdapter.notifyItemRangeChanged(0, SelectionUtils.getSelectedTasks().size() - 1);
         }
         prepareDataSetAndPopulate(data.getTaskData(), templateType, isEnabled);
 
@@ -229,7 +230,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
       //  prepareDataSetAndPopulate(data,templateType);
     }*/
 
-    public void setCursorDuration(Duration cursor){
+    public void setCursorDuration(CalEventsTemplateModel.Duration cursor){
         _cursor = cursor;
     }
     public void prepareDataSetAndPopulate(ArrayList data, String templateType, boolean isEnabled) {
@@ -256,10 +257,10 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
             recyclerView.addItemDecoration(itemDecorator);
         }*/
         ((RecyclerViewDataAccessor) adapter).setVerticalListViewActionHelper(this);
-        adapter.notifyDataSetChanged();
+        adapter.notifyAll();
     }
 
-    public void setAdapterByData(ArrayList data, String type, boolean isEnabled, Duration _cursor) {
+    public void setAdapterByData(ArrayList data, String type, boolean isEnabled, CalEventsTemplateModel.Duration _cursor) {
         switch (type) {
             case BotResponse.TEMPLATE_TYPE_FILES_LOOKUP:
                 setAdapter(new KoraFilesRecyclerAdapter(data, getContext()));
@@ -303,6 +304,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
     @Override
     public void driveItemClicked(BotCaourselButtonModel botCaourselButtonModel) {
         LinkedTreeMap<String, String> map = (LinkedTreeMap<String, String>) botCaourselButtonModel.getCustomData().get("redirectUrl");
+        assert map != null;
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(map.get("mob")));
         getContext().startActivity(browserIntent);
     }
@@ -326,9 +328,7 @@ public class VerticalListView extends ViewGroup implements VerticalListViewActio
 
     @Override
     public void tasksSelectedOrDeselected(boolean selecetd) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setTranslationZ(500 * dp1);
-        }
+        setTranslationZ(500 * dp1);
         bringToFront();
         if(composeFooterInterface != null)
             composeFooterInterface.updateActionbar(selecetd, getTemplateType(recyclerView.getAdapter()), getActions(recyclerView.getAdapter()));

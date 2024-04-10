@@ -9,18 +9,18 @@ public class XAxis extends AxisBase {
     public int mLabelRotatedHeight = 1;
     protected float mLabelRotationAngle = 0.0F;
     private boolean mAvoidFirstLastClipping = false;
-    private kore.botssdk.charts.components.XAxis.XAxisPosition mPosition;
+    private XAxisPosition mPosition;
 
     public XAxis() {
-        this.mPosition = kore.botssdk.charts.components.XAxis.XAxisPosition.TOP;
+        this.mPosition = XAxisPosition.TOP;
         this.mYOffset = Utils.convertDpToPixel(4.0F);
     }
 
-    public kore.botssdk.charts.components.XAxis.XAxisPosition getPosition() {
+    public XAxisPosition getPosition() {
         return this.mPosition;
     }
 
-    public void setPosition(kore.botssdk.charts.components.XAxis.XAxisPosition pos) {
+    public void setPosition(XAxisPosition pos) {
         this.mPosition = pos;
     }
 

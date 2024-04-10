@@ -18,6 +18,7 @@ import kore.botssdk.charts.interfaces.datasets.IDataSet;
 import kore.botssdk.charts.listener.PieRadarChartTouchListener;
 import kore.botssdk.charts.utils.MPPointF;
 import kore.botssdk.charts.utils.Utils;
+import kore.botssdk.utils.LogUtils;
 
 public abstract class PieRadarChartBase<T extends ChartData<? extends IDataSet<? extends Entry>>> extends Chart<T> {
     private float mRotationAngle = 270.0F;
@@ -170,15 +171,15 @@ public abstract class PieRadarChartBase<T extends ChartData<? extends IDataSet<?
         legendHeight = Math.max(fullLegendWidth, Math.max(this.getRequiredBaseOffset(), legendBottom));
         this.mViewPortHandler.restrainViewPort(yLegendOffset, spacing, legendWidth, legendHeight);
         if (this.mLogEnabled) {
-            Log.i("MPAndroidChart", "offsetLeft: " + yLegendOffset + ", offsetTop: " + spacing + ", offsetRight: " + legendWidth + ", offsetBottom: " + legendHeight);
+            LogUtils.i("MPAndroidChart", "offsetLeft: " + yLegendOffset + ", offsetTop: " + spacing + ", offsetRight: " + legendWidth + ", offsetBottom: " + legendHeight);
         }
 
     }
 
     public float getAngleForPoint(float x, float y) {
         MPPointF c = this.getCenterOffsets();
-        double tx = (double)(x - c.x);
-        double ty = (double)(y - c.y);
+        double tx = x - c.x;
+        double ty = y - c.y;
         double length = Math.sqrt(tx * tx + ty * ty);
         double r = Math.acos(ty / length);
         float angle = (float)Math.toDegrees(r);
@@ -202,8 +203,8 @@ public abstract class PieRadarChartBase<T extends ChartData<? extends IDataSet<?
     }
 
     public void getPosition(MPPointF center, float dist, float angle, MPPointF outputPoint) {
-        outputPoint.x = (float)((double)center.x + (double)dist * Math.cos(Math.toRadians((double)angle)));
-        outputPoint.y = (float)((double)center.y + (double)dist * Math.sin(Math.toRadians((double)angle)));
+        outputPoint.x = (float)((double)center.x + (double)dist * Math.cos(Math.toRadians(angle)));
+        outputPoint.y = (float)((double)center.y + (double)dist * Math.sin(Math.toRadians(angle)));
     }
 
     public float distanceToCenter(float x, float y) {
@@ -223,7 +224,7 @@ public abstract class PieRadarChartBase<T extends ChartData<? extends IDataSet<?
             yDist = c.y - y;
         }
 
-        dist = (float)Math.sqrt(Math.pow((double)xDist, 2.0D) + Math.pow((double)yDist, 2.0D));
+        dist = (float)Math.sqrt(Math.pow(xDist, 2.0D) + Math.pow(yDist, 2.0D));
         MPPointF.recycleInstance(c);
         return dist;
     }
@@ -286,7 +287,7 @@ public abstract class PieRadarChartBase<T extends ChartData<? extends IDataSet<?
     public void spin(int durationmillis, float fromangle, float toangle, Easing.EasingFunction easing) {
         this.setRotationAngle(fromangle);
         ObjectAnimator spinAnimator = ObjectAnimator.ofFloat(this, "rotationAngle", fromangle, toangle);
-        spinAnimator.setDuration((long)durationmillis);
+        spinAnimator.setDuration(durationmillis);
         spinAnimator.setInterpolator(easing);
         spinAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {

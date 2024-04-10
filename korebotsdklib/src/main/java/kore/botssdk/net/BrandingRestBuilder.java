@@ -15,7 +15,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
-import kore.botssdk.ssl.SSLHelper;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -27,7 +26,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class BrandingRestBuilder {
 
     private static RestAPI restAPI;
-    private static Context mContext;
 
     private BrandingRestBuilder(){}
 
@@ -45,44 +43,6 @@ public class BrandingRestBuilder {
         return restAPI;
     }
 
-    public static void setContext(Context context)
-    {
-        mContext = context;
-    }
-
-
-    private static OkHttpClient getClient(){
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(1);
-
-        if(SDKConfiguration.SSLConfig.isSSLEnable)
-        {
-            return new OkHttpClient.Builder()
-                    .connectTimeout(60, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(interceptor)
-                    .dispatcher(dispatcher)
-                    .sslSocketFactory(SSLHelper.getSSLContextWithCertificate(mContext, SDKConfiguration.Server.Branding_SERVER_URL).getSocketFactory(), SSLHelper.systemDefaultTrustManager())
-                    //.interceptors(KoreRequestInterceptor.getInstance(getApplicationContext()))
-                    //.authenticator(new KoraRequestAuthenticator(KORestBuilder.mContext))
-                    .build();
-        }
-        else
-        {
-            return new OkHttpClient.Builder()
-                    .connectTimeout(60, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .addInterceptor(interceptor)
-                    .dispatcher(dispatcher)
-                    //.interceptors(KoreRequestInterceptor.getInstance(getApplicationContext()))
-                    //.authenticator(new KoraRequestAuthenticator(KORestBuilder.mContext))
-                    .build();
-        }
-    }
-
     public static RestAPI getPDfAPI(){
 //        if(restAPI == null) {
         restAPI = new Retrofit.Builder()
@@ -94,6 +54,43 @@ public class BrandingRestBuilder {
                 .build().create(RestAPI.class);
 //        }
         return restAPI;
+    }
+
+    public static void setContext(Context context)
+    {
+    }
+
+
+    private static OkHttpClient getClient(){
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        Dispatcher dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(1);
+
+//        if(SDKConfiguration.SSLConfig.isSSLEnable)
+//        {
+//            return new OkHttpClient.Builder()
+//                    .connectTimeout(60, TimeUnit.SECONDS)
+//                    .readTimeout(60, TimeUnit.SECONDS)
+//                    .addInterceptor(interceptor)
+//                    .dispatcher(dispatcher)
+//                    .sslSocketFactory(SSLHelper.getSSLContextWithCertificate(mContext, SDKConfiguration.Server.Branding_SERVER_URL).getSocketFactory(), SSLHelper.systemDefaultTrustManager())
+//                    //.interceptors(KoreRequestInterceptor.getInstance(getApplicationContext()))
+//                    //.authenticator(new KoraRequestAuthenticator(KORestBuilder.mContext))
+//                    .build();
+//        }
+//        else
+//        {
+            return new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(interceptor)
+                    .dispatcher(dispatcher)
+                    //.interceptors(KoreRequestInterceptor.getInstance(getApplicationContext()))
+                    //.authenticator(new KoraRequestAuthenticator(KORestBuilder.mContext))
+                    .build();
+//        }
     }
 
     private static GsonConverterFactory createConverter() {
@@ -110,7 +107,7 @@ public class BrandingRestBuilder {
         public Object deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws com.google.gson.JsonParseException {
             boolean value;
             try {
-                value = json.getAsInt() > 0 ? true : false;
+                value = json.getAsInt() > 0;
             } catch (NumberFormatException ex) {
                 value = json.getAsBoolean();
             }

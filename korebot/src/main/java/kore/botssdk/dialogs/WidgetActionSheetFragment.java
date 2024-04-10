@@ -50,10 +50,9 @@ public class WidgetActionSheetFragment extends BottomSheetDialogFragment {
                 false);
         recycler_actions = view.findViewById(R.id.recycler_actions);
         recycler_actions.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recycler_actions.setHasFixedSize(true);
 
 
-        WidgetSelectActionsAdapter adapter = new WidgetSelectActionsAdapter((Activity) getActivity(), this,
+        WidgetSelectActionsAdapter adapter = new WidgetSelectActionsAdapter(getActivity(), this,
                 model, isFromFullView,verticalListViewActionHelper,skillName,trigger,isFromListMenu);
         recycler_actions.setAdapter(adapter);
 
@@ -71,7 +70,7 @@ public class WidgetActionSheetFragment extends BottomSheetDialogFragment {
             @Override
             public void onShow(DialogInterface dialogInterface) {
                 BottomSheetDialog d = (BottomSheetDialog) dialogInterface;
-                FrameLayout bottomSheet = (FrameLayout) d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+                FrameLayout bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
 
                 // Right here!
                 BottomSheetBehavior.from(bottomSheet)

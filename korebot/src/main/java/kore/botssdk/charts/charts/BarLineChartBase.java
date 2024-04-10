@@ -35,6 +35,7 @@ import kore.botssdk.charts.utils.MPPointD;
 import kore.botssdk.charts.utils.MPPointF;
 import kore.botssdk.charts.utils.Transformer;
 import kore.botssdk.charts.utils.Utils;
+import kore.botssdk.utils.LogUtils;
 
 @SuppressLint({"RtlHardcoded"})
 public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<? extends IBarLineScatterCandleBubbleDataSet<? extends Entry>>> extends Chart<T> implements BarLineScatterCandleBubbleDataProvider {
@@ -65,13 +66,13 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
     private long totalTime = 0L;
     private long drawCycles = 0L;
     private final RectF mOffsetsBuffer = new RectF();
-    protected Matrix mZoomMatrixBuffer = new Matrix();
-    protected Matrix mFitScreenMatrixBuffer = new Matrix();
+    protected final Matrix mZoomMatrixBuffer = new Matrix();
+    protected final Matrix mFitScreenMatrixBuffer = new Matrix();
     private boolean mCustomViewPortEnabled = false;
-    protected float[] mGetPositionBuffer = new float[2];
-    protected MPPointD posForGetLowestVisibleX = MPPointD.getInstance(0.0D, 0.0D);
-    protected MPPointD posForGetHighestVisibleX = MPPointD.getInstance(0.0D, 0.0D);
-    protected float[] mOnSizeChangedBuffer = new float[2];
+    protected final float[] mGetPositionBuffer = new float[2];
+    protected final MPPointD posForGetLowestVisibleX = MPPointD.getInstance(0.0D, 0.0D);
+    protected final MPPointD posForGetHighestVisibleX = MPPointD.getInstance(0.0D, 0.0D);
+    protected final float[] mOnSizeChangedBuffer = new float[2];
 
     public BarLineChartBase(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -206,7 +207,7 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
                 this.totalTime += drawtime;
                 ++this.drawCycles;
                 long average = this.totalTime / this.drawCycles;
-                Log.i("MPAndroidChart", "Drawtime: " + drawtime + " ms, average: " + average + " ms, cycles: " + this.drawCycles);
+                LogUtils.i("MPAndroidChart", "Drawtime: " + drawtime + " ms, average: " + average + " ms, cycles: " + this.drawCycles);
             }
 
         }
@@ -219,7 +220,7 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     protected void prepareValuePxMatrix() {
         if (this.mLogEnabled) {
-            Log.i("MPAndroidChart", "Preparing Value-Px Matrix, xmin: " + this.mXAxis.mAxisMinimum + ", xmax: " + this.mXAxis.mAxisMaximum + ", xdelta: " + this.mXAxis.mAxisRange);
+            LogUtils.i("MPAndroidChart", "Preparing Value-Px Matrix, xmin: " + this.mXAxis.mAxisMinimum + ", xmax: " + this.mXAxis.mAxisMaximum + ", xdelta: " + this.mXAxis.mAxisRange);
         }
 
         this.mRightAxisTransformer.prepareMatrixValuePx(this.mXAxis.mAxisMinimum, this.mXAxis.mAxisRange, this.mAxisRight.mAxisRange, this.mAxisRight.mAxisMinimum);
@@ -234,12 +235,12 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
     public void notifyDataSetChanged() {
         if (this.mData == null) {
             if (this.mLogEnabled) {
-                Log.i("MPAndroidChart", "Preparing... DATA NOT SET.");
+                LogUtils.i("MPAndroidChart", "Preparing... DATA NOT SET.");
             }
 
         } else {
             if (this.mLogEnabled) {
-                Log.i("MPAndroidChart", "Preparing...");
+                LogUtils.i("MPAndroidChart", "Preparing...");
             }
 
             if (this.mRenderer != null) {
@@ -261,23 +262,23 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
     protected void autoScale() {
         float fromX = this.getLowestVisibleX();
         float toX = this.getHighestVisibleX();
-        ((BarLineScatterCandleBubbleData)this.mData).calcMinMaxY(fromX, toX);
-        this.mXAxis.calculate(((BarLineScatterCandleBubbleData)this.mData).getXMin(), ((BarLineScatterCandleBubbleData)this.mData).getXMax());
+        this.mData.calcMinMaxY(fromX, toX);
+        this.mXAxis.calculate(this.mData.getXMin(), this.mData.getXMax());
         if (this.mAxisLeft.isEnabled()) {
-            this.mAxisLeft.calculate(((BarLineScatterCandleBubbleData)this.mData).getYMin(YAxis.AxisDependency.LEFT), ((BarLineScatterCandleBubbleData)this.mData).getYMax(YAxis.AxisDependency.LEFT));
+            this.mAxisLeft.calculate(this.mData.getYMin(YAxis.AxisDependency.LEFT), this.mData.getYMax(YAxis.AxisDependency.LEFT));
         }
 
         if (this.mAxisRight.isEnabled()) {
-            this.mAxisRight.calculate(((BarLineScatterCandleBubbleData)this.mData).getYMin(YAxis.AxisDependency.RIGHT), ((BarLineScatterCandleBubbleData)this.mData).getYMax(YAxis.AxisDependency.RIGHT));
+            this.mAxisRight.calculate(this.mData.getYMin(YAxis.AxisDependency.RIGHT), this.mData.getYMax(YAxis.AxisDependency.RIGHT));
         }
 
         this.calculateOffsets();
     }
 
     protected void calcMinMax() {
-        this.mXAxis.calculate(((BarLineScatterCandleBubbleData)this.mData).getXMin(), ((BarLineScatterCandleBubbleData)this.mData).getXMax());
-        this.mAxisLeft.calculate(((BarLineScatterCandleBubbleData)this.mData).getYMin(YAxis.AxisDependency.LEFT), ((BarLineScatterCandleBubbleData)this.mData).getYMax(YAxis.AxisDependency.LEFT));
-        this.mAxisRight.calculate(((BarLineScatterCandleBubbleData)this.mData).getYMin(YAxis.AxisDependency.RIGHT), ((BarLineScatterCandleBubbleData)this.mData).getYMax(YAxis.AxisDependency.RIGHT));
+        this.mXAxis.calculate(this.mData.getXMin(), this.mData.getXMax());
+        this.mAxisLeft.calculate(this.mData.getYMin(YAxis.AxisDependency.LEFT), this.mData.getYMax(YAxis.AxisDependency.LEFT));
+        this.mAxisRight.calculate(this.mData.getYMin(YAxis.AxisDependency.RIGHT), this.mData.getYMax(YAxis.AxisDependency.RIGHT));
     }
 
     protected void calculateLegendOffsets(RectF offsets) {
@@ -358,8 +359,8 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
             xLabelHeight = Utils.convertDpToPixel(this.mMinOffset);
             this.mViewPortHandler.restrainViewPort(Math.max(xLabelHeight, offsetLeft), Math.max(xLabelHeight, offsetTop), Math.max(xLabelHeight, offsetRight), Math.max(xLabelHeight, offsetBottom));
             if (this.mLogEnabled) {
-                Log.i("MPAndroidChart", "offsetLeft: " + offsetLeft + ", offsetTop: " + offsetTop + ", offsetRight: " + offsetRight + ", offsetBottom: " + offsetBottom);
-                Log.i("MPAndroidChart", "Content: " + this.mViewPortHandler.getContentRect().toString());
+                LogUtils.i("MPAndroidChart", "offsetLeft: " + offsetLeft + ", offsetTop: " + offsetTop + ", offsetRight: " + offsetRight + ", offsetBottom: " + offsetBottom);
+                LogUtils.i("MPAndroidChart", "Content: " + this.mViewPortHandler.getContentRect().toString());
             }
         }
 
@@ -442,7 +443,6 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         this.mViewPortHandler.refresh(save, this, false);
     }
 
-    @TargetApi(11)
     public void zoomAndCenterAnimated(float scaleX, float scaleY, float xValue, float yValue, YAxis.AxisDependency axis, long duration) {
         MPPointD origin = this.getValuesByTouchPoint(this.mViewPortHandler.contentLeft(), this.mViewPortHandler.contentTop(), axis);
         Runnable job = AnimatedZoomJob.getInstance(this.mViewPortHandler, this, this.getTransformer(axis), this.getAxis(axis), this.mXAxis.mAxisRange, scaleX, scaleY, this.mViewPortHandler.getScaleX(), this.mViewPortHandler.getScaleY(), xValue, yValue, (float)origin.x, (float)origin.y, duration);
@@ -506,7 +506,6 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         this.addViewportJob(job);
     }
 
-    @TargetApi(11)
     public void moveViewToAnimated(float xValue, float yValue, YAxis.AxisDependency axis, long duration) {
         MPPointD bounds = this.getValuesByTouchPoint(this.mViewPortHandler.contentLeft(), this.mViewPortHandler.contentTop(), axis);
         float yInView = this.getAxisRange(axis) / this.mViewPortHandler.getScaleY();
@@ -528,7 +527,6 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         this.addViewportJob(job);
     }
 
-    @TargetApi(11)
     public void centerViewToAnimated(float xValue, float yValue, YAxis.AxisDependency axis, long duration) {
         MPPointD bounds = this.getValuesByTouchPoint(this.mViewPortHandler.contentLeft(), this.mViewPortHandler.contentTop(), axis);
         float yInView = this.getAxisRange(axis) / this.mViewPortHandler.getScaleY();
@@ -711,7 +709,7 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     public Entry getEntryByTouchPoint(float x, float y) {
         Highlight h = this.getHighlightByTouchPoint(x, y);
-        return h != null ? ((BarLineScatterCandleBubbleData)this.mData).getEntryForHighlight(h) : null;
+        return h != null ? this.mData.getEntryForHighlight(h) : null;
     }
 
     public IBarLineScatterCandleBubbleDataSet getDataSetByTouchPoint(float x, float y) {
@@ -721,13 +719,13 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     public float getLowestVisibleX() {
         this.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(this.mViewPortHandler.contentLeft(), this.mViewPortHandler.contentBottom(), this.posForGetLowestVisibleX);
-        float result = (float)Math.max((double)this.mXAxis.mAxisMinimum, this.posForGetLowestVisibleX.x);
+        float result = (float)Math.max(this.mXAxis.mAxisMinimum, this.posForGetLowestVisibleX.x);
         return result;
     }
 
     public float getHighestVisibleX() {
         this.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(this.mViewPortHandler.contentRight(), this.mViewPortHandler.contentBottom(), this.posForGetHighestVisibleX);
-        float result = (float)Math.min((double)this.mXAxis.mAxisMaximum, this.posForGetHighestVisibleX.x);
+        float result = (float)Math.min(this.mXAxis.mAxisMaximum, this.posForGetHighestVisibleX.x);
         return result;
     }
 
@@ -833,10 +831,8 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     public void setPaint(Paint p, int which) {
         super.setPaint(p, which);
-        switch(which) {
-            case 4:
-                this.mGridBackgroundPaint = p;
-            default:
+        if (which == 4) {
+            this.mGridBackgroundPaint = p;
         }
     }
 
@@ -845,12 +841,10 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         if (p != null) {
             return p;
         } else {
-            switch(which) {
-                case 4:
-                    return this.mGridBackgroundPaint;
-                default:
-                    return null;
+            if (which == 4) {
+                return this.mGridBackgroundPaint;
             }
+            return null;
         }
     }
 

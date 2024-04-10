@@ -75,10 +75,8 @@ public class AdvanceOptionsAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
 
-                if (dataObj.getType().equalsIgnoreCase("radio"))
-                    setChecked(position);
-                else
-                    dataObj.setChecked(!dataObj.isChecked());
+                if (dataObj.getType().equalsIgnoreCase("radio")) setChecked(position);
+                else dataObj.setChecked(!dataObj.isChecked());
 
                 notifyDataSetChanged();
             }
@@ -88,10 +86,8 @@ public class AdvanceOptionsAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
 
-                if (dataObj.getType().equalsIgnoreCase("radio"))
-                    setChecked(position);
-                else
-                    dataObj.setChecked(!dataObj.isChecked());
+                if (dataObj.getType().equalsIgnoreCase("radio")) setChecked(position);
+                else dataObj.setChecked(!dataObj.isChecked());
 
                 notifyDataSetChanged();
             }
@@ -100,8 +96,7 @@ public class AdvanceOptionsAdapter extends BaseAdapter {
         if (dataObj.getType().equalsIgnoreCase("radio")) {
             holder.ivOptions.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_check_off));
 
-            if (dataObj.isChecked())
-                holder.ivOptions.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_check_on));
+            if (dataObj.isChecked()) holder.ivOptions.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_check_on));
         } else {
             holder.ivOptions.setBackground(ContextCompat.getDrawable(context, R.mipmap.multi_un_checked_checkbox));
 
@@ -120,8 +115,7 @@ public class AdvanceOptionsAdapter extends BaseAdapter {
         while (i < contentModels.size()) {
             contentModels.get(i).setChecked(false);
 
-            if (pos == i)
-                contentModels.get(i).setChecked(true);
+            if (pos == i) contentModels.get(i).setChecked(true);
             i++;
         }
         notifyDataSetChanged();

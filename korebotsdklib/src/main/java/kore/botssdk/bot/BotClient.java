@@ -2,26 +2,28 @@ package kore.botssdk.bot;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import kore.botssdk.models.BotInfoModel;
+import kore.botssdk.models.BotMessageAckModel;
 import kore.botssdk.models.BotSocketOptions;
 import kore.botssdk.net.RestResponse;
+import kore.botssdk.net.SDKConfiguration;
+import kore.botssdk.utils.LogUtils;
 import kore.botssdk.utils.Utils;
 import kore.botssdk.websocket.SocketConnectionListener;
 import kore.botssdk.websocket.SocketWrapper;
 
 /**
- * Created by Ramachandra Pradeep on 6/13/2016.
  * Copyright (c) 2014 Kore Inc. All rights reserved.
  */
 
@@ -168,13 +170,47 @@ public class BotClient {
         if (msg != null && !msg.isEmpty()) {
 
             RestResponse.BotPayLoad botPayLoad = new RestResponse.BotPayLoad();
+
             RestResponse.BotMessage botMessage = new RestResponse.BotMessage(msg);
-            if(customData == null)
-                customData = new RestResponse.BotCustomData();
-            customData.put("botToken",getAccessToken());
+            if(customData != null)
+                customData.put("botToken",getAccessToken());
+
             botMessage.setCustomData(customData);
             botPayLoad.setMessage(botMessage);
             botPayLoad.setBotInfo(botInfoModel);
+
+            RestResponse.Meta meta = new RestResponse.Meta(TimeZone.getDefault().getID(), Locale.getDefault().getISO3Language());
+            botPayLoad.setMeta(meta);
+
+            Gson gson = new Gson();
+            String jsonPayload = gson.toJson(botPayLoad);
+
+            LogUtils.d("BotClient", "Payload : " + jsonPayload);
+            SocketWrapper.getInstance(mContext).sendMessage(jsonPayload);
+//            BotRequestPool.getBotRequestStringArrayList().add(jsonPayload);
+        }
+//        sendQueMessages();
+    }
+
+    public void sendMessage(Object msg) {
+
+        if (msg != null) {
+
+            RestResponse.BotPayLoad botPayLoad = new RestResponse.BotPayLoad();
+            RestResponse.BotMessage botMessage = new RestResponse.BotMessage(msg);
+            customData.put("botToken",getAccessToken());
+            customData.put("rtmType", "mobile");
+
+            botPayLoad.setMessage(botMessage);
+            botPayLoad.setEvent("event");
+
+            if(botInfoModel != null)
+                botPayLoad.setBotInfo(botInfoModel);
+            else
+            {
+                botInfoModel = new BotInfoModel(SDKConfiguration.Client.bot_name,SDKConfiguration.Client.bot_id,customData);
+                botPayLoad.setBotInfo(botInfoModel);
+            }
 
             RestResponse.Meta meta = new RestResponse.Meta(TimeZone.getDefault().getID(), Locale.getDefault().getISO3Language());
             botPayLoad.setMeta(meta);
@@ -221,7 +257,7 @@ public class BotClient {
             Gson gson = new Gson();
             String jsonPayload = gson.toJson(botPayLoad);
 
-            Log.d("BotClient", "Payload : " + jsonPayload);
+            LogUtils.d("BotClient", "Payload : " + jsonPayload);
             SocketWrapper.getInstance(mContext).sendMessage(jsonPayload);
         }
         else if(attachements != null && attachements.size() > 0)
@@ -241,16 +277,29 @@ public class BotClient {
             Gson gson = new Gson();
             String jsonPayload = gson.toJson(botPayLoad);
 
-            Log.d("BotClient", "Payload : " + jsonPayload);
+            LogUtils.d("BotClient", "Payload : " + jsonPayload);
             SocketWrapper.getInstance(mContext).sendMessage(jsonPayload);
         }
 
     }
 
-    public void updateAuthToken(String accessToken){
-        if(customData != null){
-            customData.put("kmToken",accessToken);
-        }
+    /**
+     * Method to send message acknowledgement over socket.
+     * @param timestamp
+     * @param key
+     */
+    public void sendMsgAcknowledgement(String timestamp, String key) {
+        BotMessageAckModel botMessageAckModel = new BotMessageAckModel();
+        botMessageAckModel.setClientMessageId(timestamp);
+        botMessageAckModel.setId(timestamp);
+        botMessageAckModel.setKey(key);
+        botMessageAckModel.setReplyto(timestamp);
+
+        Gson gson = new Gson();
+        String jsonPayload = gson.toJson(botMessageAckModel);
+
+        Log.d("BotClient", "Payload : " + jsonPayload);
+        SocketWrapper.getInstance(mContext).sendMessage(jsonPayload);
     }
 
     public void sendFormData(String payLoad,String message) {
@@ -258,7 +307,8 @@ public class BotClient {
         if (payLoad != null && !payLoad.isEmpty()) {
             RestResponse.BotPayLoad botPayLoad = new RestResponse.BotPayLoad();
             RestResponse.BotMessage botMessage = new RestResponse.BotMessage(payLoad);
-            customData.put("botToken",getAccessToken());
+            if(customData != null)
+                customData.put("botToken",getAccessToken());
             botMessage.setCustomData(customData);
             botMessage.setParams(Utils.jsonToMap(payLoad));
             botPayLoad.setMessage(botMessage);
@@ -270,10 +320,8 @@ public class BotClient {
             Gson gson = new Gson();
             String jsonPayload = gson.toJson(botPayLoad);
 
-            Log.d("BotClient", "Payload : " + jsonPayload);
+            LogUtils.d("BotClient", "Payload : " + jsonPayload);
             SocketWrapper.getInstance(mContext).sendMessage(jsonPayload);
-//            BotRequestPool.getBotRequestStringArrayList().add(jsonPayload);
-//            sendQueMessages();
         }
 
     }

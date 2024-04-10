@@ -41,11 +41,11 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
         if (this.mValues != null && !this.mValues.isEmpty()) {
             this.mYMax = -3.4028235E38F;
             this.mYMin = 3.4028235E38F;
-            int indexFrom = this.getEntryIndex(fromX, 0.0F / 0.0F, DataSet.Rounding.DOWN);
-            int indexTo = this.getEntryIndex(toX, 0.0F / 0.0F, DataSet.Rounding.UP);
+            int indexFrom = this.getEntryIndex(fromX, 0.0F / 0.0F, Rounding.DOWN);
+            int indexTo = this.getEntryIndex(toX, 0.0F / 0.0F, Rounding.UP);
 
             for(int i = indexFrom; i <= indexTo; ++i) {
-                this.calcMinMaxY((T) this.mValues.get(i));
+                this.calcMinMaxY(this.mValues.get(i));
             }
 
         }
@@ -93,9 +93,9 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
         this.notifyDataSetChanged();
     }
 
-    public abstract kore.botssdk.charts.data.DataSet<T> copy();
+    public abstract DataSet<T> copy();
 
-    protected void copy(kore.botssdk.charts.data.DataSet dataSet) {
+    protected void copy(DataSet dataSet) {
         super.copy(dataSet);
     }
 
@@ -104,16 +104,14 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
         buffer.append(this.toSimpleString());
 
         for(int i = 0; i < this.mValues.size(); ++i) {
-            buffer.append(((Entry)this.mValues.get(i)).toString() + " ");
+            buffer.append(this.mValues.get(i).toString() + " ");
         }
 
         return buffer.toString();
     }
 
     public String toSimpleString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("DataSet, label: " + (this.getLabel() == null ? "" : this.getLabel()) + ", entries: " + this.mValues.size() + "\n");
-        return buffer.toString();
+        return "DataSet, label: " + (this.getLabel() == null ? "" : this.getLabel()) + ", entries: " + this.mValues.size() + "\n";
     }
 
     public float getYMin() {
@@ -139,8 +137,8 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
             }
 
             this.calcMinMax(e);
-            if (this.mValues.size() > 0 && ((Entry)this.mValues.get(this.mValues.size() - 1)).getX() > e.getX()) {
-                int closestIndex = this.getEntryIndex(e.getX(), e.getY(), kore.botssdk.charts.data.DataSet.Rounding.UP);
+            if (this.mValues.size() > 0 && this.mValues.get(this.mValues.size() - 1).getX() > e.getX()) {
+                int closestIndex = this.getEntryIndex(e.getX(), e.getY(), Rounding.UP);
                 this.mValues.add(closestIndex, e);
             } else {
                 this.mValues.add(e);
@@ -164,7 +162,7 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
             }
 
             this.calcMinMax(e);
-            return ((List)values).add(e);
+            return values.add(e);
         }
     }
 
@@ -187,20 +185,20 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
         return this.mValues.indexOf(e);
     }
 
-    public T getEntryForXValue(float xValue, float closestToY, kore.botssdk.charts.data.DataSet.Rounding rounding) {
+    public T getEntryForXValue(float xValue, float closestToY, Rounding rounding) {
         int index = this.getEntryIndex(xValue, closestToY, rounding);
-        return index > -1 ? (T) this.mValues.get(index) : null;
+        return index > -1 ? this.mValues.get(index) : null;
     }
 
     public T getEntryForXValue(float xValue, float closestToY) {
-        return this.getEntryForXValue(xValue, closestToY, kore.botssdk.charts.data.DataSet.Rounding.CLOSEST);
+        return this.getEntryForXValue(xValue, closestToY, Rounding.CLOSEST);
     }
 
     public T getEntryForIndex(int index) {
-        return (T) this.mValues.get(index);
+        return this.mValues.get(index);
     }
 
-    public int getEntryIndex(float xValue, float closestToY, kore.botssdk.charts.data.DataSet.Rounding rounding) {
+    public int getEntryIndex(float xValue, float closestToY, Rounding rounding) {
         if (this.mValues != null && !this.mValues.isEmpty()) {
             int low = 0;
             int high = this.mValues.size() - 1;
@@ -209,8 +207,8 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
             float closestYValue;
             for(closest = high; low < high; closest = high) {
                 int m = (low + high) / 2;
-                closestYValue = ((Entry)this.mValues.get(m)).getX() - xValue;
-                float d2 = ((Entry)this.mValues.get(m + 1)).getX() - xValue;
+                closestYValue = this.mValues.get(m).getX() - xValue;
+                float d2 = this.mValues.get(m + 1).getX() - xValue;
                 float ad1 = Math.abs(closestYValue);
                 float ad2 = Math.abs(d2);
                 if (ad2 < ad1) {
@@ -225,21 +223,21 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
             }
 
             if (closest != -1) {
-                float closestXValue = ((Entry)this.mValues.get(closest)).getX();
-                if (rounding == kore.botssdk.charts.data.DataSet.Rounding.UP) {
+                float closestXValue = this.mValues.get(closest).getX();
+                if (rounding == Rounding.UP) {
                     if (closestXValue < xValue && closest < this.mValues.size() - 1) {
                         ++closest;
                     }
-                } else if (rounding == kore.botssdk.charts.data.DataSet.Rounding.DOWN && closestXValue > xValue && closest > 0) {
+                } else if (rounding == Rounding.DOWN && closestXValue > xValue && closest > 0) {
                     --closest;
                 }
 
                 if (!Float.isNaN(closestToY)) {
-                    while(closest > 0 && ((Entry)this.mValues.get(closest - 1)).getX() == closestXValue) {
+                    while(closest > 0 && this.mValues.get(closest - 1).getX() == closestXValue) {
                         --closest;
                     }
 
-                    closestYValue = ((Entry)this.mValues.get(closest)).getY();
+                    closestYValue = this.mValues.get(closest).getY();
                     int closestYIndex = closest;
 
                     while(true) {
@@ -248,7 +246,7 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
                             break;
                         }
 
-                        Entry value = (Entry)this.mValues.get(closest);
+                        Entry value = this.mValues.get(closest);
                         if (value.getX() != closestXValue) {
                             break;
                         }
@@ -276,14 +274,14 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
         while(low <= high) {
             int m = (high + low) / 2;
-            T entry = (T) this.mValues.get(m);
+            T entry = this.mValues.get(m);
             if (xValue == entry.getX()) {
-                while(m > 0 && ((Entry)this.mValues.get(m - 1)).getX() == xValue) {
+                while(m > 0 && this.mValues.get(m - 1).getX() == xValue) {
                     --m;
                 }
 
                 for(high = this.mValues.size(); m < high; ++m) {
-                    entry = (T) this.mValues.get(m);
+                    entry = this.mValues.get(m);
                     if (entry.getX() != xValue) {
                         return entries;
                     }

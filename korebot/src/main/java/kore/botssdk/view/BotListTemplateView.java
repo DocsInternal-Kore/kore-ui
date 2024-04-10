@@ -54,15 +54,15 @@ public class BotListTemplateView extends ViewGroup {
 
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.bot_custom_list, this, true);
-        botCustomListRoot = (LinearLayout) findViewById(R.id.botCustomListRoot);
-        autoExpandListView = (AutoExpandListView) findViewById(R.id.botCustomListView);
-        botCustomListViewButton = (TextView) findViewById(R.id.botCustomListViewButton);
+        botCustomListRoot = findViewById(R.id.botCustomListRoot);
+        autoExpandListView = findViewById(R.id.botCustomListView);
+        botCustomListViewButton = findViewById(R.id.botCustomListViewButton);
         dp1 = (int) DimensionUtil.dp1;
         layoutItemHeight = getResources().getDimension(R.dimen.list_item_view_height);
 
     }
 
-    public void populateListTemplateView(ArrayList<BotListModel> botListModelArrayList, final ArrayList<BotButtonModel> botButtonModelArrayList) {
+    public void populateListTemplateView(ArrayList<BotListModel> botListModelArrayList, final ArrayList<BotButtonModel> botButtonModelArrayList, boolean isEnabled) {
 
 
         if (botListModelArrayList != null && botListModelArrayList.size() > 0) {
@@ -75,6 +75,8 @@ public class BotListTemplateView extends ViewGroup {
             } else {
                 botListTemplateAdapter = (BotListTemplateAdapter) autoExpandListView.getAdapter();
             }
+
+            botListTemplateAdapter.setEnabled(isEnabled);
             botListTemplateAdapter.setBotListModelArrayList(botListModelArrayList);
             botListTemplateAdapter.notifyDataSetChanged();
             botCustomListRoot.setVisibility(VISIBLE);

@@ -7,10 +7,11 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -25,75 +26,52 @@ import kore.botssdk.view.viewUtils.DimensionUtil;
 /**
  * Created by Anil Kumar on 12/1/2016.
  */
-public class BotButtonTemplateAdapter extends BaseAdapter {
+public class BotButtonTemplateAdapter extends RecyclerView.Adapter<BotButtonTemplateAdapter.ViewHolder> {
     private ArrayList<BotButtonModel> botButtonModels = new ArrayList<>();
-    private LayoutInflater ownLayoutInflater = null;
-    private final String splashColour;
-    private final String disabledColour;
-    private final String textColor;
-    private final String disabledTextColor;
+    private String splashColour, textColor, disabledTextColor;
+    private String disabledColour, type;
     private boolean isEnabled;
-    private final SharedPreferences sharedPreferences;
     private final float dp1;
-    private ComposeFooterInterface composeFooterInterface;
-    private InvokeGenericWebViewInterface invokeGenericWebViewInterface;
+    ComposeFooterInterface composeFooterInterface;
+    InvokeGenericWebViewInterface invokeGenericWebViewInterface;
+    private final Context context;
 
-    public BotButtonTemplateAdapter(Context context)
+    public BotButtonTemplateAdapter(Context context, String type)
     {
-        ownLayoutInflater = LayoutInflater.from(context);
-        sharedPreferences = context.getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
+        this.context = context;
+        this.type = type;
 
+        SharedPreferences sharedPreferences = context.getSharedPreferences(BotResponse.THEME_NAME, Context.MODE_PRIVATE);
         splashColour = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.colorPrimary));
         disabledColour = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.meetingsDisabled));
         textColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.white));
         disabledTextColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.white));
-
-//        splashColour = sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_BG_COLOR, splashColour);
-//        disabledColour = sharedPreferences.getString(BotResponse.BUTTON_INACTIVE_BG_COLOR, disabledColour);
-//        textColor = sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_TXT_COLOR, textColor);
-//        disabledTextColor = sharedPreferences.getString(BotResponse.BUTTON_INACTIVE_TXT_COLOR, disabledTextColor);
-
+        splashColour = sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_BG_COLOR, splashColour);
+        disabledColour = sharedPreferences.getString(BotResponse.BUTTON_INACTIVE_BG_COLOR, disabledColour);
+        textColor = sharedPreferences.getString(BotResponse.BUTTON_ACTIVE_TXT_COLOR, textColor);
+        disabledTextColor = sharedPreferences.getString(BotResponse.BUTTON_INACTIVE_TXT_COLOR, disabledTextColor);
         dp1 = DimensionUtil.dp1;
     }
 
+    @NonNull
     @Override
-    public int getCount() {
-        if (botButtonModels != null) {
-            return botButtonModels.size();
-        } else {
-            return 0;
-        }
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View convertView;
+
+        if(type.equalsIgnoreCase(BotResponse.TEMPLATE_TYPE_LIST))
+            convertView = LayoutInflater.from(context).inflate(R.layout.button_view_cell_full, parent, false);
+        else
+            convertView = LayoutInflater.from(context).inflate(R.layout.meeting_slot_button, parent, false);
+        return new ViewHolder(convertView);
     }
 
     @Override
-    public BotButtonModel getItem(int position) {
-        return botButtonModels.get(position);
-    }
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        BotButtonModel buttonTemplate = botButtonModels.get(position);
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        if (convertView == null) {
-            convertView = ownLayoutInflater.inflate(R.layout.meeting_slot_button, null);
-        }
-
-        if (convertView.getTag() == null) {
-            initializeViewHolder(convertView);
-        }
-
-        ViewHolder holder = (ViewHolder) convertView.getTag();
-        populateView(holder, position);
-
-        return convertView;
-    }
-
-    private void populateView(ViewHolder holder, int position) {
-        BotButtonModel buttonTemplate = getItem(position);
+        ((GradientDrawable) holder.botItemButton.getBackground()).setColor(isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
+        ((GradientDrawable) holder.botItemButton.getBackground()).setStroke((int)(2*dp1), isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
+        holder.botItemButton.setTextColor(isEnabled ? Color.parseColor(textColor) : Color.parseColor(disabledTextColor));
 
         holder.botItemButton.setText(buttonTemplate.getTitle());
 
@@ -121,6 +99,20 @@ public class BotButtonTemplateAdapter extends BaseAdapter {
         });
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemCount() {
+        if (botButtonModels != null) {
+            return botButtonModels.size();
+        } else {
+            return 0;
+        }
+    }
+
     public void setComposeFooterInterface(ComposeFooterInterface composeFooterInterface) {
         this.composeFooterInterface = composeFooterInterface;
     }
@@ -137,18 +129,14 @@ public class BotButtonTemplateAdapter extends BaseAdapter {
         isEnabled = enabled;
     }
 
-    public static class ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView botItemButton;
-    }
 
-    private void initializeViewHolder(View view) {
-        ViewHolder viewHolder = new ViewHolder();
-        viewHolder.botItemButton = (TextView) view.findViewById(R.id.text_view);
-
-//        ((GradientDrawable) viewHolder.botItemButton.getBackground()).setColor(isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
-        ((GradientDrawable) viewHolder.botItemButton.getBackground()).setStroke((int)(2*dp1), isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
-        viewHolder.botItemButton.setTextColor(isEnabled ? Color.parseColor(splashColour) : Color.parseColor(disabledColour));
-        view.setTag(viewHolder);
+        public ViewHolder(View view)
+        {
+            super(view);
+            botItemButton = view.findViewById(R.id.text_view);
+        }
     }
 
     public void setBotButtonModels(ArrayList<BotButtonModel> botButtonModels) {

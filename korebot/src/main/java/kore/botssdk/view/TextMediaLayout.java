@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -16,7 +15,6 @@ import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +22,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.text.HtmlCompat;
 
 import com.emojione.tools.Client;
 import com.google.gson.Gson;
@@ -39,8 +39,11 @@ import kore.botssdk.events.EntityEditEvent;
 import kore.botssdk.events.ProfileColorUpdateEvent;
 import kore.botssdk.models.BotResponse;
 import kore.botssdk.models.EntityEditModel;
+import kore.botssdk.net.SDKConfiguration;
 import kore.botssdk.utils.BubbleConstants;
+import kore.botssdk.utils.BundleConstants;
 import kore.botssdk.utils.KaFontUtils;
+import kore.botssdk.utils.LogUtils;
 import kore.botssdk.utils.StringUtils;
 import kore.botssdk.utils.markdown.MarkdownImageTagHandler;
 import kore.botssdk.utils.markdown.MarkdownTagHandler;
@@ -55,30 +58,26 @@ import kore.botssdk.view.viewUtils.MeasureUtils;
  */
 public class TextMediaLayout extends ViewGroup {
 
-    private TextView botContentTextView;
+    TextView botContentTextView;
     private float restrictedLayoutWidth;
     public int gravity = 0;
     public int widthStyle = 0;
-
     float dp1;
     private final Context mContext;
-    //    final String TEXT_COLOR = "#000000";
     private int linkTextColor;
     private Typeface medium, regular;
-    private GradientDrawable rightDrawable, leftDrawable;
-    private int transparency;
+    private GradientDrawable rightDrawable, leftDrawable, arRightDrawable, arLeftDrawable;
     private SharedPreferences sharedPreferences;
     private boolean isClicable;
     private final String REGEX_CHAR = "%%.*?%%";
     private final Gson gson = new Gson();
-    private String leftbgColor, leftTextColor, rightbgColor, rightTextColor, themeName;
+    private String leftTextColor;
+    private String rightTextColor;
+    private String themeName;
+    private String bubble_style = "rounded";
     public boolean isClicable() {
         return isClicable;
     }//
-    private final String REGEX_SIMLEY = ":)";
-    private final String REGEX_THUMSUB = ":thumbsup";
-    private final String REGEX_SAD = ":(";
-
     public void setClicable(boolean clicable) {
         isClicable = clicable;
     }
@@ -105,27 +104,61 @@ public class TextMediaLayout extends ViewGroup {
 
         //Add a textView
         botContentTextView = new LinkifyTextView(getContext());
-
         sharedPreferences = getSharedPreferences();
-        leftbgColor= sharedPreferences.getString(BotResponse.BUBBLE_LEFT_BG_COLOR, "#ffffff");
+        String leftbgColor = sharedPreferences.getString(BotResponse.BUBBLE_LEFT_BG_COLOR, "#ffffff");
         leftTextColor = sharedPreferences.getString(BotResponse.BUBBLE_LEFT_TEXT_COLOR, "#000000");
         rightTextColor = sharedPreferences.getString(BotResponse.BUBBLE_RIGHT_TEXT_COLOR, "#ffffff");
-        rightbgColor= sharedPreferences.getString(BotResponse.BUBBLE_RIGHT_BG_COLOR, "#0078cd");
+        String rightbgColor = sharedPreferences.getString(BotResponse.BUBBLE_RIGHT_BG_COLOR, "#0078cd");
         themeName = sharedPreferences.getString(BotResponse.APPLY_THEME_NAME, BotResponse.THEME_NAME_1);
+        bubble_style = sharedPreferences.getString(BundleConstants.BUBBLE_STYLE, "rounded");
 
-        //Transparency 15%
-        transparency = 0x26000000;
-        rightDrawable = (GradientDrawable) getContext().getResources().getDrawable(R.drawable.theme1_right_bubble_bg);
-        rightDrawable.setColor(Color.parseColor(rightbgColor));
-        rightDrawable.setStroke((int) (1*dp1), Color.parseColor(rightbgColor));
+        rightDrawable = (GradientDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.theme1_right_bubble_bg, getContext().getTheme());
+        leftDrawable = (GradientDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.theme1_left_bubble_bg, getContext().getTheme());
 
-        leftDrawable = (GradientDrawable) getContext().getResources().getDrawable(R.drawable.theme1_left_bubble_bg);
+        arRightDrawable = (GradientDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.theme1_ar_right_bubble_bg, getContext().getTheme());
 
-        if(themeName.equalsIgnoreCase(BotResponse.THEME_NAME_2))
-            leftDrawable = (GradientDrawable) getContext().getResources().getDrawable(R.drawable.theme2_left_bubble);
+        if(arRightDrawable != null) {
+            arRightDrawable.setColor(Color.parseColor(rightbgColor));
+            arRightDrawable.setStroke((int) (1 * dp1), Color.parseColor(rightbgColor));
+        }
 
-        leftDrawable.setColor(Color.parseColor(leftbgColor));
-        leftDrawable.setStroke((int) (1*dp1), Color.parseColor(leftbgColor));
+        arLeftDrawable = (GradientDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.theme1_ar_left_bubble_bg, getContext().getTheme());
+        if(arLeftDrawable != null) {
+            arLeftDrawable.setColor(Color.parseColor(leftbgColor));
+            arLeftDrawable.setStroke((int) (1 * dp1), Color.parseColor(leftbgColor));
+        }
+
+        //1st & 2nd - topLeft, 3rd & 4th - topRight, 5th & 6th - bottomRight 7th & 8th - bottomLeft
+        float[] roundedRadii = { 16 * dp1, 16 * dp1, 16 * dp1, 16 * dp1, 16 * dp1, 16 * dp1, 16 * dp1, 16 * dp1};
+        float[] recRightRadii = { 8 * dp1, 8 * dp1, 2 * dp1, 2 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1};
+        float[] recLeftRadii = { 2 * dp1, 2 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1};
+        float[] balRightRadii = { 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 2 * dp1, 2 * dp1, 8 * dp1, 8 * dp1};
+        float[] balLeftRadii = { 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 8 * dp1, 2 * dp1, 2 * dp1};
+
+        if(rightDrawable != null) {
+            rightDrawable.setColor(Color.parseColor(rightbgColor));
+            rightDrawable.setStroke((int) (1 * dp1), Color.parseColor(rightbgColor));
+
+            if(bubble_style.equalsIgnoreCase(BundleConstants.ROUNDED))
+                rightDrawable.setCornerRadii(roundedRadii);
+            else if(bubble_style.equalsIgnoreCase(BundleConstants.RECTANGLE))
+                rightDrawable.setCornerRadii(recRightRadii);
+            else
+                rightDrawable.setCornerRadii(balRightRadii);
+        }
+
+        if(leftDrawable != null) {
+            leftDrawable.setColor(Color.parseColor(leftbgColor));
+            leftDrawable.setStroke((int) (1 * dp1), Color.parseColor(leftbgColor));
+
+            if(bubble_style.equalsIgnoreCase(BundleConstants.ROUNDED))
+                leftDrawable.setCornerRadii(roundedRadii);
+            else if(bubble_style.equalsIgnoreCase(BundleConstants.RECTANGLE))
+                leftDrawable.setCornerRadii(recLeftRadii);
+            else
+                leftDrawable.setCornerRadii(balLeftRadii);
+        }
+
         RelativeLayout.LayoutParams txtVwParams = new RelativeLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         botContentTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
@@ -137,7 +170,6 @@ public class TextMediaLayout extends ViewGroup {
         botContentTextView.setId(BubbleConstants.TEXTVIEW_ID);
         botContentTextView.setPadding(0, 0, 0, 0);
         botContentTextView.setLinkTextColor(linkTextColor);
-        // KaFontUtils.setCustomTypeface(botContentTextView,KaFontUtils.ROBOTO_REGULAR, getContext());
         botContentTextView.setFocusable(false);
         botContentTextView.setClickable(false);
         botContentTextView.setLongClickable(false);
@@ -152,9 +184,8 @@ public class TextMediaLayout extends ViewGroup {
     }
 
     public void onEvent(ProfileColorUpdateEvent event){
-//        rightDrawable.setColor(Color.parseColor(SDKConfiguration.BubbleColors.getProfileColor())+transparency);
-//        rightDrawable.setStroke((int) (1*dp1), Color.parseColor(SDKConfiguration.BubbleColors.getProfileColor())+transparency);
     }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -166,9 +197,6 @@ public class TextMediaLayout extends ViewGroup {
         super.onDetachedFromWindow();
         KoreEventCenter.unregister(this);
     }
-    /*public void startup(String messageBody) {
-        populateText(messageBody);
-    }*/
 
     private String getRemovedEntityEditString(String _str){
         String str = _str.replaceAll(REGEX_CHAR,"");
@@ -188,7 +216,7 @@ public class TextMediaLayout extends ViewGroup {
 
             String replaceText = str.substring(_start,_end);
             String _payload = replaceText.substring(2,replaceText.length()-2);
-            Log.d("!@#$% getReqText(", _payload);
+            LogUtils.d("!@#$% getReqText(", _payload);
             _payload = _payload.substring(_payload.indexOf("{"));
             EntityEditModel model = gson.fromJson(_payload, EntityEditModel.class);
             String addableText = !StringUtils.isNullOrEmpty(model.getTitle())?model.getTitle().trim():"";
@@ -201,12 +229,9 @@ public class TextMediaLayout extends ViewGroup {
     public void populateText(String textualContent) {
         if (textualContent != null && !textualContent.isEmpty()) {
             textualContent = unescapeHtml4(textualContent.trim());
-            /*if(gravity != BubbleConstants.GRAVITY_LEFT) {
-                textualContent = "\"" + textualContent + "\"";
-            }*/
             textualContent = StringUtils.unescapeHtml3(textualContent.trim());
             textualContent = MarkdownUtil.processMarkDown(textualContent);
-            CharSequence sequence = Html.fromHtml(textualContent.replace("\n", "<br />"),
+            CharSequence sequence = HtmlCompat.fromHtml(textualContent.replace("\n", "<br />"), HtmlCompat.FROM_HTML_MODE_LEGACY,
                     new MarkdownImageTagHandler(mContext, botContentTextView, textualContent), new MarkdownTagHandler());
             SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
             URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
@@ -221,9 +246,9 @@ public class TextMediaLayout extends ViewGroup {
             boolean isPencilSpanClick = false;
 
             if(textualContent.indexOf("%%{")>0){
-                Log.d("!@#$% BEFORE ", textualContent);// munduki%%{} %%
+                LogUtils.d("!@#$% BEFORE ", textualContent);// munduki%%{} %%
                 textualContent = getReqText(textualContent);
-                Log.d("!@#$% AFTER ", textualContent);
+                LogUtils.d("!@#$% AFTER ", textualContent);
                 strBuilder = new SpannableStringBuilder(textualContent);
             }
             Matcher matcher = pattern.matcher(textualContent);
@@ -237,7 +262,7 @@ public class TextMediaLayout extends ViewGroup {
                 String reqText = textualContent.substring(_start+2, _end-2);
                 reqText = reqText.substring(reqText.indexOf("{"));
 
-                Log.d("!@#$% REQ_TEXT while", reqText);
+                LogUtils.d("!@#$% REQ_TEXT while", reqText);
 
                 EntityEditModel model = gson.fromJson(reqText, EntityEditModel.class);
                 String addableText = !StringUtils.isNullOrEmpty(model.getTitle())?model.getTitle().trim():"";
@@ -255,7 +280,6 @@ public class TextMediaLayout extends ViewGroup {
                 }
 
                 int dashStart = _start - addableTextLength /*- iconLength*/;
-                int dashEnd = _start;
 
                 final SpannableStringBuilder finalStrBuilder = strBuilder;
                 final String finalReqText = reqText;
@@ -273,16 +297,17 @@ public class TextMediaLayout extends ViewGroup {
                         }
                     }
                 };
-                strBuilder.setSpan(clickable, dashStart,dashEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                strBuilder.setSpan(clickable, dashStart, _start, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 
             if(leftTextColor != null)
             {
                 botContentTextView.setTextColor(Color.parseColor(leftTextColor));
                 themeName = getSharedPreferences().getString(BotResponse.APPLY_THEME_NAME, BotResponse.THEME_NAME_1);
-                leftDrawable = (GradientDrawable) getContext().getResources().getDrawable(R.drawable.theme1_left_bubble_bg);
+                leftDrawable = (GradientDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.theme1_left_bubble_bg, getContext().getTheme());
+
                 if(themeName.equalsIgnoreCase(BotResponse.THEME_NAME_2))
-                    leftDrawable = (GradientDrawable) getContext().getResources().getDrawable(R.drawable.theme2_left_bubble);
+                    leftDrawable = (GradientDrawable) ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.theme2_left_bubble, getContext().getTheme());
 
                 botContentTextView.setBackground(leftDrawable);
             }
@@ -290,6 +315,9 @@ public class TextMediaLayout extends ViewGroup {
             if(isPencilSpanClick && !isClicable()){
                 botContentTextView.setText(getRemovedEntityEditString(strBuilder.toString()));
             }else{
+                String REGEX_SIMLEY = ":)";
+                String REGEX_THUMSUB = ":thumbsup";
+                String REGEX_SAD = ":(";
                 if(strBuilder.toString().contains(REGEX_SIMLEY))
                 {
                     botContentTextView.setText(strBuilder);
@@ -398,11 +426,8 @@ public class TextMediaLayout extends ViewGroup {
         if (textualContent != null && !textualContent.isEmpty())
         {
             textualContent = unescapeHtml4(textualContent.trim());
-            /*if(gravity != BubbleConstants.GRAVITY_LEFT) {
-                textualContent = "\"" + textualContent + "\"";
-            }*/
             textualContent = StringUtils.unescapeHtml3(textualContent.trim());
-            CharSequence sequence = Html.fromHtml(textualContent.replace("\n", "<br />"),
+            CharSequence sequence = HtmlCompat.fromHtml(textualContent.replace("\n", "<br />"), HtmlCompat.FROM_HTML_MODE_LEGACY,
                     new MarkdownImageTagHandler(mContext, botContentTextView, textualContent), new MarkdownTagHandler());
             SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
             URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
@@ -427,9 +452,6 @@ public class TextMediaLayout extends ViewGroup {
     public void populateErrorText(String textualContent, String color) {
         if (textualContent != null && !textualContent.isEmpty()) {
             textualContent = unescapeHtml4(textualContent.trim());
-            /*if(gravity != BubbleConstants.GRAVITY_LEFT) {
-                textualContent = "\"" + textualContent + "\"";
-            }*/
             SpannableStringBuilder strBuilder = new SpannableStringBuilder(textualContent);
             URLSpan[] urls = strBuilder.getSpans(0, textualContent.length(), URLSpan.class);
 
@@ -448,15 +470,30 @@ public class TextMediaLayout extends ViewGroup {
     }
 
     public void setGravityAndTypeFace(){
-        if (gravity == BubbleConstants.GRAVITY_LEFT) {
-            //   botContentTextView.setGravity(Gravity.START);
-            botContentTextView.setTypeface(medium);
-            botContentTextView.setBackground(leftDrawable);
-        } else {
-            // botContentTextView.setGravity(Gravity.END);
-            botContentTextView.setTypeface(regular);
-            botContentTextView.setBackground(rightDrawable);
+        if(SDKConfiguration.BubbleColors.isArabic)
+        {
+            if(gravity != BubbleConstants.GRAVITY_LEFT)
+                botContentTextView.setBackground(arLeftDrawable);
+            else
+                botContentTextView.setBackground(arRightDrawable);
         }
+        else
+        {
+            if(gravity == BubbleConstants.GRAVITY_LEFT)
+                botContentTextView.setBackground(leftDrawable);
+            else
+                botContentTextView.setBackground(rightDrawable);
+        }
+
+//        if (gravity == BubbleConstants.GRAVITY_LEFT) {
+//            //   botContentTextView.setGravity(Gravity.START);
+//            botContentTextView.setTypeface(medium);
+//            botContentTextView.setBackground(leftDrawable);
+//        } else {
+//            // botContentTextView.setGravity(Gravity.END);
+//            botContentTextView.setTypeface(regular);
+//            botContentTextView.setBackground(rightDrawable);
+//        }
     }
 
     protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span) {
@@ -464,7 +501,7 @@ public class TextMediaLayout extends ViewGroup {
         int end = strBuilder.getSpanEnd(span);
         int flags = strBuilder.getSpanFlags(span);
         ClickableSpan clickable = new ClickableSpan() {
-            public void onClick(View view) {
+            public void onClick(@NonNull View view) {
                 Intent intent = new Intent(getContext(), GenericWebViewActivity.class);
                 intent.putExtra("url", span.getURL());
                 intent.putExtra("header", getResources().getString(R.string.app_name));
@@ -489,10 +526,9 @@ public class TextMediaLayout extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
 
-        int childWidthSpec, childHeightSpec;
-        int wrapSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int childWidthSpec;
+        int wrapSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         int containerWidth = 0;
 
         final int count = getChildCount();
@@ -501,29 +537,23 @@ public class TextMediaLayout extends ViewGroup {
             View child = getChildAt(i);
             int childHeight = 0, childWidth = 0;
 
-            switch (child.getId()) {
-                case BubbleConstants.TEXTVIEW_ID:
-                    childWidthSpec = MeasureSpec.makeMeasureSpec((int) restrictedLayoutWidth, MeasureSpec.UNSPECIFIED);
+            if (child.getId() == BubbleConstants.TEXTVIEW_ID) {
+                childWidthSpec = MeasureSpec.makeMeasureSpec((int) restrictedLayoutWidth, MeasureSpec.UNSPECIFIED);
+                MeasureUtils.measure(child, childWidthSpec, wrapSpec);
+                childWidth = child.getMeasuredWidth();
+                if (childWidth > restrictedLayoutWidth) {
+                    childWidthSpec = MeasureSpec.makeMeasureSpec((int) restrictedLayoutWidth, MeasureSpec.AT_MOST);
                     MeasureUtils.measure(child, childWidthSpec, wrapSpec);
-                    childWidth = child.getMeasuredWidth();
-                    if (childWidth > restrictedLayoutWidth) {
-                        childWidthSpec = MeasureSpec.makeMeasureSpec((int) restrictedLayoutWidth, MeasureSpec.AT_MOST);
-                        MeasureUtils.measure(child, childWidthSpec, wrapSpec);
-                    }
-                    childHeight = child.getMeasuredHeight();
-                    break;
-                default:
-
+                }
+                childHeight = child.getMeasuredHeight();
             }
 
             totalHeight += childHeight;
-            containerWidth = (containerWidth < child.getMeasuredWidth()) ? child.getMeasuredWidth() : containerWidth;
+            containerWidth = Math.max(containerWidth, child.getMeasuredWidth());
         }
 
         if (widthStyle == BubbleConstants.MATCH_PARENT) {
             containerWidth = parentWidth;
-        } else if (widthStyle == BubbleConstants.WRAP_CONTENT) {
-            containerWidth = containerWidth;
         }
 
         int parentHeightSpec = MeasureSpec.makeMeasureSpec(totalHeight, MeasureSpec.EXACTLY);
@@ -536,7 +566,6 @@ public class TextMediaLayout extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
 
         final int count = getChildCount();
-        int parentWidth = getMeasuredWidth();
 
         //get the available size of child view
         int childLeft = this.getPaddingLeft();
@@ -552,11 +581,4 @@ public class TextMediaLayout extends ViewGroup {
         }
     }
 
-    public int getLinkTextColor() {
-        return linkTextColor;
-    }
-
-    public void setLinkTextColor(int linkTextColor) {
-        this.linkTextColor = linkTextColor;
-    }
 }

@@ -20,10 +20,11 @@ import kore.botssdk.charts.utils.HorizontalViewPortHandler;
 import kore.botssdk.charts.utils.MPPointF;
 import kore.botssdk.charts.utils.TransformerHorizontalBarChart;
 import kore.botssdk.charts.utils.Utils;
+import kore.botssdk.utils.LogUtils;
 
 public class HorizontalBarChart extends BarChart {
     private final RectF mOffsetsBuffer = new RectF();
-    protected float[] mGetPositionBuffer = new float[2];
+    protected final float[] mGetPositionBuffer = new float[2];
 
     public HorizontalBarChart(Context context) {
         super(context);
@@ -86,8 +87,8 @@ public class HorizontalBarChart extends BarChart {
         float minOffset = Utils.convertDpToPixel(this.mMinOffset);
         this.mViewPortHandler.restrainViewPort(Math.max(minOffset, offsetLeft), Math.max(minOffset, offsetTop), Math.max(minOffset, offsetRight), Math.max(minOffset, offsetBottom));
         if (this.mLogEnabled) {
-            Log.i("MPAndroidChart", "offsetLeft: " + offsetLeft + ", offsetTop: " + offsetTop + ", offsetRight: " + offsetRight + ", offsetBottom: " + offsetBottom);
-            Log.i("MPAndroidChart", "Content: " + this.mViewPortHandler.getContentRect().toString());
+            LogUtils.i("MPAndroidChart", "offsetLeft: " + offsetLeft + ", offsetTop: " + offsetTop + ", offsetRight: " + offsetRight + ", offsetBottom: " + offsetBottom);
+            LogUtils.i("MPAndroidChart", "Content: " + this.mViewPortHandler.getContentRect().toString());
         }
 
         this.prepareOffsetMatrix();
@@ -104,13 +105,13 @@ public class HorizontalBarChart extends BarChart {
     }
 
     public void getBarBounds(BarEntry e, RectF outputRect) {
-        IBarDataSet set = (IBarDataSet)((BarData)this.mData).getDataSetForEntry(e);
+        IBarDataSet set = this.mData.getDataSetForEntry(e);
         if (set == null) {
             outputRect.set(1.4E-45F, 1.4E-45F, 1.4E-45F, 1.4E-45F);
         } else {
             float y = e.getY();
             float x = e.getX();
-            float barWidth = ((BarData)this.mData).getBarWidth();
+            float barWidth = this.mData.getBarWidth();
             float top = x - barWidth / 2.0F;
             float bottom = x + barWidth / 2.0F;
             float left = y >= 0.0F ? y : 0.0F;
@@ -135,7 +136,7 @@ public class HorizontalBarChart extends BarChart {
     public Highlight getHighlightByTouchPoint(float x, float y) {
         if (this.mData == null) {
             if (this.mLogEnabled) {
-                Log.e("MPAndroidChart", "Can't select by touch. No data set.");
+                LogUtils.e("MPAndroidChart", "Can't select by touch. No data set.");
             }
 
             return null;
@@ -146,13 +147,13 @@ public class HorizontalBarChart extends BarChart {
 
     public float getLowestVisibleX() {
         this.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(this.mViewPortHandler.contentLeft(), this.mViewPortHandler.contentBottom(), this.posForGetLowestVisibleX);
-        float result = (float)Math.max((double)this.mXAxis.mAxisMinimum, this.posForGetLowestVisibleX.y);
+        float result = (float)Math.max(this.mXAxis.mAxisMinimum, this.posForGetLowestVisibleX.y);
         return result;
     }
 
     public float getHighestVisibleX() {
         this.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(this.mViewPortHandler.contentLeft(), this.mViewPortHandler.contentTop(), this.posForGetHighestVisibleX);
-        float result = (float)Math.min((double)this.mXAxis.mAxisMaximum, this.posForGetHighestVisibleX.y);
+        float result = (float)Math.min(this.mXAxis.mAxisMaximum, this.posForGetHighestVisibleX.y);
         return result;
     }
 

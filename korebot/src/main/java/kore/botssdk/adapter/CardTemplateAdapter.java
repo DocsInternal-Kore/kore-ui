@@ -191,7 +191,8 @@ public class CardTemplateAdapter extends RecyclerView.Adapter<CardTemplateAdapte
                         ImageView ivDropDownCLose = popUpView.findViewById(R.id.ivDropDownCLose);
 
                         recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-                        AdvanceListButtonAdapter advanceListButtonAdapter = new AdvanceListButtonAdapter(context, headerOptions.getDropdownOptions(), BundleConstants.FULL_WIDTH, CardTemplateAdapter.this, null, null);
+                        AdvanceListButtonAdapter advanceListButtonAdapter = new AdvanceListButtonAdapter(context, headerOptions.getDropdownOptions(), CardTemplateAdapter.this, null, null);
+                        advanceListButtonAdapter.setType(BundleConstants.FULL_WIDTH);
                         recyclerView.setAdapter(advanceListButtonAdapter);
                         ivDropDownCLose.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -428,12 +429,12 @@ public class CardTemplateAdapter extends RecyclerView.Adapter<CardTemplateAdapte
     }
 
     public static class CardViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView bot_list_item_image, ivheaderExtra;
-        private final TextView bot_list_item_title, bot_list_item_subtitle, tvOnlyTitle, tvCardButton, tvheaderExtraTitle;
-        private final RelativeLayout rlTitle;
-        private final RecyclerView rvDescription;
-        private final LinearLayout llCardView, llCardViewTop;
-        private final View vBorder;
+        final ImageView bot_list_item_image, ivheaderExtra;
+        final TextView bot_list_item_title, bot_list_item_subtitle, tvOnlyTitle, tvCardButton, tvheaderExtraTitle;
+        final RelativeLayout rlTitle;
+        final RecyclerView rvDescription;
+        final LinearLayout llCardView, llCardViewTop;
+        final View vBorder;
 
         public CardViewHolder(@NonNull View itemView) {
             super(itemView);

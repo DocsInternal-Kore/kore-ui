@@ -54,8 +54,8 @@ public class BarEntry extends Entry {
         this.calcRanges();
     }
 
-    public kore.botssdk.charts.data.BarEntry copy() {
-        kore.botssdk.charts.data.BarEntry copied = new kore.botssdk.charts.data.BarEntry(this.getX(), this.getY(), this.getData());
+    public BarEntry copy() {
+        BarEntry copied = new BarEntry(this.getX(), this.getY(), this.getData());
         copied.setVals(this.mYVals);
         return copied;
     }

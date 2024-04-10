@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import kore.botssdk.R;
 import kore.botssdk.adapter.LiveSearchCyclerAdapter;
 import kore.botssdk.adapter.SearchCentralPanelAdapter;
+import kore.botssdk.application.AppControl;
 import kore.botssdk.listener.ComposeFooterInterface;
 import kore.botssdk.listener.InvokeGenericWebViewInterface;
 import kore.botssdk.models.PayloadInner;
